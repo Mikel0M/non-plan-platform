@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>non-plan</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+    <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header id="navigationHeader" style="position: fixed;">
+        <img id="non-plan-logo" src="./assets/non-plan-logo.svg" alt="non-plan">
+        <div style="display: flex;flex-direction: row;column-gap: 10px;">
+            <div class="language-selector">
+                <button class="languageButton" id="languageButton" style="font-size: var(--fontSizeMedium); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -50px;"><span class="material-icons-round">language</span> ▼</button>
+                <ul id="languageMenu" class="hidden">
+                    <li data-lang="en">EN</li>
+                    <li data-lang="de">DE</li>
+                </ul>
+            </div>
+            <button id="logINBtn" class="buttonTertiary" style="font-size: var(--fontSizeMedium); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -50px;">LOG IN</button>
+        </div>     
+    </header>
+    <div>
+        <section class="page" id="intro" style="width: 100%; position: absolute; display: flex; flex-direction: column; row-gap: 20px; text-align: center;padding-top: 50px;">
+            <h1 style="margin-top: 20px;font-size: var(--fontSizeGiantXXL);" data-lang="start_welcome">Welcome to non-plan</h1>
+        
+            <!-- First Section: Introduction to the Company -->
+            <div style="display: flex; background-color: var(--background); flex-direction: column;align-items:center; padding: 60px; text-align:left; border-radius: 10px;justify-content: center;">
+                <div style="display: flex; flex-direction: row;align-items:center; column-gap: 60px; justify-content: space-between; width: 100%;">
+                    <div style="flex: 1; background-color: var(--primary-200); aspect-ratio: 2; align-items: start; padding: 30px; text-align: left; border-radius: 30px;">
+                        <h0 style="color: var(--complementary-200); margin-bottom: 20px;" data-lang="start_innovateHeading">Innovating AEC with Digital Solutions</h0>
+                        <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 800px;padding-top: 20px;" data-lang="start_innovateText">
+                            Based in Zurich, non-plan is a leading provider of cutting-edge software solutions tailored to the architecture, engineering, and construction (AEC) industry. Our mission is to enhance the efficiency, accuracy, and creativity of professionals by providing custom-made digital tools that fit seamlessly into their workflows. 
+                            Our services include custom web applications, Python automation scripts, AR-based visualization tools, and much more.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Section: non-plan Platform & non-plan services -->
+            <div style="display: flex; background-color: var(--background-200); flex-direction: column;align-items:center; padding: 60px; text-align:left; border-radius: 10px;justify-content: center;">
+                <div style="display: flex; flex-direction: row;align-items:center; column-gap: 60px; justify-content: space-between; width: 100%;">
+                    <div style="flex: 1; background-color: var(--primary-200); aspect-ratio: 1; align-items: start; padding: 30px; text-align: left; border-radius: 30px;">
+                        <h0 style="color: var(--complementary-200); margin-bottom: 20px;" data-lang="start_introPlatform">Introducing the non-plan Platform</h0>
+                        <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 800px;padding-top: 20px;" data-lang="start_platformText">
+                            The Non-Plan WebApp is designed to simplify and accelerate project management in the AEC industry. It integrates a range of advanced tools to streamline workflows and improve productivity, from project tracking and task management to automated checks and feasibility assessments. Our web app empowers teams to track progress, collaborate seamlessly, and make data-driven decisions faster than ever before. 
+                            The app also includes sophisticated capabilities such as automated plausibility modeling based on location and the generation of new geometries to visualize sustainable building practices.
+                        </p>
+                    </div>
+                    <div style="flex: 1; background-color: var(--complementary-200); aspect-ratio: 1; align-items: start; padding: 30px; text-align: left; border-radius: 30px;row-gap: 30px;">
+                        <h0 style="color: var(--primary-200); margin-bottom: 20px;" data-lang="start_solutionsIntro">Tailored Solutions for AEC Professionals</h0>
+                        <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 800px;padding-top: 20px;" data-lang="start_solutionsText">
+                            At Non-Plan, we don't just build tools – we create solutions that address the unique challenges of the AEC industry. Whether you're working in architecture, engineering, or construction, our services can help optimize your processes. We offer:
+                        </p>
+                        <ul style="font-size: var(--fontSizeBiggest); color: var(--textColor); text-align: left; max-width: 800px;padding-top: 30px;padding-left: 30px;" data-lang="start_solutionsList">
+                            <li>Custom web applications that integrate into your existing workflows.</li>
+                            <li>Grasshopper and Python automation scripts to streamline repetitive tasks.</li>
+                            <li>Advanced BIM and CAD consulting for creating and managing intelligent building models.</li>
+                            <li>Specialized AR tools for visualizing designs and data in immersive environments.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- Third Section: Who We Are -->
+            <div style="display: flex; background-color: transparent; flex-direction: column; row-gap: 20px; align-items: center; padding: 30px; text-align: start; border-radius: 10px;">
+                <h0 style="color: var(--primary-200); margin-bottom: 20px;" data-lang="start_whoTitle">Who We Are</h0>
+                <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 1200px; text-align: start;" data-lang="start_whoText">
+                    At Non-Plan, we are a team of architects, designers, and innovators dedicated to redefining the AEC industry through digital transformation and creative collaboration. 
+                    Our collective expertise bridges the gap between traditional architectural practice and cutting-edge technology, fostering a culture of experimentation and innovation.
+                </p>
+                <!-- Grid Container for Team Members -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, 200px); gap: 30px; justify-content: center; width: 100%; padding: 40px; background-color: transparent; border-radius: 10px;">
+                    <!-- Circle 1 -->
+                    <div style="background-color: white; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <img src="path-to-image1.jpg" alt="Team Member 1" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px;">Katrin</div>
+                    </div>
+
+                    <!-- Circle 2 -->
+                    <div style="background-color: white; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <img src="path-to-image2.jpg" alt="Team Member 2" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px;">Mikel</div>
+                    </div>
+
+                    <!-- Circle 3 -->
+                    <div style="background-color: white; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <img src="path-to-image3.jpg" alt="Team Member 3" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px;"></div>
+                    </div>
+
+                    <!-- Circle 4 -->
+                    <div style="background-color: white; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <img src="path-to-image4.jpg" alt="Team Member 4" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fourth Section: Highlighting Key Projects and Collaborations -->
+            <div style="display: flex; background-color: transparent; flex-direction: column; row-gap: 20px; align-items: center; padding: 30px; text-align:start; border-radius: 10px;">
+                <h0 style="color: var(--primary-200); margin-bottom: 20px; " data-lang="start_projectsTitle">Projects and Collaborations</h0>
+                <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 1200px;justify-content: start;" data-lang="start_projectsText">
+                    Non-Plan is at the forefront of innovation in the AEC sector, with a proven track record of high-profile collaborations. 
+                    We recently represented Liechtenstein at the 2023 Venice Architecture Biennale, showcasing our immersive VR experience that pushed the boundaries of architectural visualization. Our work with OOS AG in Zurich has helped them enhance their design and project management processes with tailored digital solutions.
+                </p>
+                <!-- Grid Container -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, 500px); gap: 30px; justify-content: center; width: 100%; padding: 40px; background-color: transparent; border-radius: 10px;">
+                    <!-- Rectangle 1 -->
+                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
+                        <h1 style="color: var(--complementary-200); margin-bottom: 20px;">Example</h1>
+                    </div>
+
+                    <!-- Rectangle 2 -->
+                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
+                        <h1 style="color: var(--primary-200); margin-bottom: 20px;">Example</h1>
+                    </div>
+
+                    <!-- Rectangle 3 -->
+                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
+                        <h1 style="color: var(--complementary-200); margin-bottom: 20px;">Example</h1>
+                    </div>
+
+                    <!-- Rectangle 4 -->
+                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
+                        <h1 style="color: var(--primary-200); margin-bottom: 20px;">Example</h1>
+                    </div>  
+                    <!-- Rectangle 5 -->
+                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
+                        <h1 style="color: var(--complementary-200); margin-bottom: 20px;">Example</h1>
+                    </div>
+
+                    <!-- Rectangle 6 -->
+                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
+                        <h1 style="color: var(--primary-200); margin-bottom: 20px;">Example</h1>
+                    </div>
+
+                    <!-- Rectangle 7 -->
+                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
+                        <h1 style="color: var(--complementary-200); margin-bottom: 20px;">Example</h1>
+                    </div>
+
+                    <!-- Rectangle 8 -->
+                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
+                        <h1 style="color: var(--primary-200); margin-bottom: 20px;">Example</h1>
+                    </div>
+                </div>
+            </div>
+
+        
+            <!-- Fifth Section: Call to Action for WebApp Login -->
+            <div style="display: flex; background-color: var(--background-100); flex-direction: column; row-gap: 20px; align-items: center; padding: 30px; text-align: left; border-radius: 10px;">
+                <h0 style="color: var(--primary); margin-bottom: 20px; text-align: center;" data-lang="start_accessTitle">Access the non-plan Platform</h0>
+                <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 800px; text-align: justify;" data-lang="start_accessText">
+                    Unlock the full potential of your projects with the Non-Plan WebApp. Our platform offers a wide range of features to streamline your project management, automate workflows, and generate sustainable design solutions. Whether you're a project manager, architect, or contractor, our web application can help you optimize your work processes and make informed decisions. 
+                </p>
+                <button id="logINBtnEnd" class="buttonTertiary" style="font-size: var(--fontSizeBig); display: flex; align-items: center; justify-content: center; border-radius: 45px; width: 300px; height: 45px;" data-lang="start_logIn">Log in to Non-Plan Platform</button>
+            </div>
+        
+            
+            <!-- Contact -->
+            <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center; padding-left: 20px; padding-right: 20px;">
+                <img id="non-plan-logo" src="./assets/non-plan-logo.svg" alt="non-plan">
+                <div>
+                    <h5 style="color: var(--primary-200); text-align: left; color: #969696;">CONTACT</h5>
+                    <h5 style="color: var(--primary-200); text-align: left; color: #969696; padding-top: 10px;">
+                        <a href="mailto:studio@non-plan.com" style="color: #969696;">studio@non-plan.com</a>
+                    </h5>
+                </div>
+                <div>
+                    <h5 style="color: var(--primary-200); text-align: left; color: #969696;">FOLLOW US</h5>
+                    <div style="display: flex; flex-direction: row; padding-top: 10px;">
+                        <a href="https://www.linkedin.com" target="_blank" style="color: #969696; margin-right: 10px;">
+                            <span class="material-icons-round">chat_bubble_outline</span>
+                        </a>
+                        <a href="https://www.youtube.com" target="_blank" style="color: #969696;">
+                            <span class="material-icons-round">stay_primary_portrait</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        
+            <hr style="width: 100%; border: 0; border-top: 0.1px solid #969696;">
+            <!-- Footer -->
+            <div style="display: flex; flex-direction: row; justify-content: space-between; padding-left: 20px; padding-right: 20px; margin-top: 5px; padding-bottom: 20px;">
+                <h6 style="color: var(--primary-200); text-align: left; color: #969696;">©2025, non-plan GmbH</h6>
+                <h6 style="color: var(--primary-200); text-align: left; color: #969696;">Privacy Policy</h6>
+                <h6 style="color: var(--primary-200); text-align: left; color: #969696;">Legal Notice</h6>
+            </div>
+        </section>
+                
+        
+        <aside id="sidebar" style = "display: none">
+            <ul id="nav-buttons">
+                <li id="projectsBtn"><span class="material-icons-round">maps_home_work</span>Projects</li>
+                <li id="usersBtn"><span class="material-icons-round">people</span>Users</li>
+                <li><span class="material-icons-round">dashboard</span>Dashboard</li>
+                <li><span class="material-icons-round">task</span>Tasks/To-Do</li>
+                <li><span class="material-icons-round">date_range</span>Calendar</li>
+                <li><span class="material-icons-round">folder_open</span>Documents</li>
+                <li><span class="material-icons-round">build</span>Tools</li>
+            </ul>
+        </aside> 
+
+    </div>
+    
+    
+    <main id="content" >
+        <div class="page" id = "projectsPage" style = "display: none">
+            <dialog id = "newProjectModal">
+                <form id = "newProjectForm">
+                    <h2>New Project</h2>
+                    <div class= "userCard">
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">apartment</span>Name</label>
+                            <input name = "name" type="text" placeholder="What's the name of your project?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short name</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Description</label>
+                            <textarea name = "description" cols="30" rows="5" placeholder="Give your project a nice description!"></textarea>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">account_circle</span>Role</label>
+                            <select name = "userRole">
+                                <option>Architect</option>
+                                <option>Engineer</option>
+                                <option>Developer</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">not_listed_location</span>Status</label>
+                            <select name = "status">
+                                <option>Pending</option>
+                                <option>Active</option>
+                                <option>Finished</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_view_week</span>Design Phase</label>
+                            <select name = "phase">
+                                <option>Design</option>
+                                <option>Construction project</option>
+                                <option>Execution</option>
+                                <option>Construction</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_today</span>Start Date</label>
+                            <input name = startDate type="date">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_month</span>Finish Date</label>
+                            <input name = finishDate type="date">
+                        </div>
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('newProjectModal')">Cancel</button>
+                        <button type="submit" class =acceptButton>Accept</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id="newProjectErrorModal">
+                <form id="newProjectErrorForm" method="dialog" style="box-sizing: border-box;">
+                    <h2 style="display: flex; align-items: center; gap: 8px; font-size: 20px; padding: 10px; margin: 0;">
+                        <span class="material-icons-round" style="font-size: 20px; vertical-align: middle;">warning</span>
+                        Error
+                    </h2>
+                    <div style="border-top: 2px solid var(--complementary200); margin-top: 8px; margin-bottom: 16px;"></div>
+                
+                    <p id="errorMessage" style="display: flex; justify-content: center;">Error message placeholder</p>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                        <button onclick="closeModal('newProjectErrorModal')" type="button" class="cancelButton" style="margin-right: 10px; height: 30px;">OK</button>
+                    </div>
+                </form>
+            </dialog>
+            <header>
+                <h2>Projects</h2>
+                <div style="display: flex;flex-direction: row;column-gap: 10px;">
+                    <button id="importProjectsBtn" class = "buttonTertiary"><span class="material-icons-round">file_download</span><span class="material-icons-round">foundation</span></button>
+                    <button id="exportProjectsBtn" class = "buttonTertiary"><span class="material-icons-round">file_upload</span><span class="material-icons-round">foundation</span></button>
+                    <button id="newProjectBtn" class = "buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">foundation</span></button>
+                </div>
+            </header>
+            <div id="projectsList" class="projectsList">
+            </div>  
+        </div>
+        <div class="page" id = "projectDetails" style = "display: none">
+            <header>
+                <div>
+                    <h2>Hospital Center</h2>
+                    <p style="color:#969696">Community Hospital Location</p>
+                </div>
+            </header>
+            <div class = "mainPageContent">
+                <div style="display:flex;flex-direction: column;row-gap: 10px;">
+                    <div class="dashboardCard">
+                        <div class ="upperDashboard">
+                            <p style="font-size: 16px;display:flex; align-items:center;justify-content: center; background-color: #6491F9; padding: 5xp; border-radius: 850%; aspect-ratio: 1; width: 40px;height: 40px;">HC</p>
+                            <button class = "buttonSecondary">Edit<p style="height: 100px;"></p></button>
+                        </div>
+                        <div class ="middleDashboard">
+                            <h5>Hospital Center</h5>
+                            <p>Community hospital located in downtown</p>
+                        </div>
+                        <div class = "bottomDashboard">
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Status</p>
+                                <p>Active</p>
+                            </div>
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Cost</p>
+                                <p>2'542.00 CHF</p>
+                            </div>
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Role</p>
+                                <p>Engineer</p>
+                            </div>
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Finish Date</p>
+                                <p>2023-05-01</p>
+                            </div>
+                        </div>
+                        <div style="background-color: #404040; width: calc(100% - 40px); height: 25px; border-radius: 50px; overflow: hidden; margin: 20px auto 30px auto; position: relative;">
+                            <div style="width: 80%; height: 100%; background-color: green; border-radius: 10px 0 0 10px; display: flex; justify-content: center; align-items: center;">80%</div>
+                        </div>
+                    </div>
+                    <div class="dashboardCard" style="flex-grow: 1;">
+                        <div style="display: flex; align-items: center;flex-direction: row;justify-content:space-between;margin:20px">
+                            <h4>To-Do</h4>
+                            <div style="display: flex;align-items: center;align-items: center;padding-left: 80px;">
+                                <span class="material-icons-round" style="padding-right: 10px;">search</span>
+                                <input type="text" style="font-size: var(--fontSizeSmall);" placeholder="Search To-Do's by name">
+                            </div>
+                            <span class="material-icons-round">add</span>
+                        </div>
+                        <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
+                            <div class="todoItem">
+                                <div style="display: flex; justify-content: space-between;flex-direction: row;align-items: center;">
+                                    <div style="display:flex;column-gap: 15px;">
+                                        <span class="material-icons-round" style="background-color: #969696; padding: 8px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">construction</span>
+                                        <p>Absolutely nonsense text for testing, so I don't know what I'm writing about</p>
+                                    </div>
+                                    <p style="text-wrap: nowrap; margin-left: 10px;">Fri, 20 sep</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
+                            <div class="todoItem">
+                                <div style="display: flex; justify-content: space-between;flex-direction: row;align-items: center;">
+                                    <div style="display:flex;column-gap: 15px;">
+                                        <span class="material-icons-round" style="background-color: #969696; padding: 8px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">construction</span>
+                                        <p>Absolutely nonsense text for testing, so I don't know what I'm writing about</p>
+                                    </div>
+                                    <p style="text-wrap: nowrap; margin-left: 10px;">Fri, 20 sep</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="viewerContainer" class="dashboardCard"></div>  
+            </div>
+        </div>
+        <div class="page" id = "usersPage" style = "display: none">
+            <dialog id = "newUserModal">
+                <form id = "newUserForm">
+                    <h2>New User</h2>
+                    <div class= "userCard">
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Name</label>
+                            <input name = "name" type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Surname</label>
+                            <input name = "surname" type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">email</span>Email Adress</label>
+                            <input name = "email" type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">call</span>Telephone Number</label>
+                            <input name ="phone" type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">account_circle</span>Role</label>
+                            <select name = "usersRole">
+                                <option>Architect</option>
+                                <option>Engineer</option>
+                                <option>Developer</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">vpn_key</span>Access rights</label>
+                            <select name = "access">
+                                <option>Administrator</option>
+                                <option>Editor</option>
+                                <option>Guest</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">business</span>Company Name</label>
+                            <input name = "company" type="text">
+                        </div>
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('newUserModal')">Cancel</button>
+                        <button type="submit" class =acceptButton>Accept</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id = "newCompanyModal">
+                <form id = "newCompanyForm">
+                    <h2>New Company</h2>
+                    <div class= "userCard">
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Company Name</label>
+                            <input type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Company Address</label>
+                            <input type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">email</span>Contact Email</label>
+                            <input type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">call</span>Telephone Number</label>
+                            <input type="tel">
+                        </div>
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('newCompanyModal')">Cancel</button>
+                        <button type="submit" class =acceptButton>Accept</button>
+                    </div>
+                </form>
+            </dialog>         
+            <header>
+                <h2>Users</h2>
+                <div style="display: flex;flex-direction: row;column-gap: 10px;">
+                    <button id="newUserBtn" class = "buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">person</span></button>
+                    <button id="newCompanyBtn" class = "buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">business</span></button>
+                </div>
+            </header>
+            <div style="display: flex; flex-direction: row; font-size: var(--fontSizeStandard); height: 40px; column-gap: 100px;padding-left: 30px;">
+                <div style="display: flex; flex-direction: row;">
+                    <label style="padding-left: 10px;">All Users:</label>
+                    <label style="padding-left: 15px;">3</label>
+                </div>
+                <div style="position: relative; display: flex; column-gap: 20px; align-items:start;">
+                    <span class="material-icons-round" 
+                          style="position: absolute; left: 10px; top: calc(50% - 12px); font-size: 24px; color: #969696;">
+                        search
+                    </span>
+                    <input type="text" placeholder="Search" 
+                           style="padding-left: 40px; height: 10px; width: 200px; font-size: var(--fontSizeStandard); line-height: 10px;">
+                    <button class="buttonSecondary" 
+                            style="width: 60px; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons-round">filter_list</span>
+                    </button>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; padding-left: 30px;padding-right: 30px;padding-top: 30px; column-gap: 20px; align-items: center;">
+                <label style="padding-left: 10px;">User name</label>
+                <label>Access</label>
+                <label>Role</label>
+                <label>Company</label>
+                <label>Last active</label>
+                <label style="justify-self: end;">Message</label>
+            </div>
+            <div>
+            </div>
+            <div >
+                <div id = "usersList" class="usersList" style="display: flex;flex-direction: column;row-gap: 10px;padding-left: 30px;padding-right: 30px">
+                     <!-- Project Card -->
+                    <div class="userCard" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; column-gap: 20px; align-items: center; padding: 10px;">
+                        <!-- User Info -->
+                        <div style="display: flex; column-gap: 10px; align-items: center;">
+                            <p style="font-size: 20px; display: flex; align-items: center; background-color: #6491F9; padding: 2px; border-radius: 8px; width: 35px; height: 35px;justify-content: center;">MM</p>
+                            <div>
+                                <h5>Mikel Martinez</h5>
+                                <p>mikel@non-plan.com</p>
+                            </div>
+                        </div>
+                
+                        <!-- Card Properties -->
+                        <div class="userCardProperty"><p>Admin</p></div>
+                        <div class="userCardProperty"><p>Developer</p></div>
+                        <div class="userCardProperty"><p>Group01</p></div>
+                        <div class="userCardProperty"><p>non-plan</p></div>
+                        <div class="userCardProperty"><p>2024-12-01</p></div>
+                        <button class = "buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">email</span></button>
+                    </div>
+                    <div class="userCard" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; column-gap: 20px; align-items: center; padding: 10px;">
+                        <!-- User Info -->
+                        <div style="display: flex; column-gap: 10px; align-items: center;">
+                            <p style="font-size: 20px; display: flex; align-items: center; background-color: #3a7c55; padding: 2px; border-radius: 8px; width: 35px; height: 35px;justify-content: center;">T1</p>
+                            <div>
+                                <h5>Test 1</h5>
+                                <p>test1@test.com</p>
+                            </div>
+                        </div>
+                
+                        <!-- Card Properties -->
+                        <div class="userCardProperty"><p>Editor</p></div>
+                        <div class="userCardProperty"><p>Architect</p></div>
+                        <div class="userCardProperty"><p>Group02</p></div>
+                        <div class="userCardProperty"><p>Company 1</p></div>
+                        <div class="userCardProperty"><p>2024-11-25</p></div>
+                        <button class = "buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">email</span></button>
+                    </div>
+                    <div class="userCard" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; column-gap: 20px; align-items: center; padding: 10px;">
+                        <!-- User Info -->
+                        <div style="display: flex; column-gap: 10px; align-items: center;">
+                            <p style="font-size: 20px; display: flex; align-items: center; background-color: #7e8a3e; padding: 2px; border-radius: 8px; width: 35px; height: 35px;justify-content: center;">T2</p>
+                            <div>
+                                <h5>Test 2</h5>
+                                <p>test2@test.com</p>
+                            </div>
+                        </div>
+                
+                        <!-- Card Properties -->
+                        <div class="userCardProperty"><p>Guest</p></div>
+                        <div class="userCardProperty"><p>Structural Engineer</p></div>
+                        <div class="userCardProperty"><p>Group02</p></div>
+                        <div class="userCardProperty"><p>Company 2</p></div>
+                        <div class="userCardProperty"><p>2024-12-10</p></div>
+                        <button class = "buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">email</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script type="module" src="./src/index.ts"></script>
+</body>
+</html>

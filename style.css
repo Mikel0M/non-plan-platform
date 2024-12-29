@@ -1,0 +1,570 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+:root{
+    --primary: #db9900;
+    --primary-100: #FFB70F;
+    --primary-200: #f9cc64;
+    --primary-300: #fae4b1;
+    --primary-400: #fff6e0;
+    --complementary: #0042DB;
+    --complementary-100: #0F57FF;
+    --complementary-200: #6491F9;
+    --complementary-300: #B1C7FA;
+    --complementary-400: #E0E9FF;
+    --background: #202124;
+    --background-100: #26282b;
+    --background-200: #3b3c3f;
+    --fontSizeSmallest: 10px;
+    --fontSizeSmall: 12px;
+    --fontSizeStandard: 14px;
+    --fontSizeMedium: 16px;
+    --fontSizeBig: 18px;
+    --fontSizeBigger: 20px;
+    --fontSizeBiggest: 22px;
+    --fontSizeGiant: 30px;
+    --fontSizeGiantXL: 40px;
+    --fontSizeGiantXXL: 50px;
+
+}
+
+*{
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    margin-top: 70px; /* Adjust based on your header height */
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "sidebar main";
+    grid-template-rows: 70px 1fr; /* Adjust the second row to take remaining space */
+    grid-template-columns: 200px auto;
+    height: 100vh;
+    background-color: var(--background);
+    color: #fff;
+    vertical-align: middle;
+}
+
+#navigationHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--background); /* Optional: match header background */
+    z-index: 1000;
+}
+/* Keep it on top */
+/* General Styles */
+
+h0 {
+    font-size: var(--fontSizeGiantXL);
+}
+
+
+h1 {
+    font-size: var(--fontSizeGiant);
+}
+
+h2 {
+    font-size: var(--fontSizeBiggest);
+}
+
+
+h3 {
+    font-size: var(--fontSizeBigger);
+}
+
+h4 {
+    font-size: var(--fontSizeBig);
+}
+
+h5 {
+    font-size: var(--fontSizeStandard);
+}
+
+h6 {
+    font-size: var(--fontSizeSmall);
+}
+
+h7 {
+    font-size: var(--fontSizeSmallest);
+}
+
+button {
+    padding: 8px 15px;
+    cursor: pointer;
+    height: 40px;
+    font-size: var(--fontSizeMedium);
+    background-color: var(--primary);
+    color: white;
+    border-radius: 100px;
+    border: none;
+    display: flex;
+    align-items: center;
+    column-gap: 10px; 
+}
+
+button:hover {
+    background-color: var(--complementary-200);
+}
+
+buttonBlue {
+    padding: 8px 15px;
+    cursor: pointer;
+    height: 40px;
+    font-size: var(--fontSizeMedium);
+    background-color: var(--primary);
+    color: white;
+    border-radius: 100px;
+    border: none;
+    display: flex;
+    align-items: center;
+    column-gap: 10px; 
+}
+
+buttonBlue:hover {
+    background-color: var(--complementary-200);
+}
+
+.acceptButton {
+    background-color: var(--complementary-200);
+    margin-bottom: 20px;
+
+    
+}
+
+.acceptButton:hover {
+    background-color: var(--complementary-300);
+}
+
+.cancelButton {
+    background-color: transparent;
+    margin-bottom: 20px;
+    
+}
+
+.cancelButton:hover {
+    background-color: var(--complementary-300);
+}
+
+.cancelAccept {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    padding-top: 20px;
+    padding-right: 20px;
+    column-gap: 10px;
+
+}
+
+.upperDashboard {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 20px;
+    column-gap: 10px;
+
+}
+
+.middleDashboard {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-left: 20px;
+    padding-right: 20px;
+    column-gap: 10px;
+
+}
+
+.bottomDashboard {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    column-gap: 10px;
+
+}
+
+
+.buttonSecondary {
+    background-color: transparent;
+    outline: 2px solid #969696;
+    width: 20%;
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--fontSizeSmall);
+}
+
+.buttonSecondary:hover {
+    background-color: var(--complementary-200);
+    outline: none;
+}
+
+
+.buttonTertiary {
+
+    cursor: pointer;
+    height: 55px;
+    width: 55px;
+    font-size: var(--fontSizeMedium);
+    background-color: transparent;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    column-gap: 0px;
+    display: flex;
+    justify-content: center;
+    border: 2px solid var(--complementary-200);
+}
+
+.buttonTertiary:hover {
+    background-color: var(--complementary-200);
+    outline: none;
+    
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Header styles */
+#navigationHeader {
+    grid-area: header;
+    background-color: var(--background-100);
+    border-bottom: 2px solid var(--background-200);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    padding-right: 30px;
+    height: 70px;
+}
+
+/* Sidebar styles */
+
+#sidebar {
+    background-color: var(--background-100);
+    padding-top: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    height: calc(100vh - 70px);
+    margin-top: 0px; /* Adjust based on header height */
+    
+}
+
+#non-plan-logo {
+    height: 60px;
+}
+
+#nav-buttons {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+
+
+    
+}
+
+#nav-buttons li{
+    list-style-type: none;
+    padding: 15px;
+    border-radius: 50px;
+    font-size: var(--fontSizeMedium);
+    cursor: pointer;
+    background-color: var(--primary);
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    background-color: var(--background-300);
+    height: 10px;
+    border: 1px solid var(--primary);
+    
+
+}
+
+.material-icons-round {
+    display: flex;
+    align-content: center;
+    height: 20px;
+
+}
+
+#nav-buttons li:hover {
+    background-color: var(--primary-200);
+}
+
+/* Content styles */
+
+#content {
+    font-size: var(--fontSizeStandard);
+    
+}
+
+/* Header styles */
+
+
+
+header {
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    
+}
+
+/* Card Classes */
+
+.projectCard {
+    background-color: var(--background-100);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.projectCard:hover {
+    outline: 2px solid var(--complementary-200);
+}
+
+.cardHeader {
+    display: flex;
+    column-gap: 20px;
+    padding: 15px 20px;
+    align-items: center;
+    justify-content: start;
+    border-bottom: 2px solid #3b3c3f;
+    height: 8px;
+}
+
+.cardContent {
+    padding: 30px 20px;
+    display: flex;
+    flex-direction:column;
+    row-gap: 20px;
+    align-items: start;
+}
+
+.cardProperty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.projectsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    padding: 10px 30px;
+    gap: 20px;
+
+}
+
+.todoItem {
+    padding: 20px;
+    background-color: var(--background-200);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.todoItem:hover {
+    background-color: var(--complementary-200);
+}
+
+/* Form Styles */
+
+dialog {
+    background-color: transparent;
+    border: none;
+    margin:auto;
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3xp);
+}
+
+form {
+    width: 450px;
+    border-radius: 10px;
+    background-color: var(--background-100);
+    color: white;
+}
+
+form h2 {
+    padding: 20px;
+    border-bottom: 2px solid var(--complementary-200);
+}
+
+form .userCard {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    row-gap: 25px;
+}
+
+form .formFieldContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+label {
+    font-size: var(--fontSizeStandard);
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: rgba(150, 150, 150, 1);
+    display: flex;
+    flex-direction:row;
+    align-items: center;
+    column-gap: 5px;
+}
+
+input, textarea, select {
+    color: white;
+    background-color: var(--background-200);
+    padding: 15px;
+    border-radius: 8px;
+    border: none;
+    font-size: var(--fontSizeStandard);
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--primary)
+}
+
+/* Project Details Page */
+
+.dashboardCard {
+    background-color: var(--background-100);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+#projectDetails > .mainPageContent {
+    display:grid;
+    padding: 20px 40px;
+    gap: 30px;
+    grid-template-columns: 475px 1fr;
+    height: 100%;
+}
+
+/* Users */
+
+.buttonsGroup {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    align-items: center;
+ 
+    
+}
+
+.cardUser {
+    display: flex;
+    flex-direction: row;
+    column-gap: 100px;
+    align-items: center;
+    justify-content: start;
+    border: 2px solid #3b3c3f;
+    height: 8px;
+}
+
+.userCardProperty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.userCard {
+    background-color: var(--background-100);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.userCard:hover {
+    outline: 2px solid var(--complementary-200);
+}
+
+/* Language */
+
+.language-selector {
+    position: relative;
+    display: inline-block;
+}
+
+
+.languageButton {
+
+    cursor: pointer;
+    height: 55px;
+    width: 55px;
+    font-size: var(--fontSizeMedium);
+    background-color: transparent;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    column-gap: 0px;
+    display: flex;
+    justify-content: center;
+    border: 2px solid var(--complementary-200);
+}
+
+.languageButton:hover {
+    background-color: var(--complementary-200);
+    outline: none;
+    
+}
+
+#languageMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: var(--background-200);
+    border: 1px solid var(--complementary-200);
+    width: 150px;
+    z-index: 1000;
+}
+
+#languageMenu li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#languageMenu li:hover {
+    background-color: var(--complementary-200);
+}
+
+.hidden {
+    display: none;
+}
