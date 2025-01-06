@@ -76,7 +76,6 @@ export class Project implements IProject{
         for (const key in defaults) {
             this[key] = data[key] || defaults[key];
         }
-        
         this.icon = sliceTwoEachWord(this.name)
         this.id = uuidv4()
         this.setUI()

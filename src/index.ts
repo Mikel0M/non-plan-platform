@@ -100,37 +100,73 @@ logINBtnEnd?.addEventListener("click", ()=> {
     sidebar.style.display = "flex";
 })
 
-//Add event listener to Projects button
-const projectsBtn = document.getElementById("projectsBtn");
-projectsBtn?.addEventListener("click", ()=> {
+// Add event listener to Projects button
+const projectsBtn = document.getElementById("projectsBtn") as HTMLLIElement;
+const usersBtn = document.getElementById("usersBtn") as HTMLLIElement;
+
+projectsBtn?.addEventListener("click", () => {
     const projectsPage = document.getElementById("projectsPage") as HTMLDivElement;
     const usersPage = document.getElementById("usersPage") as HTMLDivElement;
     const detailsPage = document.getElementById("projectDetails") as HTMLDivElement;
     const introPage = document.getElementById("intro") as HTMLDivElement;
     const sidebar = document.getElementById("sidebar") as HTMLDivElement;
-    if (!(projectsPage && detailsPage)) return console.warn("Pages not found");
-    detailsPage.style.display = "none";
+
+    if (!(projectsPage && usersPage)) {
+        return console.warn("Pages not found");
+    }
+
+    // Page changes
     usersPage.style.display = "none";
     projectsPage.style.display = "flex";
+    detailsPage.style.display = "none";
     introPage.style.display = "none";
     sidebar.style.display = "flex";
-})
 
-//Add event listener to Users button
-const usersBtn = document.getElementById("usersBtn");
-usersBtn?.addEventListener("click", ()=> {
+    // Set Projects button to active style
+    if (projectsBtn) {
+        projectsBtn.classList.add("active"); // Add the active class
+        projectsBtn.innerHTML = `<span class="material-icons-round">maps_home_work</span> Projects`; // Keep the icon and text
+    }
+
+    // Revert Users button to default style
+    if (usersBtn) {
+        usersBtn.classList.remove("active"); // Remove the active class
+        usersBtn.innerHTML = `<span class="material-icons-round">group</span> Users`; // Keep the icon and text
+    }
+});
+
+// Add event listener to Users button
+usersBtn?.addEventListener("click", () => {
     const projectsPage = document.getElementById("projectsPage") as HTMLDivElement;
     const usersPage = document.getElementById("usersPage") as HTMLDivElement;
     const detailsPage = document.getElementById("projectDetails") as HTMLDivElement;
     const introPage = document.getElementById("intro") as HTMLDivElement;
     const sidebar = document.getElementById("sidebar") as HTMLDivElement;
-    if (!(projectsPage && detailsPage)) return console.warn("Pages not found");
-    detailsPage.style.display = "none";
-    usersPage.style.display = "flex";
+
+    if (!(projectsPage && usersPage)) {
+        return console.warn("Pages not found");
+    }
+
+    // Page changes
     projectsPage.style.display = "none";
+    usersPage.style.display = "flex";
+    detailsPage.style.display = "none";
     introPage.style.display = "none";
     sidebar.style.display = "flex";
-})
+    
+
+    // Set Users button to active style
+    if (usersBtn) {
+        usersBtn.classList.add("active"); // Add the active class
+        usersBtn.innerHTML = `<span class="material-icons-round">group</span> Users`; // Keep the icon and text
+    }
+
+    // Revert Projects button to default style
+    if (projectsBtn) {
+        projectsBtn.classList.remove("active"); // Remove the active class
+        projectsBtn.innerHTML = `<span class="material-icons-round">maps_home_work</span> Projects`; // Keep the icon and text
+    }
+});
 
 /**
  * Handles the submission of the "New Project" form:

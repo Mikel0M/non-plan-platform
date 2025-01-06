@@ -284,26 +284,34 @@ buttonBlue:hover {
     flex-direction: column;
     row-gap: 10px;
 
-
-    
 }
 
-#nav-buttons li{
+
+#nav-buttons li {
     list-style-type: none;
     padding: 15px;
     border-radius: 50px;
     font-size: var(--fontSizeMedium);
     cursor: pointer;
-    background-color: var(--primary);
+    background-color: var(--background-300); /* Default background */
     display: flex;
     align-items: center;
     column-gap: 10px;
-    background-color: var(--background-300);
     height: 10px;
     border: 1px solid var(--primary);
-    
-
 }
+
+/* Hover effect */
+#nav-buttons li:hover {
+    background-color: var(--primary-300);
+}
+
+/* Active (pressed) state */
+#nav-buttons li.active {
+    background-color: var(--primary);
+    color: white;
+}
+
 
 .material-icons-round {
     display: flex;
