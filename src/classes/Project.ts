@@ -6,9 +6,12 @@ export type phase = "Design" | "Contruction Project" | "Execution" | "Constructi
 
 export interface IProject {
     icon: string
+    color: string
     name: string
     description: string
+    location: string
     userRole: userRole
+    cost: number
     status: status
     phase: phase
     startDate: Date
@@ -48,7 +51,10 @@ export class Project implements IProject{
     //To satisfy IProject
     icon: string
     name: string
+    color: string
     description: string
+    location: string
+    cost: number
     userRole: "not defined" |"Architect" | "Engineer" | "Developer"
     status: "Pending" | "Active" | "Finished"
     phase: "Design" | "Contruction Project" | "Execution" | "Construction"
@@ -57,28 +63,39 @@ export class Project implements IProject{
 
     //Class internals
     ui: HTMLDivElement
-    cost: number = 0
+    //cost: number = 0
     progress: number = 0
     id: string
 
-    constructor (data: IProject) {
-        //Project data definition default values
+    constructor(data: IProject) {
+        // Project data definition default values
         const defaults = {
             name: "Default Project Name",
             description: "Default Project Description",
             userRole: "not defined",
+            location: "not defined",
+            cost: 0,
             status: "Pending",
             phase: "Design",
-            startDate: "not given Date",
-            finishDate: "not given Date",
+            startDate: new Date(),
+            finishDate: new Date(),
         };
         //Project data definition
         for (const key in defaults) {
             this[key] = data[key] || defaults[key];
         }
+<<<<<<< HEAD
         this.icon = sliceTwoEachWord(this.name)
         this.id = uuidv4()
         this.setUI()
+=======
+    
+        this.icon = sliceTwoEachWord(this.name);
+        this.color = getRandomColor();
+        this.id = uuidv4();
+        this.setUI();
+
+>>>>>>> projectDetails
     }
 
     setUI() {
@@ -87,7 +104,7 @@ export class Project implements IProject{
         this.ui.className = "projectCard"
         this.ui.innerHTML = `
         <div class = "cardHeader" style="height: 35px;">
-            <p style="font-size: 20px;display:flex; align-items: center; background-color:${getRandomColor()}; padding: 10xp;width: 40px;height: 40px ;justify-content: center;border-radius: 8px; aspect-ratio: 1;">${this.icon}</p>
+            <p style="font-size: 20px;display:flex; align-items: center; background-color:${this.color}; padding: 10xp;width: 40px;height: 40px ;justify-content: center;border-radius: 8px; aspect-ratio: 1;">${this.icon}</p>
             <div>
                 <h5>${this.name}</h5>
                 <p>${this.description}</p>
@@ -104,7 +121,7 @@ export class Project implements IProject{
             </div>
             <div class = "cardProperty">
                 <p style = "color: #969696;">Cost</p>
-                <p>$${this.cost}</p>    
+                <p>${this.cost}$</p>    
             </div>
             <div class = "cardProperty">
                 <p style = "color: #969696;">Progress</p>
