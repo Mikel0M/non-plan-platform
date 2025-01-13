@@ -24,12 +24,55 @@ export class ProjectsManager {
             if (!projectsPage || !detailsPage) {return}
             projectsPage.style.display = "none"
             detailsPage.style.display = "flex"
+            this.setDetailsPage(project)
         })
 
         this.ui.append(project.ui);
         this.list.push(project);
         return project;
     }
+    
+    private setDetailsPage(project: Project) {
+        
+        const detailsPage = document.getElementById("projectDetails")
+        if (!detailsPage) { return }
+
+        const iconPD = detailsPage.querySelector("[data-project-info='iconPD']")
+        if (iconPD) { iconPD.textContent = project.icon}
+        const namePD = detailsPage.querySelector("[data-project-info='namePD']")
+        if (namePD) { namePD.textContent = project.name}
+        const nameBigPD = detailsPage.querySelector("[data-project-info='nameBigPD']")
+        if (nameBigPD) { nameBigPD.textContent = project.name}
+        const locationPD = detailsPage.querySelector("[data-project-info='locationPD']")
+        if (locationPD) { locationPD.textContent = project.location}
+        const descriptionPD = detailsPage.querySelector("[data-project-info='descriptionPD']")
+        if (descriptionPD) { descriptionPD.textContent = project.description}
+        const costPD = detailsPage.querySelector("[data-project-info='costPD']")
+        if (costPD) { 
+            costPD.textContent = project.cost.toString(); 
+        }
+        const statusPD = detailsPage.querySelector("[data-project-info='statusPD']")
+        if (statusPD) { statusPD.textContent = project.status}
+        const rolePD = detailsPage.querySelector("[data-project-info='rolePD']")
+        if (rolePD) { rolePD.textContent = project.userRole}
+        const startPD = detailsPage.querySelector("[data-project-info='startPD']")
+        if (startPD) { 
+            startPD.textContent = project.startDate.toLocaleDateString(); 
+        }
+        const finishPD = detailsPage.querySelector("[data-project-info='finishPD']")
+        if (finishPD) { 
+            finishPD.textContent = project.finishDate.toLocaleDateString(); 
+        }
+
+        const iconElement = document.getElementById("iconPD");
+
+        if (iconElement) {
+        // Assign the desired background color
+        (iconElement as HTMLElement).style.backgroundColor = project.color; // Replace with your dynamic color
+        }
+    }
+
+
     
     // Method to handle modal display
     showErrorModal(repeatedName: string) {
@@ -47,6 +90,8 @@ export class ProjectsManager {
             modal.showModal();
         }
     }
+
+
 
     getProject(id: string) {
         const project = this.list.find((project) => {

@@ -184,9 +184,12 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
         const formData = new FormData(projectForm)
         const ProjectData: IProject = {
             icon:formData.get("icon") as string,
+            color:formData.get("color") as string,
             name:formData.get("name") as string,
             description:formData.get("description") as string,
             userRole:formData.get("userRole") as userRole,
+            location:formData.get("location") as string,
+            cost: formData.get("cost") ? parseFloat(formData.get("cost") as string) : 0,
             status:formData.get("status") as status,
             phase:formData.get("phase") as phase,
             startDate:new Date(formData.get("startDate") as string),
