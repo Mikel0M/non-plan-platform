@@ -207,7 +207,7 @@
     
     
     <main id="content" >
-        <div class="page" id = "projectsPage" style = "display: none">
+        <div class="page" id = "projectsPage" style = "display: none"> 
             <dialog id = "newProjectModal">
                 <form id = "newProjectForm">
                     <h2>New Project</h2>
@@ -220,6 +220,16 @@
                         <div class = "formFieldContainer">
                             <label><span class="material-icons-round">subject</span>Description</label>
                             <textarea name = "description" cols="30" rows="5" placeholder="Give your project a nice description!"></textarea>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">pin_drop</span>Location</label>
+                            <input name = "location" type="text" placeholder="Where is your project located?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;"></label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">paid</span>Estimated cost</label>
+                            <input name = "cost" type="number" placeholder="What's the estimated cost of the project?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Estimated cost of the project</label>
                         </div>
                         <div class = "formFieldContainer">
                             <label><span class="material-icons-round">account_circle</span>Role</label>
@@ -289,37 +299,41 @@
         <div class="page" id = "projectDetails" style = "display: none">
             <header>
                 <div>
-                    <h2>Hospital Center</h2>
-                    <p style="color:#969696">Community Hospital Location</p>
+                    <h2 data-project-info="namePD">Hospital Center</h2>
+                    <p data-project-info="locationPD" style="color:#969696">Community Hospital Location</p>
                 </div>
             </header>
             <div class = "mainPageContent">
                 <div style="display:flex;flex-direction: column;row-gap: 10px;">
                     <div class="dashboardCard">
                         <div class ="upperDashboard">
-                            <p style="font-size: 16px;display:flex; align-items:center;justify-content: center; background-color: #6491F9; padding: 5xp; border-radius: 850%; aspect-ratio: 1; width: 40px;height: 40px;">HC</p>
+                            <p id="iconPD" style="font-size: 16px;display:flex; align-items:center;justify-content: center; background-color: #6491F9; padding: 5xp; border-radius: 850%; aspect-ratio: 1; width: 40px;height: 40px;" data-project-info="iconPD">HC</p>
                             <button class = "buttonSecondary">Edit<p style="height: 100px;"></p></button>
                         </div>
                         <div class ="middleDashboard">
-                            <h5>Hospital Center</h5>
-                            <p>Community hospital located in downtown</p>
+                            <h5 data-project-info="nameBigPD">Hospital Center</h5>
+                            <p data-project-info="descriptionPD">Community hospital located in downtown</p>
                         </div>
                         <div class = "bottomDashboard">
                             <div>
                                 <p style="color: #969696; font-size: var(--fontSizeSmall);">Status</p>
-                                <p>Active</p>
+                                <p data-project-info="statusPD">Active</p>
                             </div>
                             <div>
                                 <p style="color: #969696; font-size: var(--fontSizeSmall);">Cost</p>
-                                <p>2'542.00 CHF</p>
+                                <p data-project-info="costPD">2'542.00 CHF</p>
                             </div>
                             <div>
                                 <p style="color: #969696; font-size: var(--fontSizeSmall);">Role</p>
-                                <p>Engineer</p>
+                                <p data-project-info="rolePD">Engineer</p>
+                            </div>
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Start Date</p>
+                                <p data-project-info="startPD">2023-05-01</p>
                             </div>
                             <div>
                                 <p style="color: #969696; font-size: var(--fontSizeSmall);">Finish Date</p>
-                                <p>2023-05-01</p>
+                                <p data-project-info="finishPD">2023-05-01</p>
                             </div>
                         </div>
                         <div style="background-color: #404040; width: calc(100% - 40px); height: 25px; border-radius: 50px; overflow: hidden; margin: 20px auto 30px auto; position: relative;">
