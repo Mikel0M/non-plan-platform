@@ -234,6 +234,7 @@
                         <div class = "formFieldContainer">
                             <label><span class="material-icons-round">account_circle</span>Role</label>
                             <select name = "userRole">
+                                <option>not defined</option>
                                 <option>Architect</option>
                                 <option>Engineer</option>
                                 <option>Developer</option>
@@ -303,12 +304,76 @@
                     <p data-project-info="locationPD" style="color:#969696">Community Hospital Location</p>
                 </div>
             </header>
+            <dialog id = "editProjectModal">
+                <form id = "editProjectForm">
+                    <h2>Edit Project</h2>
+                    <div class= "userCard">
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">apartment</span>Name</label>
+                            <input name = "name" type="text" id="projectNameInput" />
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short name</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Description</label>
+                            <textarea name = "description" cols="30" rows="5" placeholder="Give your project a nice description!"></textarea>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">pin_drop</span>Location</label>
+                            <input name = "location" type="text" placeholder="Where is your project located?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;"></label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">paid</span>Estimated cost</label>
+                            <input name = "cost" type="number" placeholder="What's the estimated cost of the project?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Estimated cost of the project</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">account_circle</span>Role</label>
+                            <select name = "userRole">
+                                <option>not defined</option>
+                                <option>Architect</option>
+                                <option>Engineer</option>
+                                <option>Developer</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">not_listed_location</span>Status</label>
+                            <select name = "status">
+                                <option>Pending</option>
+                                <option>Active</option>
+                                <option>Finished</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_view_week</span>Design Phase</label>
+                            <select name = "phase">
+                                <option>Design</option>
+                                <option>Construction project</option>
+                                <option>Execution</option>
+                                <option>Construction</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_today</span>Start Date</label>
+                            <input name = startDate type="date">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_month</span>Finish Date</label>
+                            <input name = finishDate type="date">
+                        </div>
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('newProjectModal')">Cancel</button>
+                        <button type="submit" class =acceptButton>Accept</button>
+                    </div>
+                </form>
+            </dialog>
             <div class = "mainPageContent">
                 <div style="display:flex;flex-direction: column;row-gap: 10px;">
                     <div class="dashboardCard">
                         <div class ="upperDashboard">
                             <p id="iconPD" style="font-size: 16px;display:flex; align-items:center;justify-content: center; background-color: #6491F9; padding: 5xp; border-radius: 850%; aspect-ratio: 1; width: 40px;height: 40px;" data-project-info="iconPD">HC</p>
-                            <button class = "buttonSecondary">Edit<p style="height: 100px;"></p></button>
+                            <button id = "editProject" class = "buttonSecondary">Edit<p style="height: 100px;"></p></button>
                         </div>
                         <div class ="middleDashboard">
                             <h5 data-project-info="nameBigPD">Hospital Center</h5>

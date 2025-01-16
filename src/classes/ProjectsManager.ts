@@ -12,10 +12,10 @@ export class ProjectsManager {
         const projectNames = this.list.map((project) => project.name);
         const nameInUse = projectNames.includes(data.name);
         const project = new Project(data);
-    
+
         if (nameInUse) {
             // Trigger the modal instead of throwing an error
-            this.showErrorModal(data.name);
+            this.showErrorModalDupName(data.name);
             return null; // Prevent further execution
         }
         project.ui.addEventListener("click", () => {
@@ -26,6 +26,13 @@ export class ProjectsManager {
             detailsPage.style.display = "flex"
             this.setDetailsPage(project)
         })
+        
+
+        if (data.name.length < 5) {
+            this.showErrorModalShortName()
+            return null; // Prevent further execution
+
+        }
 
         this.ui.append(project.ui);
         this.list.push(project);
@@ -41,6 +48,14 @@ export class ProjectsManager {
         if (iconPD) { iconPD.textContent = project.icon}
         const namePD = detailsPage.querySelector("[data-project-info='namePD']")
         if (namePD) { namePD.textContent = project.name}
+
+        // Populate the form in the edit modal
+        const projectNameInput = document.getElementById("projectNameInput") as HTMLInputElement;
+        if (projectNameInput) {
+        // Set the value of the input to the project's name
+        projectNameInput.value = project.name;
+        }
+
         const nameBigPD = detailsPage.querySelector("[data-project-info='nameBigPD']")
         if (nameBigPD) { nameBigPD.textContent = project.name}
         const locationPD = detailsPage.querySelector("[data-project-info='locationPD']")
@@ -56,13 +71,10 @@ export class ProjectsManager {
         const rolePD = detailsPage.querySelector("[data-project-info='rolePD']")
         if (rolePD) { rolePD.textContent = project.userRole}
         const startPD = detailsPage.querySelector("[data-project-info='startPD']")
-        if (startPD) { 
-            startPD.textContent = project.startDate.toLocaleDateString(); 
-        }
+        if (startPD) { startPD.textContent = project.startDate}
         const finishPD = detailsPage.querySelector("[data-project-info='finishPD']")
-        if (finishPD) { 
-            finishPD.textContent = project.finishDate.toLocaleDateString(); 
-        }
+        if (finishPD) { finishPD.textContent = project.finishDate}
+        
 
         const iconElement = document.getElementById("iconPD");
 
@@ -75,7 +87,23 @@ export class ProjectsManager {
 
     
     // Method to handle modal display
-    showErrorModal(repeatedName: string) {
+    showErrorModalShortName() {
+        const modal = document.getElementById("newProjectErrorModal") as HTMLDialogElement;
+    
+        // Find the content area of the modal (create a target element in your modal if needed)
+        const errorMessageElement = modal.querySelector("#errorMessage");
+    
+        if (errorMessageElement) {
+            errorMessageElement.textContent = `A valid project name should have at least 5 characters.`;
+        }
+    
+        // Show the modal
+        if (modal) {
+            modal.showModal();
+        }
+    }
+    
+    showErrorModalDupName(repeatedName: string) {
         const modal = document.getElementById("newProjectErrorModal") as HTMLDialogElement;
     
         // Find the content area of the modal (create a target element in your modal if needed)
@@ -90,7 +118,6 @@ export class ProjectsManager {
             modal.showModal();
         }
     }
-
 
 
     getProject(id: string) {

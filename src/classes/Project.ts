@@ -14,8 +14,8 @@ export interface IProject {
     cost: number
     status: status
     phase: phase
-    startDate: Date
-    finishDate: Date
+    startDate: string
+    finishDate: string
 }
 
 function getRandomColor() {
@@ -47,6 +47,15 @@ function sliceTwoEachWord(input) {
     return result.join("");
 }
 
+// This function will allow me to calculate todays data as a string
+function formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Months are 0-indexed, so we add 1.
+    const day = date.getDate().toString().padStart(2, '0');  // Pad single-digit days with leading zero.
+
+    return `${year}-${month}-${day}`;
+}
+
 export class Project implements IProject{
     //To satisfy IProject
     icon: string
@@ -58,8 +67,8 @@ export class Project implements IProject{
     userRole: "not defined" |"Architect" | "Engineer" | "Developer"
     status: "Pending" | "Active" | "Finished"
     phase: "Design" | "Contruction Project" | "Execution" | "Construction"
-    startDate: Date
-    finishDate: Date
+    startDate: string
+    finishDate: string
 
     //Class internals
     ui: HTMLDivElement
@@ -68,7 +77,14 @@ export class Project implements IProject{
     id: string
 
     constructor(data: IProject) {
+        //Preparing defaults Dates for start and finish as today and in one year
+        const currentDate = new Date()
+
+        //otherwise I overwrite the year
+        const currentDateforNext = new Date()
+        const nextYear = new Date(currentDateforNext.setFullYear(currentDate.getFullYear() + 1));
         // Project data definition default values
+        
         const defaults = {
             name: "Default Project Name",
             description: "Default Project Description",
@@ -77,8 +93,8 @@ export class Project implements IProject{
             cost: 0,
             status: "Pending",
             phase: "Design",
-            startDate: new Date(),
-            finishDate: new Date(),
+            startDate: formatDate(currentDate), // default to today's date in DD.MM.YYYY format
+            finishDate: formatDate(nextYear) // default to today's date in DD.MM.YYYY format
         };
         //Project data definition
         for (const key in defaults) {
@@ -120,6 +136,6 @@ export class Project implements IProject{
             <div class = "cardProperty">
                 <p style = "color: #969696;">Progress</p>
                 <p>${this.progress * 100}%</p>    
-            </div>      
+            </div>     
         </div>`}
 }

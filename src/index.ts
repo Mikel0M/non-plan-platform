@@ -49,6 +49,16 @@ if (newProjectBtn){
     console.warn("New projects button was not found")
 }
 
+//editProjectModal
+const editProjectBtn = document.getElementById("editProject")
+
+
+if (editProjectBtn){
+    editProjectBtn.addEventListener("click", () => {showModal("editProjectModal")})
+} else {
+    console.warn("Edit projects button was not found")
+}
+
 //newUserModal
 const newUserBtn = document.getElementById("newUserBtn")
 
@@ -192,8 +202,8 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
             cost: formData.get("cost") ? parseFloat(formData.get("cost") as string) : 0,
             status:formData.get("status") as status,
             phase:formData.get("phase") as phase,
-            startDate:new Date(formData.get("startDate") as string),
-            finishDate:new Date(formData.get("finishDate") as string),
+            startDate:formData.get("startDate") as string,
+            finishDate:formData.get("finishDate") as string,
         }
         try {
             const project = projectsManager.newProject(ProjectData)
