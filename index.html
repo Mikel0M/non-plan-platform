@@ -12,6 +12,9 @@
     <header id="navigationHeader" style="position: fixed;">
         <img id="non-plan-logo" src="./assets/non-plan-logo.svg" alt="non-plan">
         <div style="display: flex;flex-direction: row;column-gap: 10px;">
+            <button id="insightsBtn" class="buttonTextBlue" style="font-size: var(--fontSizeBig); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -150px;" data-lang="insights">insights</button>
+            <button id="servicesBtn" class="buttonTextBlue" style="font-size: var(--fontSizeBig); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -100px;" data-lang="services">services</button>
+            <button id="npInfoBtn" class="buttonTextBlue" style="font-size: var(--fontSizeBig); display: flex; align-items: center; border-radius: 45px; width: 200px; height: 45px; justify-content: center; position: relative; left: -50px;" >non-plan Platform</button>
             <div class="language-selector">
                 <button class="languageButton" id="languageButton" style="font-size: var(--fontSizeMedium); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -50px;"><span class="material-icons-round">language</span> ▼</button>
                 <ul id="languageMenu" class="hidden">
@@ -19,30 +22,93 @@
                     <li data-lang="de">DE</li>
                 </ul>
             </div>
-            <button id="logINBtn" class="buttonTertiary" style="font-size: var(--fontSizeMedium); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -50px;">LOG IN</button>
+            <dialog id = "insightsModal">
+                <form class="infoForm" id = "insightsForm">
+                    <h2>Insight</h2>
+                    <div class= "infoCard">
+                        
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('insightsModal')">OK</button>
+                    </div>
+                </form>
+            </dialog> 
+            <dialog id = "servicesModal">
+                <form class="infoForm" id = "servicesForm">
+                    <h2>Services</h2>
+                    <div class= "infoCard">
+                        
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('servicesModal')">OK</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id = "npInfoModal">
+                <form class="infoForm" id = "npInfoForm">
+                    <h2>non-plan Platform</h2>
+                    <div class= "infoCard">
+                        
+                    </div>
+            
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('npInfoModal')">OK</button>
+                    </div>
+                </form>
+            </dialog> 
+            <dialog id = "loginModal">
+                <form class="userForm" id = "loginForm">
+                    <h2>login</h2>
+                    <div class= "userCard">
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Company Name</label>
+                            <input type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Company Address</label>
+                            <input type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">email</span>Contact Email</label>
+                            <input type="text">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">call</span>Telephone Number</label>
+                            <input type="tel">
+                        </div>
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('loginModal')">Cancel</button>
+                        <button type="button" id="logINBtn" class =acceptButton onclick="closeModal('loginModal')">Login</button>
+                    </div>
+                </form>
+            </dialog> 
+            <button id="infoLogINBtn" class="buttonTertiary" style="font-size: var(--fontSizeMedium); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -50px;">LOG IN</button>
         </div>     
     </header>
     <div>
-        <section class="page" id="intro" style="width: 100%; position: absolute; display: flex; flex-direction: column; row-gap: 20px; text-align: center;padding-top: 50px;">
-            <h1 style="margin-top: 20px;font-size: var(--fontSizeGiantXXL);" data-lang="start_welcome">Welcome to non-plan</h1>
+        <section class="page" id="intro" style="width: 100%; position: absolute; display: flex; flex-direction: column; row-gap: 0px; text-align:left ;padding-top: 30px;">
+            <h1 style="margin-top: 0px;color: var(--complementary-200); padding-left: 90px; font-size: var(--fontSizeGiantXXXL);" data-lang="start_welcome">Welcome to non-plan</h1>
         
             <!-- First Section: Introduction to the Company -->
-            <div style="display: flex; background-color: var(--background); flex-direction: column;align-items:center; padding: 60px; text-align:left; border-radius: 10px;justify-content: center;">
+            <div style="display: flex; background-color: var(--background); flex-direction: column;align-items:center; padding-left: 60px;padding-right: 60px; padding-bottom: 60px; padding-top: 30px; text-align:left; border-radius: 10px;justify-content: center;">
                 <div style="display: flex; flex-direction: row;align-items:center; column-gap: 60px; justify-content: space-between; width: 100%;">
-                    <div style="flex: 1; background-color: var(--primary-200); aspect-ratio: 2; align-items: start; padding: 30px; text-align: left; border-radius: 30px;">
+                    <div style="flex: 1; background-image: url('./assets/non-plan_background_orangeDark.jpg'); background-size: cover; background-position: center; aspect-ratio: 2; align-items: start; padding: 30px; text-align: left; border-radius: 30px;">
                         <h0 style="color: var(--complementary-200); margin-bottom: 20px;" data-lang="start_innovateHeading">Innovating AEC with Digital Solutions</h0>
-                        <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 800px;padding-top: 20px;" data-lang="start_innovateText">
+                        <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--complementary200); max-width: 800px; padding-top: 20px;" data-lang="start_innovateText">
                             Based in Zurich, non-plan is a leading provider of cutting-edge software solutions tailored to the architecture, engineering, and construction (AEC) industry. Our mission is to enhance the efficiency, accuracy, and creativity of professionals by providing custom-made digital tools that fit seamlessly into their workflows. 
                             Our services include custom web applications, Python automation scripts, AR-based visualization tools, and much more.
                         </p>
                     </div>
+                    
+                    
                 </div>
             </div>
 
             <!-- Second Section: non-plan Platform & non-plan services -->
             <div style="display: flex; background-color: var(--background-200); flex-direction: column;align-items:center; padding: 60px; text-align:left; border-radius: 10px;justify-content: center;">
                 <div style="display: flex; flex-direction: row;align-items:center; column-gap: 60px; justify-content: space-between; width: 100%;">
-                    <div style="flex: 1; background-color: var(--primary-200); aspect-ratio: 1; align-items: start; padding: 30px; text-align: left; border-radius: 30px;">
+                    <div style="flex: 1; background-image: url('./assets/platform_preview.jpg'); aspect-ratio: 1; align-items: start; padding: 30px; text-align: left; border-radius: 30px;">
                         <h0 style="color: var(--complementary-200); margin-bottom: 20px;" data-lang="start_introPlatform">Introducing the non-plan Platform</h0>
                         <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 800px;padding-top: 20px;" data-lang="start_platformText">
                             The Non-Plan WebApp is designed to simplify and accelerate project management in the AEC industry. It integrates a range of advanced tools to streamline workflows and improve productivity, from project tracking and task management to automated checks and feasibility assessments. Our web app empowers teams to track progress, collaborate seamlessly, and make data-driven decisions faster than ever before. 
@@ -64,90 +130,88 @@
                 </div>
             </div>
             <!-- Third Section: Who We Are -->
-            <div style="display: flex; background-color: transparent; flex-direction: column; row-gap: 20px; align-items: center; padding: 30px; text-align: start; border-radius: 10px;">
+            <div style="display: flex; background-color: transparent; flex-direction: column; row-gap: 20px; align-items: center; padding: 30px; text-align:start; border-radius: 10px;">
+                <!-- Section Title -->
                 <h0 style="color: var(--primary-200); margin-bottom: 20px;" data-lang="start_whoTitle">Who We Are</h0>
-                <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 1200px; text-align: start;" data-lang="start_whoText">
+                <!-- Section Text -->
+                <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 1200px;justify-content: start;" data-lang="start_projectsText">
                     At Non-Plan, we are a team of architects, designers, and innovators dedicated to redefining the AEC industry through digital transformation and creative collaboration. 
                     Our collective expertise bridges the gap between traditional architectural practice and cutting-edge technology, fostering a culture of experimentation and innovation.
                 </p>
                 <!-- Grid Container for Team Members -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, 200px); gap: 30px; justify-content: center; width: 100%; padding: 40px; background-color: transparent; border-radius: 10px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));max-width: 700px; gap: 0px; justify-content: center; align-items: center; width: 100%; padding: 40px; background-color: transparent; border-radius: 10px;">
                     <!-- Circle 1 -->
-                    <div style="background-color: white; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
-                        <img src="path-to-image1.jpg" alt="Team Member 1" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px;">Katrin</div>
+                    <div style="width: 300px; height: 300px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; margin: 0 auto;">
+                        <img src="./assets/Non-Plan_222105387.jpg" alt="Team Member 1" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px; text-align: center;">Katrin</div>
                     </div>
-
                     <!-- Circle 2 -->
-                    <div style="background-color: white; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
-                        <img src="path-to-image2.jpg" alt="Team Member 2" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px;">Mikel</div>
-                    </div>
-
-                    <!-- Circle 3 -->
-                    <div style="background-color: white; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
-                        <img src="path-to-image3.jpg" alt="Team Member 3" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px;"></div>
-                    </div>
-
-                    <!-- Circle 4 -->
-                    <div style="background-color: white; width: 200px; height: 200px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
-                        <img src="path-to-image4.jpg" alt="Team Member 4" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px;"></div>
+                    <div style="width: 300px; height: 300px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; margin: 0 auto;">
+                        <img src="./assets/Non-Plan_222105335.jpg" alt="Team Member 2" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px; text-align: center;">Mikel</div>
                     </div>
                 </div>
             </div>
-
             <!-- Fourth Section: Highlighting Key Projects and Collaborations -->
-            <div style="display: flex; background-color: transparent; flex-direction: column; row-gap: 20px; align-items: center; padding: 30px; text-align:start; border-radius: 10px;">
-                <h0 style="color: var(--primary-200); margin-bottom: 20px; " data-lang="start_projectsTitle">Projects and Collaborations</h0>
-                <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 1200px;justify-content: start;" data-lang="start_projectsText">
-                    Non-Plan is at the forefront of innovation in the AEC sector, with a proven track record of high-profile collaborations. 
-                    We recently represented Liechtenstein at the 2023 Venice Architecture Biennale, showcasing our immersive VR experience that pushed the boundaries of architectural visualization. Our work with OOS AG in Zurich has helped them enhance their design and project management processes with tailored digital solutions.
-                </p>
-                <!-- Grid Container -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, 500px); gap: 30px; justify-content: center; width: 100%; padding: 40px; background-color: transparent; border-radius: 10px;">
-                    <!-- Rectangle 1 -->
-                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
-                        <h1 style="color: var(--complementary-200); margin-bottom: 20px;">Example</h1>
-                    </div>
-
-                    <!-- Rectangle 2 -->
-                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
-                        <h1 style="color: var(--primary-200); margin-bottom: 20px;">Example</h1>
-                    </div>
-
-                    <!-- Rectangle 3 -->
-                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
-                        <h1 style="color: var(--complementary-200); margin-bottom: 20px;">Example</h1>
-                    </div>
-
-                    <!-- Rectangle 4 -->
-                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
-                        <h1 style="color: var(--primary-200); margin-bottom: 20px;">Example</h1>
-                    </div>  
-                    <!-- Rectangle 5 -->
-                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
-                        <h1 style="color: var(--complementary-200); margin-bottom: 20px;">Example</h1>
-                    </div>
-
-                    <!-- Rectangle 6 -->
-                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
-                        <h1 style="color: var(--primary-200); margin-bottom: 20px;">Example</h1>
-                    </div>
-
-                    <!-- Rectangle 7 -->
-                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
-                        <h1 style="color: var(--complementary-200); margin-bottom: 20px;">Example</h1>
-                    </div>
-
-                    <!-- Rectangle 8 -->
-                    <div style="background-color: white; aspect-ratio: 1; padding: 30px; text-align: left; border-radius: 30px; overflow: hidden;">
-                        <h1 style="color: var(--primary-200); margin-bottom: 20px;">Example</h1>
-                    </div>
+            <div style="display: flex; background-color: transparent; flex-direction: column; row-gap: 00px; align-items: center; padding: 60px; text-align:start; border-radius: 10px;">
+                <h0 style="color: var(--primary-200); margin-bottom: 20px;" data-lang="start_projectsTitle">Projects and Collaborations</h0>
+               <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 1200px; justify-content: start;" data-lang="start_projectsText">
+                  Non-Plan is at the forefront of innovation in the AEC sector, with a proven track record of high-profile collaborations. 
+                   We recently represented Liechtenstein at the 2023 Venice Architecture Biennale, showcasing our immersive VR experience that pushed the boundaries of architectural visualization. Our work with OOS AG in Zurich has helped them enhance their design and project management processes with tailored digital solutions.
+              </p>
+              <!-- Grid Container -->
+              <div id="gridContainer" style="display: grid; grid-template-columns: repeat(auto-fit, 450px); gap: 0px; justify-content: center; width: 100%; padding: 40px; background-color: transparent; border-radius: 10px;">
+                  <!-- Images -->
+                  <div class="grid-item" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                      <img src="./assets/LinkedIn_01.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 1">
+                  </div>
+                  <div class="grid-item" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                     <img src="./assets/LinkedIn_02.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 2">
+                  </div>
+                  <div class="grid-item" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                      <img src="./assets/LinkedIn_03.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 3">
+                 </div>
+                 <!-- Hidden items -->
+                    <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                        <img src="./assets/LinkedIn_04.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 5">
+                    </div>      
+                    <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                        <img src="./assets/LinkedIn_05.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 5">
+                   </div>
+                   <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                       <img src="./assets/LinkedIn_06.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 6">
+                   </div>
+                    <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                        <img src="./assets/LinkedIn_07.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 7">
+                 </div>
+                 <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                     <img src="./assets/LinkedIn_08.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                 </div>
+                 <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                    <img src="./assets/LinkedIn_09.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
                 </div>
-            </div>
-
+                <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                    <img src="./assets/LinkedIn_10.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                </div>
+                <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                    <img src="./assets/LinkedIn_11.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                </div>
+                <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                    <img src="./assets/LinkedIn_12.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                </div>
+                <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                    <img src="./assets/LinkedIn_13.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                </div>
+                <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                    <img src="./assets/LinkedIn_14.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                </div>
+                 <!-- Add more as needed -->
+             </div>
+             <!-- Show More Button -->
+             <button id="showMoreButton" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Show More</button>
+             <button id="showLessButton" style="padding: 10px 20px; font-size: 16px; cursor: pointer; display: none;">Show Less</button>
+         
+            </div>    
         
             <!-- Fifth Section: Call to Action for WebApp Login -->
             <div style="display: flex; background-color: var(--background-100); flex-direction: column; row-gap: 20px; align-items: center; padding: 30px; text-align: left; border-radius: 10px;">
@@ -209,7 +273,7 @@
     <main id="content" >
         <div class="page" id = "projectsPage" style = "display: none"> 
             <dialog id = "newProjectModal">
-                <form id = "newProjectForm">
+                <form class="userForm" id = "newProjectForm">
                     <h2>New Project</h2>
                     <div class= "userCard">
                         <div class = "formFieldContainer">
@@ -273,7 +337,7 @@
                 </form>
             </dialog>
             <dialog id="newProjectErrorModal">
-                <form id="newProjectErrorForm" method="dialog" style="box-sizing: border-box;">
+                <form class="userForm" id="newProjectErrorForm" method="dialog" style="box-sizing: border-box;">
                     <h2 style="display: flex; align-items: center; gap: 8px; font-size: 20px; padding: 10px; margin: 0;">
                         <span class="material-icons-round" style="font-size: 20px; vertical-align: middle;">warning</span>
                         Error
@@ -305,7 +369,7 @@
                 </div>
             </header>
             <dialog id = "editProjectModal">
-                <form id = "editProjectForm">
+                <form class="userForm" id = "editProjectForm">
                     <h2>Edit Project</h2>
                     <div class= "userCard">
                         <div class = "formFieldContainer">
@@ -443,7 +507,7 @@
         </div>
         <div class="page" id = "usersPage" style = "display: none">
             <dialog id = "newUserModal">
-                <form id = "newUserForm">
+                <form class="userForm" id = "newUserForm">
                     <h2>New User</h2>
                     <div class= "userCard">
                         <div class = "formFieldContainer">
@@ -490,7 +554,7 @@
                 </form>
             </dialog>
             <dialog id = "newCompanyModal">
-                <form id = "newCompanyForm">
+                <form class="userForm" id = "newCompanyForm">
                     <h2>New Company</h2>
                     <div class= "userCard">
                         <div class = "formFieldContainer">

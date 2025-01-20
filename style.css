@@ -24,6 +24,7 @@
     --fontSizeGiant: 30px;
     --fontSizeGiantXL: 40px;
     --fontSizeGiantXXL: 50px;
+    --fontSizeGiantXXXL: 100px;
 
 }
 
@@ -131,6 +132,25 @@ buttonBlue {
 
 buttonBlue:hover {
     background-color: var(--complementary-200);
+}
+
+.buttonTextBlue {
+    padding: 8px 15px;
+    cursor: pointer;
+    height: 40px;
+    font-size: var(--fontSizeMedium);
+    background-color: transparent;
+    color: var(--complementary-200);
+    border-radius: 100px;
+    border: none;
+    display: flex;
+    align-items: center;
+    column-gap: 10px; 
+}
+
+.buttonTextBlue:hover {
+    color: var(--primary-200);
+    background-color: transparent;
 }
 
 .acceptButton {
@@ -413,6 +433,8 @@ dialog::backdrop {
     backdrop-filter: blur(3xp);
 }
 
+
+/* Default form styles */
 form {
     width: 450px;
     border-radius: 10px;
@@ -425,7 +447,20 @@ form h2 {
     border-bottom: 2px solid var(--complementary-200);
 }
 
-form .userCard {
+/* Styles for userForm */
+.userForm .userCard {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    row-gap: 25px;
+}
+
+/* Styles for infoForm */
+.infoForm {
+    width: 850px;
+}
+
+.infoForm .infoCard {
     display: flex;
     flex-direction: column;
     padding: 20px;

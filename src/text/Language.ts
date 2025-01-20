@@ -4,6 +4,8 @@ export const translations = {
         //Header:
         en: "EN",
         de: "DE",
+        services: "services",
+        insights: "insights",
         //start_non-plan Website:
         start_welcome: "Welcome to non-plan",
         start_innovateHeading: "Innovating AEC with Digital Solutions",
@@ -29,6 +31,8 @@ export const translations = {
         //Header:
         en: "EN",
         de: "DE",
+        services: "Dienstleistungen",
+        insights: "Überblick",
         //start_non-plan Website:
         start_welcome: "Willkommen bei non-plan",
         start_innovateHeading: "Innovation im AEC-Bereich durch digitale Lösungen",

@@ -78,6 +78,51 @@ if (newCompanyBtn){
     console.warn("New company button was not found")
 }
 
+//insightModal
+const insightBtn = document.getElementById("insightsBtn")
+
+if (insightBtn){
+    insightBtn.addEventListener("click", () => {showModal("insightsModal")})
+} else {
+    console.warn("insightsModal button was not found")
+}
+
+//servicesModal
+const servicesBtn = document.getElementById("servicesBtn")
+
+if (servicesBtn){
+    servicesBtn.addEventListener("click", () => {showModal("servicesModal")})
+} else {
+    console.warn("servicesModal button was not found")
+}
+
+//npInfoModal
+const npInfoBtn = document.getElementById("npInfoBtn")
+
+if (npInfoBtn){
+    npInfoBtn.addEventListener("click", () => {showModal("npInfoModal")})
+} else {
+    console.warn("npInfo Modal button was not found")
+}
+
+//loginModal
+const infoLogINBtn = document.getElementById("infoLogINBtn")
+
+if (infoLogINBtn){
+    infoLogINBtn.addEventListener("click", () => {showModal("loginModal")})
+} else {
+    console.warn("login Modal button was not found")
+}
+
+//loginModalEnd
+const logINBtnEnd = document.getElementById("logINBtnEnd")
+
+if (logINBtnEnd){
+    logINBtnEnd.addEventListener("click", () => {showModal("loginModal")})
+} else {
+    console.warn("logINBtnEnd  button was not found")
+}
+
 //Add event listener to logIn button(Main Page)
 const logINBtn = document.getElementById("logINBtn");
 logINBtn?.addEventListener("click", ()=> {
@@ -92,23 +137,17 @@ logINBtn?.addEventListener("click", ()=> {
     projectsPage.style.display = "flex";
     introPage.style.display = "none";
     sidebar.style.display = "flex";
+    // Get buttons to hide
+    const insightsBtn = document.getElementById("insightsBtn") as HTMLButtonElement;
+    const servicesBtn = document.getElementById("servicesBtn") as HTMLButtonElement;
+    const npInfoBtn = document.getElementById("npInfoBtn") as HTMLButtonElement;
+    // Hide specific buttons
+    insightsBtn.style.display = "none";
+    servicesBtn.style.display = "none";
+    npInfoBtn.style.display = "none";
+
 })
 
-//Add event listener to logIn button End(Main Page)
-const logINBtnEnd = document.getElementById("logINBtnEnd");
-logINBtnEnd?.addEventListener("click", ()=> {
-    const projectsPage = document.getElementById("projectsPage") as HTMLDivElement;
-    const usersPage = document.getElementById("usersPage") as HTMLDivElement;
-    const detailsPage = document.getElementById("projectDetails") as HTMLDivElement;
-    const introPage = document.getElementById("intro") as HTMLDivElement;
-    const sidebar = document.getElementById("sidebar") as HTMLDivElement;
-    if (!(projectsPage && detailsPage)) return console.warn("Pages not found");
-    detailsPage.style.display = "none";
-    usersPage.style.display = "none";
-    projectsPage.style.display = "flex";
-    introPage.style.display = "none";
-    sidebar.style.display = "flex";
-})
 
 // Add event listener to Projects button
 const projectsBtn = document.getElementById("projectsBtn") as HTMLLIElement;
@@ -366,3 +405,25 @@ function updateMenuText(language: string) {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const showMoreButton = document.getElementById('showMoreButton');
+    const showLessButton = document.getElementById('showLessButton');
+    const hiddenItems = document.querySelectorAll('.grid-item.hidden');
+
+    // Show More: Display hidden items and toggle buttons
+    showMoreButton?.addEventListener('click', () => {
+        hiddenItems.forEach(item => item.classList.remove('hidden'));
+
+        if (showMoreButton) showMoreButton.style.display = 'none';
+        if (showLessButton) showLessButton.style.display = 'inline-block';
+    });
+
+    // Show Less: Hide extra items and toggle buttons
+    showLessButton?.addEventListener('click', () => {
+        hiddenItems.forEach(item => item.classList.add('hidden'));
+
+        if (showLessButton) showLessButton.style.display = 'none';
+        if (showMoreButton) showMoreButton.style.display = 'inline-block';
+    });
+});
