@@ -87,6 +87,15 @@ if (insightBtn){
     console.warn("insightsModal button was not found")
 }
 
+//insightModal2
+const insightBtn2 = document.getElementById("insightsBtn2")
+
+if (insightBtn2){
+    insightBtn2.addEventListener("click", () => {showModal("insightsModal")})
+} else {
+    console.warn("insightsModal2 button was not found")
+}
+
 //servicesModal
 const servicesBtn = document.getElementById("servicesBtn")
 
@@ -96,6 +105,15 @@ if (servicesBtn){
     console.warn("servicesModal button was not found")
 }
 
+//servicesModal2
+const servicesBtn2 = document.getElementById("servicesBtn2")
+
+if (servicesBtn2){
+    servicesBtn2.addEventListener("click", () => {showModal("servicesModal")})
+} else {
+    console.warn("servicesModal2 button was not found")
+}
+
 //npInfoModal
 const npInfoBtn = document.getElementById("npInfoBtn")
 
@@ -103,6 +121,15 @@ if (npInfoBtn){
     npInfoBtn.addEventListener("click", () => {showModal("npInfoModal")})
 } else {
     console.warn("npInfo Modal button was not found")
+}
+
+//npInfoModal2
+const npInfoBtn2 = document.getElementById("npInfoBtn2")
+
+if (npInfoBtn2){
+    npInfoBtn2.addEventListener("click", () => {showModal("npInfoModal")})
+} else {
+    console.warn("npInfo2 Modal button was not found")
 }
 
 //loginModal
@@ -123,7 +150,34 @@ if (logINBtnEnd){
     console.warn("logINBtnEnd  button was not found")
 }
 
-//Add event listener to logIn button(Main Page)
+//newAccountBtn
+const newAccountBtn = document.getElementById("newAccountBtn");
+
+if (newAccountBtn) {
+    newAccountBtn.addEventListener("click", (event) => {
+        event.preventDefault(); // Prevents the form from submitting
+        console.log("newAccountBtn clicked");
+        showModal("newAccountModal");
+    });
+} else {
+    console.warn("newAccountBtn was not found");
+}
+
+
+//Button Login temporary:
+const logINBtn = document.getElementById("logINBtn");
+
+if (logINBtn) {
+    logINBtn.addEventListener("click", (event) => {
+        event.preventDefault(); // Prevents the form from submitting
+        console.log("logINBtn clicked");
+        showModal("newAccountModal");
+    });
+} else {
+    console.warn("logINBtn was not found");
+}
+
+/*Add event listener to logIn button(Main Page)
 const logINBtn = document.getElementById("logINBtn");
 logINBtn?.addEventListener("click", ()=> {
     const projectsPage = document.getElementById("projectsPage") as HTMLDivElement;
@@ -146,7 +200,7 @@ logINBtn?.addEventListener("click", ()=> {
     servicesBtn.style.display = "none";
     npInfoBtn.style.display = "none";
 
-})
+})*/
 
 
 // Add event listener to Projects button

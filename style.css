@@ -160,9 +160,21 @@ buttonBlue:hover {
     
 }
 
+.loginButton:hover {
+    background-color: var(--primary-300);
+}
+
+.loginButton {
+    background-color: var(--primary-100);
+    margin-bottom: 20px;
+
+    
+}
+
 .acceptButton:hover {
     background-color: var(--complementary-300);
 }
+
 
 .cancelButton {
     background-color: transparent;
@@ -233,6 +245,17 @@ buttonBlue:hover {
 .buttonSecondary:hover {
     background-color: var(--complementary-200);
     outline: none;
+}
+
+.buttonMainPage {
+    
+}
+
+.buttonMainPage:hover {
+    outline: 2px solid var(--primary);
+    cursor: pointer;
+    filter: brightness(120%);
+    transition: filter 0.3s ease;
 }
 
 
@@ -436,15 +459,15 @@ dialog::backdrop {
 
 /* Default form styles */
 form {
-    width: 450px;
     border-radius: 10px;
+    width: 450px;
     background-color: var(--background-100);
     color: white;
 }
 
 form h2 {
     padding: 20px;
-    border-bottom: 2px solid var(--complementary-200);
+    /*border-bottom: 2px solid var(--complementary-200);*/
 }
 
 /* Styles for userForm */
@@ -455,16 +478,36 @@ form h2 {
     row-gap: 25px;
 }
 
+/* Styles for loginForm */
+.loginForm {
+    width: 450px; /* Total width, including padding and border */
+    box-sizing: border-box; /* Ensures padding and borders don't add to width */
+    margin: 0 auto; /* Centers the form horizontally */
+}
+
+.loginForm .loginCard {
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Ensures it stays within the form's width */
+    padding: 20px; /* Inner padding */
+    box-sizing: border-box; /* Includes padding in width */
+    row-gap: 20px; /* Space between children */
+}
+
+.userForm {
+    width: 450px;
+}
+
 /* Styles for infoForm */
 .infoForm {
-    width: 850px;
+    width: 900px;
 }
 
 .infoForm .infoCard {
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    row-gap: 25px;
+    padding: 10px;
+    row-gap: 10px;
 }
 
 form .formFieldContainer {
@@ -550,9 +593,66 @@ input:focus, textarea:focus, select:focus {
     cursor: pointer;
 }
 
+.userCard {
+    background-color: var(--background-100);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
 .userCard:hover {
     outline: 2px solid var(--complementary-200);
 }
+
+#loginModal {
+    border: 1px solid white; /* Modal border */
+    border-radius: 30px;     /* Rounded corners */
+    padding: 0;              /* Reset padding (if not intentional) */
+    box-sizing: border-box;  /* Ensure padding/borders are within size */
+}
+
+#insightsModal {
+    border: 1px solid white; /* Modal border */
+    border-radius: 30px;     /* Rounded corners */
+    padding: 0;              /* Reset padding (if not intentional) */
+    box-sizing: border-box;  /* Ensure padding/borders are within size */
+}
+
+#servicesModal {
+    border: 1px solid white; /* Modal border */
+    border-radius: 30px;     /* Rounded corners */
+    padding: 0;              /* Reset padding (if not intentional) */
+    box-sizing: border-box;  /* Ensure padding/borders are within size */
+}
+
+#npInfoModal {
+    border: 1px solid white; /* Modal border */
+    border-radius: 30px;     /* Rounded corners */
+    padding: 0;              /* Reset padding (if not intentional) */
+    box-sizing: border-box;  /* Ensure padding/borders are within size */
+}
+
+
+.loginCardProperty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;             /* Ensure children don't expand */
+    box-sizing: border-box;  /* Include padding/borders in size */
+}
+
+.loginCard {
+    display: flex;
+    flex-direction: column;
+    width: 100%;             /* Constrain to parent width */
+    background-color: var(--background-100); /* Background */
+    border-radius: 8px;      /* Rounded corners */
+    padding: 20px;           /* Padding inside the card */
+    box-sizing: border-box;  /* Ensure padding is included in width */
+    row-gap: 20px;           /* Space between children */
+}
+
+
+
 
 /* Language */
 
