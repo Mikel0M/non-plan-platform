@@ -1,8 +1,11 @@
+import { v4 as uuidv4 } from 'uuid'
+
 export type usersRole = "Architect" | "Engineer" | "Developer"
 export type access = "Administrator" | "Editor" | "Guest"
 
 
 export interface IUser {
+    id?: string
     name: string
     surname: string
     email: string
@@ -21,11 +24,15 @@ export class User implements IUser{
     role: "Architect" | "Engineer" | "Developer"
     access: "Administrator" | "Editor" | "Guest"
     company: string
+    id: string
 
     //Class internals
     ui: HTMLDivElement
 
     constructor (data: IUser) {
+        //Allow existing id, otherwise generate a new one
+        this.id = data.id || uuidv4();
+
         //Project data definition
         this.name = data.name
         this.surname = data.surname

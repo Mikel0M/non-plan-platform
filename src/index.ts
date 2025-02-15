@@ -13,7 +13,7 @@ import { translations } from "./text/Language"
 
 
 //Shows a modal. If the modal id is not found, it will show an error
-function showModal(id: string) {
+export function showModal(id: string) {
     const modal = document.getElementById(id)
     if (modal && modal instanceof HTMLDialogElement){
         modal.showModal()
@@ -22,8 +22,9 @@ function showModal(id: string) {
     }
 }
 
+
 //Closes a modal. If the modal id is not found, it will show an error
-function closeModal(id: string) {
+export function closeModal(id: string) {
     const modal = document.getElementById(id)
     if (modal && modal instanceof HTMLDialogElement){
         modal.close()
@@ -33,11 +34,15 @@ function closeModal(id: string) {
 }
 
 
-// Attach to the global window object
+// Attach to the global window object, Ensures that setChangeButton() runs when the app initializes, so the "Change" button always works.
 (window as any).closeModal = closeModal;
 
 const projectsListUI = document.getElementById("projectsList") as HTMLElement
 const projectsManager = new ProjectsManager(projectsListUI)
+
+
+// Call this method to set up the "Change" button event listener
+projectsManager.setChangeButton();
 
 //newProjectModal
 const newProjectBtn = document.getElementById("newProjectBtn")
@@ -164,7 +169,7 @@ if (newAccountBtn) {
 }
 
 
-//Button Login temporary:
+/*Button Login temporary:
 const logINBtn = document.getElementById("logINBtn");
 
 if (logINBtn) {
@@ -176,8 +181,9 @@ if (logINBtn) {
 } else {
     console.warn("logINBtn was not found");
 }
+    */
 
-/*Add event listener to logIn button(Main Page)
+//Add event listener to logIn button(Main Page)
 const logINBtn = document.getElementById("logINBtn");
 logINBtn?.addEventListener("click", ()=> {
     const projectsPage = document.getElementById("projectsPage") as HTMLDivElement;
@@ -200,7 +206,7 @@ logINBtn?.addEventListener("click", ()=> {
     servicesBtn.style.display = "none";
     npInfoBtn.style.display = "none";
 
-})*/
+})
 
 
 // Add event listener to Projects button
@@ -218,25 +224,30 @@ projectsBtn?.addEventListener("click", () => {
         return console.warn("Pages not found");
     }
 
-    // Page changes
+    // Hide other pages and show the Projects page
     usersPage.style.display = "none";
-    projectsPage.style.display = "flex";
     detailsPage.style.display = "none";
     introPage.style.display = "none";
+    projectsPage.style.display = "flex"; // Show Projects page
     sidebar.style.display = "flex";
 
-    // Set Projects button to active style
-    if (projectsBtn) {
-        projectsBtn.classList.add("active"); // Add the active class
-        projectsBtn.innerHTML = `<span class="material-icons-round">maps_home_work</span> Projects`; // Keep the icon and text
-    }
+    // Set the Projects button to active style
+    projectsBtn.classList.add("active");
+    projectsBtn.innerHTML = `<span class="material-icons-round">maps_home_work</span> Projects`;
+    console.log("Refreshing the project list...");
+    
+    // Refresh the project list
+    projectsManager.updateAllProjectCards()
+    console.log('List of projects:', projectsManager.list);
+    projectsManager.refreshProjectList();
+    console.log('List of projects:', projectsManager.list);
 
-    // Revert Users button to default style
-    if (usersBtn) {
-        usersBtn.classList.remove("active"); // Remove the active class
-        usersBtn.innerHTML = `<span class="material-icons-round">group</span> Users`; // Keep the icon and text
-    }
+    // Reset Users button to default style
+    usersBtn.classList.remove("active");
+    usersBtn.innerHTML = `<span class="material-icons-round">group</span> Users`; // Keep the icon and text
 });
+
+
 
 // Add event listener to Users button
 usersBtn?.addEventListener("click", () => {
@@ -305,12 +316,16 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
         } catch(error) {
             alert(error)
         }
+        projectsManager.refreshProjectList()
         
-
+        
     })
 }   else {
     console.warn("The project form was not found. Check the ID!")
 }
+
+
+
 
 /**
  * Handles the submission of the "New Users" form:
@@ -480,4 +495,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (showLessButton) showLessButton.style.display = 'none';
         if (showMoreButton) showMoreButton.style.display = 'inline-block';
     });
+
+    // Update Project
+    
 });
+

@@ -1,11 +1,34 @@
-import { IProject, Project } from "./Project"
+import { IProject, Project, userRole, status, phase } from "./Project";
+import { showModal, closeModal } from "../index";
+
+export let currentProject: Project | null = null; // Ensure it's globally accessible
 
 export class ProjectsManager {
-    list: Project[] = []
-    ui: HTMLElement
+    list: Project[] = [];
+    ui: HTMLElement;
+    currentProject: Project | null = null;
+    projectsListContainer: HTMLElement | null = null; // To hold the #projectsList container
 
     constructor(container: HTMLElement) {
-        this.ui = container
+        this.ui = container;
+    
+        // Query for #projectsList within the provided container projectsPage
+        this.projectsListContainer = this.ui.querySelector("#projectsList");
+    
+        console.log('container:', container); // Log the container to verify it's what you expect
+        console.log('projectsListContainer:', this.projectsListContainer); // Log to see if it's found
+    
+        if (this.projectsListContainer) {
+            console.log("Projects List container found!");
+        } else {
+            console.warn("Wrapper container '#projectsList' not found!");
+        }
+    }
+
+    updateAllProjectCards() {
+        this.list.forEach((project) => {
+            this.updateProjectCards(project);
+        });
     }
 
     newProject(data: IProject) {
@@ -18,151 +41,370 @@ export class ProjectsManager {
             this.showErrorModalDupName(data.name);
             return null; // Prevent further execution
         }
+
+        // Add event listener to select project for editing
         project.ui.addEventListener("click", () => {
-            const projectsPage = document.getElementById("projectsPage")
-            const detailsPage = document.getElementById("projectDetails")
-            if (!projectsPage || !detailsPage) {return}
-            projectsPage.style.display = "none"
-            detailsPage.style.display = "flex"
-            this.setDetailsPage(project)
-        })
-        
+            const projectsPage = document.getElementById("projectsPage");
+            const detailsPage = document.getElementById("projectDetails");
+            if (!projectsPage || !detailsPage) return;
 
+            projectsPage.style.display = "none";
+            detailsPage.style.display = "flex";
+
+            this.currentProject = project;
+            this.setDetailsPage(project);  // Set the details page with the selected project
+            this.setProjectsPage(project);  // Set the details page with the selected project
+        });
+
+        // Other checks for project name
         if (data.name.length < 5) {
-            this.showErrorModalShortName()
+            this.showErrorModalShortName();
             return null; // Prevent further execution
-
         }
 
         this.ui.append(project.ui);
         this.list.push(project);
         return project;
     }
-    
-    private setDetailsPage(project: Project) {
-        
-        const detailsPage = document.getElementById("projectDetails")
-        if (!detailsPage) { return }
 
-        const iconPD = detailsPage.querySelector("[data-project-info='iconPD']")
-        if (iconPD) { iconPD.textContent = project.icon}
-        const namePD = detailsPage.querySelector("[data-project-info='namePD']")
-        if (namePD) { namePD.textContent = project.name}
-
-        // Populate the form in the edit modal
-        const projectNameInput = document.getElementById("projectNameInput") as HTMLInputElement;
-        if (projectNameInput) {
-        // Set the value of the input to the project's name
-        projectNameInput.value = project.name;
+    setDetailsPage(project: Project) {
+        const detailsPage = document.getElementById("projectDetails");
+        if (!detailsPage || !this.currentProject) {
+            console.warn("No project selected for editing!");
+            return;  // Exit early if there's no project to edit
         }
 
-        const nameBigPD = detailsPage.querySelector("[data-project-info='nameBigPD']")
-        if (nameBigPD) { nameBigPD.textContent = project.name}
-        const locationPD = detailsPage.querySelector("[data-project-info='locationPD']")
-        if (locationPD) { locationPD.textContent = project.location}
-        const descriptionPD = detailsPage.querySelector("[data-project-info='descriptionPD']")
-        if (descriptionPD) { descriptionPD.textContent = project.description}
-        const costPD = detailsPage.querySelector("[data-project-info='costPD']")
-        if (costPD) { 
-            costPD.textContent = project.cost.toString(); 
-        }
-        const statusPD = detailsPage.querySelector("[data-project-info='statusPD']")
-        if (statusPD) { statusPD.textContent = project.status}
-        const rolePD = detailsPage.querySelector("[data-project-info='rolePD']")
-        if (rolePD) { rolePD.textContent = project.userRole}
-        const startPD = detailsPage.querySelector("[data-project-info='startPD']")
-        if (startPD) { startPD.textContent = project.startDate}
-        const finishPD = detailsPage.querySelector("[data-project-info='finishPD']")
-        if (finishPD) { finishPD.textContent = project.finishDate}
-        
+        // Populate project details
+        const setText = (selector: string, value: string | number) => {
+            const element = detailsPage.querySelector(`[data-project-info='${selector}']`);
+            if (element) {
+                element.textContent = value.toString();
+            } else {
+                console.warn(`Element not found for ${selector}`);
+            }
+        };
 
+        setText("iconPD", project.icon);
+        setText("namePD", project.name);
+        setText("nameBigPD", project.name);
+        setText("locationPD", project.location);
+        setText("descriptionPD", project.description);
+        setText("costPD", project.cost);
+        setText("statusPD", project.status);
+        setText("rolePD", project.userRole);
+        setText("startPD", project.startDate);
+        setText("finishPD", project.finishDate);
+
+        // Populate form fields for editing
+        const setInputValue = (id: string, value: string | number) => {
+            const input = document.getElementById(id) as HTMLInputElement;
+            if (input) input.value = value.toString();
+        };
+
+        setInputValue("projectNameInput", project.name);
+        setInputValue("projectLocationInput", project.location);
+        setInputValue("projectDescriptionInput", project.description);
+        setInputValue("projectCostInput", project.cost);
+        setInputValue("projectStatusInput", project.status);
+        setInputValue("projectRoleInput", project.userRole);
+        setInputValue("projectStartPDInput", project.startDate);
+        setInputValue("projectFinishPDInput", project.finishDate);
+
+        // Set icon background color
         const iconElement = document.getElementById("iconPD");
-
         if (iconElement) {
-        // Assign the desired background color
-        (iconElement as HTMLElement).style.backgroundColor = project.color; // Replace with your dynamic color
+            (iconElement as HTMLElement).style.backgroundColor = project.color;
         }
     }
 
+    setProjectsPage(project: Project) {
+        const projectsPage = document.getElementById("projectsPage");
+        if (!projectsPage || !this.currentProject) {
+            console.warn("No project selected for editing!");
+            return;  // Exit early if there's no project to edit
+        }
+
+        // Populate project page
+        const setText = (selector: string, value: string | number) => {
+            const element = projectsPage.querySelector(`[data-project-info='${selector}']`);
+            if (element) element.textContent = value.toString();
+        };
+
+        setText("iconPD", project.icon);
+        setText("namePD", project.name);
+        setText("nameBigPD", project.name);
+        setText("locationPD", project.location);
+        setText("descriptionPD", project.description);
+        setText("costPD", project.cost);
+        setText("statusPD", project.status);
+        setText("rolePD", project.userRole);
+        setText("startPD", project.startDate);
+        setText("finishPD", project.finishDate);
+
+        // Populate form fields for editing
+        const setInputValue = (id: string, value: string | number) => {
+            const input = document.getElementById(id) as HTMLInputElement;
+            if (input) input.value = value.toString();
+        };
+
+        setInputValue("projectNameInput", project.name);
+        setInputValue("projectLocationInput", project.location);
+        setInputValue("projectDescriptionInput", project.description);
+        setInputValue("projectCostInput", project.cost);
+        setInputValue("projectStatusInput", project.status);
+        setInputValue("projectRoleInput", project.userRole);
+        setInputValue("projectStartPDInput", project.startDate);
+        setInputValue("projectFinishPDInput", project.finishDate);
+
+        const iconElement = document.getElementById("iconPD");
+        if (iconElement) {
+            (iconElement as HTMLElement).style.backgroundColor = project.color;
+        }
+    }
+
+    setChangeButton() {
+        const saveButton = document.getElementById("changeProjectButton") as HTMLButtonElement;
+        if (saveButton) {
+            saveButton.addEventListener("click", () => {
+                if (this.currentProject) {
+                    this.updateProjectData(this.currentProject.id);
+                    this.updateProjectUI(this.currentProject);
+                    this.updateProjectCards(this.currentProject);
+
+                    const modal = document.getElementById("editProjectModal") as HTMLDialogElement;
+                    if (modal) {
+                        modal.close();
+                    }
+                } else {
+                    console.warn("No project selected for editing.");
+                }
+            });
+        }
+    }
+
+    refreshProjectList() {
+        // Step 1: Get the container where the project cards are displayed
+        const projectsListContainer = this.projectsListContainer;
+        console.log("here should come the projectsListContainer")
+        console.log(this.projectsListContainer)
+        this.updateAllProjectCards()
+        console.log(this.projectsListContainer)
+    
+        // Step 2: Clear the existing project cards
+        if (projectsListContainer) {
+            projectsListContainer.innerHTML = ''; // Remove all current project cards
+        } else {
+            console.warn("Projects list container not found!");
+            return;
+        }
+    
+        // Step 3: Recreate and append all project cards
+        if (this.list.length === 0) {
+            console.log("No projects to display.");
+            return;
+        }
+    
+        // Iterate over all projects and append them again
+        this.list.forEach((project) => {
+            // Assuming each project has a `setUI()` method that creates a new UI element
+            project.setUI();
+            if (projectsListContainer) {
+                projectsListContainer.appendChild(project.ui); // Add the new project card
+            }
+        });
+    
+        console.log("Projects list refreshed.");
+    }
+    
 
     
-    // Method to handle modal display
+
+    updateProjectData(projectId: string) {
+        const project = this.getProject(projectId);
+
+        if (!project) {
+            console.warn("No project found with the provided ID.");
+            return;
+        }
+
+        const getInputValue = (id: string): string => {
+            const input = document.getElementById(id) as HTMLInputElement;
+            return input ? input.value : "";
+        };
+
+        // Update project properties
+        project.name = getInputValue("projectNameInput");
+        project.location = getInputValue("projectLocationInput");
+        project.description = getInputValue("projectDescriptionInput");
+        project.cost = parseFloat(getInputValue("projectCostInput")) || 0;
+
+        // Validate and update status
+        const statusValue = getInputValue("projectStatusInput") as status;
+        if (["Pending", "Active", "Finished"].includes(statusValue)) {
+            project.status = statusValue;
+        } else {
+            console.warn(`Invalid status: ${statusValue}`);
+        }
+
+        // Validate and update userRole
+        const roleValue = getInputValue("projectRoleInput") as userRole;
+        if (["not defined", "Architect", "Engineer", "Developer"].includes(roleValue)) {
+            project.userRole = roleValue;
+        } else {
+            console.warn(`Invalid userRole: ${roleValue}`);
+        }
+
+        // Validate and update phase
+        const phaseValue = getInputValue("projectPhaseInput") as phase;
+        if (["Design", "Contruction Project", "Execution", "Construction"].includes(phaseValue)) {
+            project.phase = phaseValue;
+        } else {
+            console.warn(`Invalid phase: ${phaseValue}`);
+        }
+
+        project.startDate = getInputValue("projectStartPDInput");
+        project.finishDate = getInputValue("projectFinishPDInput");
+
+        this.updateProjectUI(project);
+        this.updateProjectCards(project);
+        this.refreshProjectList();
+    }
+
+    updateProjectCards(project: Project){
+        const projectsPage = document.getElementById("projectsPage");
+        if (!projectsPage) return;
+
+        const setText = (selector: string, value: string | number) => {
+            const element = projectsPage.querySelector(`[data-project-info='${selector}']`);
+            if (element) element.textContent = value.toString();
+        };
+
+        setText("iconPD", project.icon);
+        setText("namePD", project.name);
+        setText("nameBigPD", project.name);
+        setText("locationPD", project.location);
+        setText("descriptionPD", project.description);
+        setText("costPD", project.cost);
+        setText("statusPD", project.status);
+        setText("rolePD", project.userRole);
+        setText("startPD", project.startDate);
+        setText("finishPD", project.finishDate);
+
+        const setInputValue = (id: string, value: string | number) => {
+            const input = document.getElementById(id) as HTMLInputElement;
+            if (input) input.value = value.toString();
+        };
+
+        setInputValue("projectNameInput", project.name);
+        setInputValue("projectLocationInput", project.location);
+        setInputValue("projectDescriptionInput", project.description);
+        setInputValue("projectCostInput", project.cost);
+        setInputValue("projectStatusInput", project.status);
+        setInputValue("projectRoleInput", project.userRole);
+        setInputValue("projectStartPDInput", project.startDate);
+        setInputValue("projectFinishPDInput", project.finishDate);
+
+        const iconElement = document.getElementById("iconPD");
+        if (iconElement) {
+            (iconElement as HTMLElement).style.backgroundColor = project.color;
+        }
+
+    }
+
+    updateProjectUI(project: Project) {
+        const detailsPage = document.getElementById("projectDetails");
+        if (!detailsPage) return;
+
+        const setText = (selector: string, value: string | number) => {
+            const element = detailsPage.querySelector(`[data-project-info='${selector}']`);
+            if (element) element.textContent = value.toString();
+        };
+
+        setText("iconPD", project.icon);
+        setText("namePD", project.name);
+        setText("nameBigPD", project.name);
+        setText("locationPD", project.location);
+        setText("descriptionPD", project.description);
+        setText("costPD", project.cost);
+        setText("statusPD", project.status);
+        setText("rolePD", project.userRole);
+        setText("startPD", project.startDate);
+        setText("finishPD", project.finishDate);
+
+        const setInputValue = (id: string, value: string | number) => {
+            const input = document.getElementById(id) as HTMLInputElement;
+            if (input) input.value = value.toString();
+        };
+
+        setInputValue("projectNameInput", project.name);
+        setInputValue("projectLocationInput", project.location);
+        setInputValue("projectDescriptionInput", project.description);
+        setInputValue("projectCostInput", project.cost);
+        setInputValue("projectStatusInput", project.status);
+        setInputValue("projectRoleInput", project.userRole);
+        setInputValue("projectStartPDInput", project.startDate);
+        setInputValue("projectFinishPDInput", project.finishDate);
+
+        const iconElement = document.getElementById("iconPD");
+        if (iconElement) {
+            (iconElement as HTMLElement).style.backgroundColor = project.color;
+        }
+    }
+
     showErrorModalShortName() {
         const modal = document.getElementById("newProjectErrorModal") as HTMLDialogElement;
-    
-        // Find the content area of the modal (create a target element in your modal if needed)
         const errorMessageElement = modal.querySelector("#errorMessage");
-    
+
         if (errorMessageElement) {
             errorMessageElement.textContent = `A valid project name should have at least 5 characters.`;
         }
-    
-        // Show the modal
+
         if (modal) {
             modal.showModal();
         }
     }
-    
+
     showErrorModalDupName(repeatedName: string) {
         const modal = document.getElementById("newProjectErrorModal") as HTMLDialogElement;
-    
-        // Find the content area of the modal (create a target element in your modal if needed)
         const errorMessageElement = modal.querySelector("#errorMessage");
-    
+
         if (errorMessageElement) {
             errorMessageElement.textContent = `A project with the name "${repeatedName}" already exists.`;
         }
-    
-        // Show the modal
+
         if (modal) {
             modal.showModal();
         }
     }
 
-
     getProject(id: string) {
-        const project = this.list.find((project) => {
-            return project.id === id
-        })
-        return project 
+        const project = this.list.find((project) => project.id === id);
+        return project;
     }
 
     deleteProject(id: string) {
-        const project = this.getProject(id)
-        if(!project) { return }
-        project.ui.remove()
-        const remaining = this.list.filter((project) => {
-            return project.id !== id
-        })
-        this.list = remaining
+        const project = this.getProject(id);
+        if (!project) return;
+        project.ui.remove();
+        this.list = this.list.filter((project) => project.id !== id);
     }
 
     getProjectbyName(name: string) {
-        const project = this.list.find((project) => {
-            return project.name === name
-        })
-        return project
+        return this.list.find((project) => project.name === name);
     }
 
     getTotalCostAllProjects() {
-        let totalCost = 0
-        for (let i = 0; i> this.list.length; i++){
-            totalCost+=this.list[i].cost;
-        }
-        return totalCost
+        return this.list.reduce((total, project) => total + project.cost, 0);
     }
 
     exportToJSON() {
-        // Create a version of the projects data that excludes the `ui` property
         const exportableData = this.list.map(project => {
             const { ui, ...projectData } = project; // Destructure to exclude `ui`
             return projectData;
         });
-    
-        // Convert the cleaned data to JSON
+
         const json = JSON.stringify(exportableData, null, 2);
-    
-        // Trigger a download of the JSON file
+
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -171,32 +413,27 @@ export class ProjectsManager {
         a.click();
         URL.revokeObjectURL(url); // Clean up the URL object
     }
-    
+
     importFromJSON() {
-        // Create a file input element to select the JSON file
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'application/json';
-    
-        // Handle file loading
+
         input.addEventListener('change', () => {
             const file = input.files?.[0];
             if (!file) {
                 console.error("No file selected");
                 return;
             }
-    
-            // Read the file's content
+
             const reader = new FileReader();
             reader.onload = () => {
                 try {
                     const json = reader.result as string;
-                    const projects: IProject[] = JSON.parse(json); // Parse the JSON data
-    
-                    // Loop through the projects and create new instances
+                    const projects: IProject[] = JSON.parse(json);
+
                     for (const projectData of projects) {
                         try {
-                            // Ensure the UI is properly initialized when importing
                             this.newProject(projectData);
                         } catch (error) {
                             console.error(`Failed to import project: ${projectData.name}`, error);
@@ -210,11 +447,10 @@ export class ProjectsManager {
             reader.onerror = () => {
                 console.error("Failed to read the file:", reader.error);
             };
-    
+
             reader.readAsText(file); // Start reading the file
         });
-    
-        // Trigger the file input
+
         input.click();
     }
 }
