@@ -1,5 +1,5 @@
+import { closeModal } from "..";
 import { IProject, Project, userRole, status, phase } from "./Project";
-import { showModal, closeModal } from "../index";
 
 export let currentProject: Project | null = null; // Ensure it's globally accessible
 
@@ -25,11 +25,7 @@ export class ProjectsManager {
         }
     }
 
-    updateAllProjectCards() {
-        this.list.forEach((project) => {
-            this.updateProjectCards(project);
-        });
-    }
+   
 
     newProject(data: IProject) {
         const projectNames = this.list.map((project) => project.name);
@@ -41,12 +37,12 @@ export class ProjectsManager {
             this.showErrorModalDupName(data.name);
             return null; // Prevent further execution
         }
-
         // Add event listener to select project for editing
         project.ui.addEventListener("click", () => {
             const projectsPage = document.getElementById("projectsPage");
             const detailsPage = document.getElementById("projectDetails");
             if (!projectsPage || !detailsPage) return;
+            
 
             projectsPage.style.display = "none";
             detailsPage.style.display = "flex";
@@ -54,7 +50,24 @@ export class ProjectsManager {
             this.currentProject = project;
             this.setDetailsPage(project);  // Set the details page with the selected project
             this.setProjectsPage(project);  // Set the details page with the selected project
+            // Add event listener to open the  to Do Modal:
+            
+             
+
         });
+
+        //newtoDotModal 
+        const newtoDoModalBtn = document.getElementById("newToDoBtn");
+        const modaltoDo = document.getElementById("newToDoModal") as HTMLDialogElement;
+        if (newtoDoModalBtn && modaltoDo){
+            const name = modaltoDo.querySelector("[data-project-info='toDoProjectName']");
+            if (name) { name.textContent = data.name}
+            console.log(data.name)
+            newtoDoModalBtn.addEventListener("click", () => {modaltoDo.showModal()})
+        }
+
+        // Add event listener to open the projects tab
+
 
         // Other checks for project name
         if (data.name.length < 5) {
@@ -66,6 +79,79 @@ export class ProjectsManager {
         this.list.push(project);
         return project;
     }
+
+
+    setToDoModal(project: Project) {
+        const toDoModal = document.getElementById("editProjectModal");
+        if (!toDoModal || !this.currentProject) {
+            console.warn("No project selected for editing!");
+            return;  // Exit early if there's no project to edit
+        }
+
+        // Populate project details
+        const setText = (selector: string, value: string | number) => {
+            const element = toDoModal.querySelector(`[data-project-info='${selector}']`);
+            if (element) {
+                element.textContent = value.toString();
+            } else {
+                console.warn(`Element not found for ${selector}`);
+            }
+        };
+        
+        console.log("ready to test")
+        console.log("project.name")
+        setText("iconPD", project.icon);
+        setText("namePD", project.name);
+        setText("nameBigPD", project.name);
+        setText("locationPD", project.location);
+        setText("descriptionPD", project.description);
+        setText("progressPD", project.progress);
+        setText("costPD", project.cost);
+        setText("statusPD", project.status);
+        setText("rolePD", project.userRole);
+        setText("startPD", project.startDate);
+        setText("finishPD", project.finishDate);
+
+        // Populate form fields for editing
+        const setInputValue = (id: string, value: string | number) => {
+            const input = document.getElementById(id) as HTMLInputElement;
+            if (input) input.value = value.toString();
+        };
+
+        setInputValue("projectNameInput", project.name);
+        setInputValue("projectLocationInput", project.location);
+        setInputValue("projectDescriptionInput", project.description);
+        setInputValue("projectCostInput", project.cost);
+        setInputValue("projectProgressInput", project.progress);
+        setInputValue("projectStatusInput", project.status);
+        setInputValue("projectRoleInput", project.userRole);
+        setInputValue("projectStartPDInput", project.startDate);
+        setInputValue("projectFinishPDInput", project.finishDate);
+
+        // Set icon background color
+        const iconElement = document.getElementById("iconPD");
+        if (iconElement) {
+            (iconElement as HTMLElement).style.backgroundColor = project.color;
+        }
+
+        // Capture the project details into a constant
+        const projectDetails = {
+            name: project.name, // Project name
+            location: project.location, // Project location
+            description: project.description, // Project description
+            cost: project.cost, // Project costs
+            progress: project.progress, // Project progress
+            status: project.status, // Project status
+            role: project.userRole, // Project role
+            startDate: project.startDate, // Project start date
+            endDate: project.finishDate, // Project end date
+            // You can add more project properties here
+        };
+        console.log("testing")
+        console.log(projectDetails)
+    }
+
+    
 
     setDetailsPage(project: Project) {
         const detailsPage = document.getElementById("projectDetails");
@@ -84,11 +170,14 @@ export class ProjectsManager {
             }
         };
 
+        this.updateProgressBar(project.progress)
+
         setText("iconPD", project.icon);
         setText("namePD", project.name);
         setText("nameBigPD", project.name);
         setText("locationPD", project.location);
         setText("descriptionPD", project.description);
+        setText("progressPD", project.progress);
         setText("costPD", project.cost);
         setText("statusPD", project.status);
         setText("rolePD", project.userRole);
@@ -104,6 +193,7 @@ export class ProjectsManager {
         setInputValue("projectNameInput", project.name);
         setInputValue("projectLocationInput", project.location);
         setInputValue("projectDescriptionInput", project.description);
+        setInputValue("projectProgressInput", project.progress);
         setInputValue("projectCostInput", project.cost);
         setInputValue("projectStatusInput", project.status);
         setInputValue("projectRoleInput", project.userRole);
@@ -115,7 +205,23 @@ export class ProjectsManager {
         if (iconElement) {
             (iconElement as HTMLElement).style.backgroundColor = project.color;
         }
+
+        // Capture the project details into a constant
+        const projectDetails = {
+            name: project.name, // Project name
+            location: project.location, // Project location
+            description: project.description, // Project description
+            progress: project.progress, // Project progress
+            cost: project.cost, // Project costs
+            status: project.status, // Project status
+            role: project.userRole, // Project role
+            startDate: project.startDate, // Project start date
+            endDate: project.finishDate, // Project end date
+            // You can add more project properties here
+        };
+        
     }
+
 
     setProjectsPage(project: Project) {
         const projectsPage = document.getElementById("projectsPage");
@@ -135,6 +241,7 @@ export class ProjectsManager {
         setText("nameBigPD", project.name);
         setText("locationPD", project.location);
         setText("descriptionPD", project.description);
+        setText("progressPD", project.progress);
         setText("costPD", project.cost);
         setText("statusPD", project.status);
         setText("rolePD", project.userRole);
@@ -150,6 +257,7 @@ export class ProjectsManager {
         setInputValue("projectNameInput", project.name);
         setInputValue("projectLocationInput", project.location);
         setInputValue("projectDescriptionInput", project.description);
+        setInputValue("projectProgressInput", project.progress);
         setInputValue("projectCostInput", project.cost);
         setInputValue("projectStatusInput", project.status);
         setInputValue("projectRoleInput", project.userRole);
@@ -162,62 +270,70 @@ export class ProjectsManager {
         }
     }
 
+    setDeleteProjectButton(){
+        const deleteButton = document.getElementById("ConfirmDeleteButton") as HTMLButtonElement;
+        if (deleteButton) {
+            deleteButton.addEventListener("click", () => {
+                console.log("Delete button clicked");
+                if (this.currentProject) {
+                    this.deleteProject(this.currentProject.id);
+                    const projectsPage = document.getElementById("projectsPage") as HTMLDivElement;
+                    const usersPage = document.getElementById("usersPage") as HTMLDivElement;
+                    const detailsPage = document.getElementById("projectDetails") as HTMLDivElement;
+                    const introPage = document.getElementById("intro") as HTMLDivElement;
+                    const sidebar = document.getElementById("sidebar") as HTMLDivElement;
+                    if (projectsPage && detailsPage) {
+                        // Hide other pages and show the Projects page
+                        usersPage.style.display = "none";
+                        detailsPage.style.display = "none";
+                        introPage.style.display = "none";
+                        projectsPage.style.display = "flex"; // Show Projects page
+                        sidebar.style.display = "flex";
+                    }
+                } else {
+                    console.warn("No project selected for deletion.");
+                }
+                const modal = document.getElementById("DeleteProjectModal") as HTMLDialogElement;
+                    if (modal) {
+                        modal.close();
+                    }
+                
+            });
+        }
+
+    }
+
     setChangeButton() {
         const saveButton = document.getElementById("changeProjectButton") as HTMLButtonElement;
         if (saveButton) {
             saveButton.addEventListener("click", () => {
                 if (this.currentProject) {
                     this.updateProjectData(this.currentProject.id);
-                    this.updateProjectUI(this.currentProject);
+                    this.currentProject.updateUI()
                     this.updateProjectCards(this.currentProject);
+                    this.updateProgressBar(this.currentProject.progress)
 
                     const modal = document.getElementById("editProjectModal") as HTMLDialogElement;
                     if (modal) {
                         modal.close();
                     }
-                } else {
+                    this.refreshModalToDo(this.currentProject)
+                    } else {
                     console.warn("No project selected for editing.");
                 }
             });
         }
     }
 
-    refreshProjectList() {
-        // Step 1: Get the container where the project cards are displayed
-        const projectsListContainer = this.projectsListContainer;
-        console.log("here should come the projectsListContainer")
-        console.log(this.projectsListContainer)
-        this.updateAllProjectCards()
-        console.log(this.projectsListContainer)
-    
-        // Step 2: Clear the existing project cards
-        if (projectsListContainer) {
-            projectsListContainer.innerHTML = ''; // Remove all current project cards
-        } else {
-            console.warn("Projects list container not found!");
-            return;
-        }
-    
-        // Step 3: Recreate and append all project cards
-        if (this.list.length === 0) {
-            console.log("No projects to display.");
-            return;
-        }
-    
-        // Iterate over all projects and append them again
-        this.list.forEach((project) => {
-            // Assuming each project has a `setUI()` method that creates a new UI element
-            project.setUI();
-            if (projectsListContainer) {
-                projectsListContainer.appendChild(project.ui); // Add the new project card
-            }
-        });
-    
-        console.log("Projects list refreshed.");
-    }
-    
+    refreshModalToDo(project){
+        const modaltoDo = document.getElementById("newToDoModal") as HTMLDialogElement;
+        const name = modaltoDo.querySelector("[data-project-info='toDoProjectName']");
+            if (name) { name.textContent = project.name}
+            console.log(project.name)
 
-    
+    }
+
+
 
     updateProjectData(projectId: string) {
         const project = this.getProject(projectId);
@@ -236,6 +352,7 @@ export class ProjectsManager {
         project.name = getInputValue("projectNameInput");
         project.location = getInputValue("projectLocationInput");
         project.description = getInputValue("projectDescriptionInput");
+        project.progress = parseFloat(getInputValue("projectProgressInput")) || 0;
         project.cost = parseFloat(getInputValue("projectCostInput")) || 0;
 
         // Validate and update status
@@ -267,7 +384,7 @@ export class ProjectsManager {
 
         this.updateProjectUI(project);
         this.updateProjectCards(project);
-        this.refreshProjectList();
+
     }
 
     updateProjectCards(project: Project){
@@ -284,6 +401,7 @@ export class ProjectsManager {
         setText("nameBigPD", project.name);
         setText("locationPD", project.location);
         setText("descriptionPD", project.description);
+        setText("progressPD", project.progress);
         setText("costPD", project.cost);
         setText("statusPD", project.status);
         setText("rolePD", project.userRole);
@@ -298,6 +416,7 @@ export class ProjectsManager {
         setInputValue("projectNameInput", project.name);
         setInputValue("projectLocationInput", project.location);
         setInputValue("projectDescriptionInput", project.description);
+        setInputValue("projectProgressInput", project.progress);
         setInputValue("projectCostInput", project.cost);
         setInputValue("projectStatusInput", project.status);
         setInputValue("projectRoleInput", project.userRole);
@@ -325,6 +444,7 @@ export class ProjectsManager {
         setText("nameBigPD", project.name);
         setText("locationPD", project.location);
         setText("descriptionPD", project.description);
+        setText("progressPD", project.progress);
         setText("costPD", project.cost);
         setText("statusPD", project.status);
         setText("rolePD", project.userRole);
@@ -339,6 +459,7 @@ export class ProjectsManager {
         setInputValue("projectNameInput", project.name);
         setInputValue("projectLocationInput", project.location);
         setInputValue("projectDescriptionInput", project.description);
+        setInputValue("projectProgressInput", project.progress);
         setInputValue("projectCostInput", project.cost);
         setInputValue("projectStatusInput", project.status);
         setInputValue("projectRoleInput", project.userRole);
@@ -382,6 +503,7 @@ export class ProjectsManager {
         return project;
     }
 
+
     deleteProject(id: string) {
         const project = this.getProject(id);
         if (!project) return;
@@ -395,6 +517,22 @@ export class ProjectsManager {
 
     getTotalCostAllProjects() {
         return this.list.reduce((total, project) => total + project.cost, 0);
+    }
+
+    updateProgressBar(progress: number) {
+        // Get the progress bar element
+        const progressBar = document.querySelector("#percentageDiv") as HTMLElement;
+    
+        if (progressBar) {
+            // Ensure the progress is between 0 and 100
+            const clampedProgress = Math.max(0, Math.min(100, progress));
+    
+            // Set the width dynamically
+            progressBar.style.width = `${clampedProgress}%`;
+    
+            // Update the text inside the div
+            progressBar.textContent = `${clampedProgress}%`;
+        }
     }
 
     exportToJSON() {

@@ -1,9 +1,10 @@
-import { IProject, status, userRole, phase} from "./classes/Project"
+import { IProject, status, userRole, phase, Project} from "./classes/Project"
 import { ProjectsManager } from "./classes/ProjectsManager"
 import { IUser, usersRole, access} from "./classes/User"
 import { UsersManager } from "./classes/UsersManager"
 import { ICompany} from "./classes/Companies"
 import { CompanyManager } from "./classes/CompaniesManager"
+
 
 //Languages import
 
@@ -44,6 +45,8 @@ const projectsManager = new ProjectsManager(projectsListUI)
 // Call this method to set up the "Change" button event listener
 projectsManager.setChangeButton();
 
+projectsManager.setDeleteProjectButton();
+
 //newProjectModal
 const newProjectBtn = document.getElementById("newProjectBtn")
 
@@ -54,15 +57,52 @@ if (newProjectBtn){
     console.warn("New projects button was not found")
 }
 
+
+
 //editProjectModal
 const editProjectBtn = document.getElementById("editProject")
 
 
 if (editProjectBtn){
-    editProjectBtn.addEventListener("click", () => {showModal("editProjectModal")})
+    editProjectBtn.addEventListener("click", () => {
+        (showModal("editProjectModal"));
+        console.log("now testing again");
+        
+        // Check if currentProject is not null
+        if (projectsManager) {
+            console.log(projectsManager); // Access currentProject.name safely
+        } else {
+            console.warn("projectsManager is null!");
+        }
+    
+    })
+
 } else {
     console.warn("Edit projects button was not found")
 }
+
+//deleteProjectModal
+const deleteProjectBtn = document.getElementById("deleteProjectBtn")
+
+
+if (deleteProjectBtn){
+    deleteProjectBtn.addEventListener("click", () => {
+        (showModal("DeleteProjectModal"));
+        console.log("now testing again");
+        
+        // Check if currentProject is not null
+        if (projectsManager) {
+            console.log(projectsManager); // Access currentProject.name safely
+        } else {
+            console.warn("projectsManager is null!");
+        }
+    
+    })
+
+} else {
+    console.warn("Edit projects button was not found")
+}
+
 
 //newUserModal
 const newUserBtn = document.getElementById("newUserBtn")
@@ -219,6 +259,7 @@ projectsBtn?.addEventListener("click", () => {
     const detailsPage = document.getElementById("projectDetails") as HTMLDivElement;
     const introPage = document.getElementById("intro") as HTMLDivElement;
     const sidebar = document.getElementById("sidebar") as HTMLDivElement;
+    console.log(projectsManager.list)
 
     if (!(projectsPage && usersPage)) {
         return console.warn("Pages not found");
@@ -234,13 +275,8 @@ projectsBtn?.addEventListener("click", () => {
     // Set the Projects button to active style
     projectsBtn.classList.add("active");
     projectsBtn.innerHTML = `<span class="material-icons-round">maps_home_work</span> Projects`;
-    console.log("Refreshing the project list...");
+
     
-    // Refresh the project list
-    projectsManager.updateAllProjectCards()
-    console.log('List of projects:', projectsManager.list);
-    projectsManager.refreshProjectList();
-    console.log('List of projects:', projectsManager.list);
 
     // Reset Users button to default style
     usersBtn.classList.remove("active");
@@ -303,6 +339,7 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
             description:formData.get("description") as string,
             userRole:formData.get("userRole") as userRole,
             location:formData.get("location") as string,
+            progress: formData.get("progress") ? parseFloat(formData.get("progress") as string) : 0,
             cost: formData.get("cost") ? parseFloat(formData.get("cost") as string) : 0,
             status:formData.get("status") as status,
             phase:formData.get("phase") as phase,
@@ -316,7 +353,7 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
         } catch(error) {
             alert(error)
         }
-        projectsManager.refreshProjectList()
+        
         
         
     })
@@ -496,7 +533,5 @@ document.addEventListener('DOMContentLoaded', () => {
         if (showMoreButton) showMoreButton.style.display = 'inline-block';
     });
 
-    // Update Project
-    
 });
 

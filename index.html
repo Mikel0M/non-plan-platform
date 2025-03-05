@@ -118,8 +118,8 @@
                                 </div>
                             </div>
                             <div id="insightsCard9" class="card" style="display: none; width: 100%; height: 400px;">
-                                <div  style="flex: 1; background-image: url('./assets/IntroPage/Pictures/CircularChaos.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var(--complementary-200);">
-                                    <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 450px;"
+                                <div  style="flex: 1; background-image: url('./assets/IntroPage/Pictures/CircularChaos.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var (--complementary-200);">
+                                    <p  style="font-size: var (--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 450px;"
                                         data-lang="start_Chaos">
                                         Circular Chaos, an application to replace geometries from reusable element lists
                                     </p>
@@ -589,6 +589,11 @@
                             <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Estimated cost of the project</label>
                         </div>
                         <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">percent</span>Estimated Progress</label>
+                            <input name = "progress" type="number" placeholder="What's the estimated completion progress of the project?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Estimated progress percentage of the project</label>
+                        </div>
+                        <div class = "formFieldContainer">
                             <label><span class="material-icons-round">account_circle</span>Role</label>
                             <select name = "userRole">
                                 <option>not defined</option>
@@ -655,10 +660,100 @@
             </div>  
         </div>
         <div class="page" id = "projectDetails" style = "display: none">
+            <dialog id = "DeleteProjectModal">
+                <form class="userForm" id = "newUserForm">
+                    <h2>Are you sure you want to delete the project?</h2>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('DeleteProjectModal')">Cancel</button>
+                        <button type="button" class="acceptButton" id="ConfirmDeleteButton">Delete</button>
+                    </div>
+                </form>
+            </dialog>
             <dialog id = "editProjectModal">
                 <form class="userForm" id = "editProjectForm">
                     <h2>Edit Project</h2>
                     <div class= "userCard">
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">apartment</span>Name</label>
+                            <input name = "name" type="text" id="projectNameInput" />
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short name</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Description</label>
+                            <textarea name = "description" cols="30" rows="5" placeholder="Give your project a nice description!" id="projectDescriptionInput" ></textarea>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">pin_drop</span>Location</label>
+                            <input name = "location" type="text" placeholder="Where is your project located?" id="projectLocationInput">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;"></label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">percent</span>Estimated progress</label>
+                            <input name = "progress" type="number" placeholder="What's the estimated progress of the project?" id="projectProgressInput" >
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;" >Estimated cost of the project</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">paid</span>Estimated cost</label>
+                            <input name = "cost" type="number" placeholder="What's the estimated cost of the project?" id="projectCostInput" >
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;" >Estimated cost of the project</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">account_circle</span>Role</label>
+                            <select name = "userRole" id="projectRoleInput">
+                                <option>not defined</option>
+                                <option>Architect</option>
+                                <option>Engineer</option>
+                                <option>Developer</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">not_listed_location</span>Status</label>
+                            <select name = "status" id="projectStatusInput">
+                                <option>Pending</option>
+                                <option>Active</option>
+                                <option>Finished</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_view_week</span>Design Phase</label>
+                            <select name = "phase" id="projectPhaseInput">
+                                <option>Design</option>
+                                <option>Construction project</option>
+                                <option>Execution</option>
+                                <option>Construction</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_today</span>Start Date</label>
+                            <input name = startDate type="date" id="projectStartPDInput">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_month</span>Finish Date</label>
+                            <input name = finishDate type="date" id="projectFinishPDInput">
+                        </div>
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('editProjectModal')">Cancel</button>
+                        <button type="button" class="acceptButton" id="changeProjectButton">Change</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id = "newToDoModal">
+                <form class="toDoForm" id = "newToDoForm">
+                    <h2>Add To Do</h2>
+                    <div class= "userCard">
+                        <div style="display: flex;flex-direction: row;justify-content: space-between; width: 100%; gap: 20px">
+                            <div class = "formFieldContainerToDo">
+                                <label><span class="material-icons-round">apartment</span>Title</label>
+                                <input name = "Title" type="text" id="toDoNameInput" />
+                                <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short title</label>
+                            </div>
+                            <div class = "formFieldContainerToDo">
+                                <label><span class="material-icons-round">apartment</span>Title</label>
+                                <h2 data-project-info="toDoProjectName">Project Name</h2>
+                                <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short title</label>
+                            </div>
+                        </div>
                         <div class = "formFieldContainer">
                             <label><span class="material-icons-round">apartment</span>Name</label>
                             <input name = "name" type="text" id="projectNameInput" />
@@ -680,7 +775,7 @@
                         </div>
                         <div class = "formFieldContainer">
                             <label><span class="material-icons-round">account_circle</span>Role</label>
-                            <select name = "userRole" id="projecRoleInput">
+                            <select name = "userRole" id="projectRoleInput">
                                 <option>not defined</option>
                                 <option>Architect</option>
                                 <option>Engineer</option>
@@ -723,8 +818,18 @@
                 <div style="display:flex;flex-direction: column;row-gap: 10px;">
                     <div class="dashboardCard">
                         <div class ="upperDashboard">
-                            <p id="iconPD" style="font-size: 16px;display:flex; align-items:center;justify-content: center; background-color: #6491F9; padding: 5xp; border-radius: 850%; aspect-ratio: 1; width: 40px;height: 40px;" data-project-info="iconPD">HC</p>
-                            <button id = "editProject" class = "buttonSecondary">Edit<p style="height: 100px;"></p></button>
+                            <p id="iconPD" style="font-size: var(--fontSizeBig); display: flex; align-items: center; justify-content: center; background-color: #6491F9; padding: 5px; border-radius: 50%; aspect-ratio: 1; width: 40px; height: 40px; color: white;" data-project-info="iconPD">
+                                HC
+                            </p>
+                            
+                            <div style="display: flex; flex-direction: row; gap: 20px;">
+                                <button id="editProject" class="buttonSecondary" style="display: flex; align-items: center; justify-content: center; width: 100px; height: 40px; font-size: var(--fontSizeStandard);">
+                                    Edit
+                                </button>    
+                                <button id="deleteProjectBtn" class="buttonSecondary" style="display: flex; align-items: center; justify-content: center; width: 100px; height: 40px; font-size: var(--fontSizeStandard);">
+                                    Delete
+                                </button>          
+                            </div>
                         </div>
                         <div class ="middleDashboard">
                             <h5 data-project-info="nameBigPD">Hospital Center</h5>
@@ -753,7 +858,9 @@
                             </div>
                         </div>
                         <div style="background-color: #404040; width: calc(100% - 40px); height: 25px; border-radius: 50px; overflow: hidden; margin: 20px auto 30px auto; position: relative;">
-                            <div style="width: 80%; height: 100%; background-color: green; border-radius: 10px 0 0 10px; display: flex; justify-content: center; align-items: center;">80%</div>
+                            <div id="percentageDiv" style="width: 0%; height: 100%; background-color: green; border-radius: 10px 0 0 10px; display: flex; justify-content: center; align-items: center; position: relative; color: white; font-weight: bold;">
+                                <span id="progressText" style="position: absolute; width: 100%; text-align: center; left: 0;">0%</span>
+                              </div>
                         </div>
                     </div>
                     <div class="dashboardCard" style="flex-grow: 1;">
@@ -763,7 +870,7 @@
                                 <span class="material-icons-round" style="padding-right: 10px;">search</span>
                                 <input type="text" style="font-size: var(--fontSizeSmall);" placeholder="Search To-Do's by name">
                             </div>
-                            <span class="material-icons-round">add</span>
+                            <button id = "newToDoBtn" class = "buttonTertiary"><span class="material-icons-round">add</span></button>
                         </div>
                         <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
                             <div class="todoItem">

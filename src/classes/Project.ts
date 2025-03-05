@@ -12,6 +12,7 @@ export interface IProject {
     description: string;
     location: string;
     userRole: userRole;
+    progress: number;
     cost: number;
     status: status;
     phase: phase;
@@ -52,11 +53,13 @@ function formatDate(date: Date): string {
 }
 
 export class Project implements IProject {
+    id: string;
     icon: string;
     name: string;
     color: string;
     description: string;
     location: string;
+    progress: number;
     cost: number;
     userRole: userRole;
     status: status;
@@ -64,8 +67,8 @@ export class Project implements IProject {
     startDate: string;
     finishDate: string;
     ui: HTMLDivElement;
-    progress: number = 0;
-    id: string;
+
+    
 
     constructor(data: IProject) {
         // Allow existing id, otherwise generate a new one
@@ -79,6 +82,7 @@ export class Project implements IProject {
             description: "Default Project Description",
             userRole: "not defined",
             location: "not defined",
+            progress: 0,
             cost: 0,
             status: "Pending",
             phase: "Design",
@@ -126,7 +130,7 @@ export class Project implements IProject {
             </div>
             <div class="cardProperty">
                 <p style="color: #969696;">Progress</p>
-                <p>${this.progress * 100}%</p>    
+                <p>${this.progress}%</p>    
             </div>     
         </div>`;
     }
@@ -158,8 +162,9 @@ export class Project implements IProject {
     
         const costElement = this.ui.querySelector(".cardProperty:nth-child(3) p:nth-child(2)");
         if (costElement) costElement.textContent = `${this.cost}$`;
+
     
         const progressElement = this.ui.querySelector(".cardProperty:nth-child(4) p:nth-child(2)");
-        if (progressElement) progressElement.textContent = `${this.progress * 100}%`;
+        if (progressElement) progressElement.textContent = `${this.progress}%`;
     }
 }

@@ -478,6 +478,14 @@ form h2 {
     row-gap: 25px;
 }
 
+/* Styles for toDoForm */
+.toDoForm{
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    row-gap: 25px;
+}
+
 /* Styles for loginForm */
 .loginForm {
     width: 450px; /* Total width, including padding and border */
@@ -498,6 +506,10 @@ form h2 {
     width: 450px;
 }
 
+.toDoForm {
+    width: 1200px;
+}
+
 /* Styles for infoForm */
 .infoForm {
     width: 900px;
@@ -513,6 +525,13 @@ form h2 {
 form .formFieldContainer {
     display: flex;
     flex-direction: column;
+}
+
+form .formFieldContainerToDo {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    width: 100%;
 }
 
 
