@@ -661,7 +661,7 @@
         </div>
         <div class="page" id = "projectDetails" style = "display: none">
             <dialog id = "DeleteProjectModal">
-                <form class="userForm" id = "newUserForm">
+                <form class="userForm" id = "DeleteNewUserForm">
                     <h2>Are you sure you want to delete the project?</h2>
                     <div class= "cancelAccept">
                         <button type="button" class =cancelButton onclick="closeModal('DeleteProjectModal')">Cancel</button>
@@ -900,80 +900,80 @@
             </div>
         </div>
         <div class="page" id = "usersPage" style = "display: none">
-            <dialog id = "newUserModal">
-                <form class="userForm" id = "newUserForm">
+            <dialog id="newUserModal">
+                <form class="userForm" id="newUserForm">
                     <h2>New User</h2>
-                    <div class= "userCard">
-                        <div class = "formFieldContainer">
+                    <div class="userCard">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">subject</span>Name</label>
-                            <input name = "name" type="text">
+                            <input name="name" type="text">
                         </div>
-                        <div class = "formFieldContainer">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">subject</span>Surname</label>
-                            <input name = "surname" type="text">
+                            <input name="surname" type="text">
                         </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">email</span>Email Adress</label>
-                            <input name = "email" type="text">
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">email</span>Email Address</label>
+                            <input name="email" type="text">
                         </div>
-                        <div class = "formFieldContainer">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">call</span>Telephone Number</label>
-                            <input name ="phone" type="text">
+                            <input name="phone" type="text">
                         </div>
-                        <div class = "formFieldContainer">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">account_circle</span>Role</label>
-                            <select name = "usersRole">
+                            <select name="usersRole">
                                 <option>Architect</option>
                                 <option>Engineer</option>
                                 <option>Developer</option>
                             </select>
                         </div>
-                        <div class = "formFieldContainer">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">vpn_key</span>Access rights</label>
-                            <select name = "access">
+                            <select name="access">
                                 <option>Administrator</option>
                                 <option>Editor</option>
                                 <option>Guest</option>
                             </select>
                         </div>
-                        <div class = "formFieldContainer">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">business</span>Company Name</label>
-                            <input name = "company" type="text">
+                            <input name="company" type="text">
                         </div>
                     </div>
-                    <div class= "cancelAccept">
-                        <button type="button" class =cancelButton onclick="closeModal('newUserModal')">Cancel</button>
-                        <button type="submit" class =acceptButton>Accept</button>
+                    <div class="cancelAccept">
+                        <button type="button" class="cancelButton" onclick="closeModal('newUserModal')">Cancel</button>
+                        <button type="submit" class="acceptButton" id="UserCreateButton">Accept</button>
                     </div>
                 </form>
             </dialog>
-            <dialog id = "newCompanyModal">
-                <form class="userForm" id = "newCompanyForm">
+            <dialog id="newCompanyModal">
+                <form class="userForm" id="newCompanyForm">
                     <h2>New Company</h2>
-                    <div class= "userCard">
-                        <div class = "formFieldContainer">
+                    <div class="userCard">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">subject</span>Company Name</label>
-                            <input type="text">
+                            <input type="text" name="cName">
                         </div>
-                        <div class = "formFieldContainer">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">subject</span>Company Address</label>
-                            <input type="text">
+                            <input type="text" name="cAddress">
                         </div>
-                        <div class = "formFieldContainer">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">email</span>Contact Email</label>
-                            <input type="text">
+                            <input type="text" name="cEmail">
                         </div>
-                        <div class = "formFieldContainer">
+                        <div class="formFieldContainer">
                             <label><span class="material-icons-round">call</span>Telephone Number</label>
-                            <input type="tel">
+                            <input type="tel" name="cPhone">
                         </div>
                     </div>
-                    <div class= "cancelAccept">
-                        <button type="button" class =cancelButton onclick="closeModal('newCompanyModal')">Cancel</button>
-                        <button type="submit" class =acceptButton>Accept</button>
+                    <div class="cancelAccept">
+                        <button type="button" class="cancelButton" onclick="closeModal('newCompanyModal')">Cancel</button>
+                        <button type="submit" class="acceptButton">Accept</button>
                     </div>
                 </form>
-            </dialog>         
+            </dialog>     
             <header>
                 <h2>Users</h2>
                 <div style="display: flex;flex-direction: row;column-gap: 10px;">
@@ -1011,61 +1011,6 @@
             </div>
             <div >
                 <div id = "usersList" class="usersList" style="display: flex;flex-direction: column;row-gap: 10px;padding-left: 30px;padding-right: 30px">
-                     <!-- Project Card -->
-                    <div class="userCard" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; column-gap: 20px; align-items: center; padding: 10px;">
-                        <!-- User Info -->
-                        <div style="display: flex; column-gap: 10px; align-items: center;">
-                            <p style="font-size: 20px; display: flex; align-items: center; background-color: #6491F9; padding: 2px; border-radius: 8px; width: 35px; height: 35px;justify-content: center;">MM</p>
-                            <div>
-                                <h5>Mikel Martinez</h5>
-                                <p>mikel@non-plan.com</p>
-                            </div>
-                        </div>
-                
-                        <!-- Card Properties -->
-                        <div class="userCardProperty"><p>Admin</p></div>
-                        <div class="userCardProperty"><p>Developer</p></div>
-                        <div class="userCardProperty"><p>Group01</p></div>
-                        <div class="userCardProperty"><p>non-plan</p></div>
-                        <div class="userCardProperty"><p>2024-12-01</p></div>
-                        <button class = "buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">email</span></button>
-                    </div>
-                    <div class="userCard" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; column-gap: 20px; align-items: center; padding: 10px;">
-                        <!-- User Info -->
-                        <div style="display: flex; column-gap: 10px; align-items: center;">
-                            <p style="font-size: 20px; display: flex; align-items: center; background-color: #3a7c55; padding: 2px; border-radius: 8px; width: 35px; height: 35px;justify-content: center;">T1</p>
-                            <div>
-                                <h5>Test 1</h5>
-                                <p>test1@test.com</p>
-                            </div>
-                        </div>
-                
-                        <!-- Card Properties -->
-                        <div class="userCardProperty"><p>Editor</p></div>
-                        <div class="userCardProperty"><p>Architect</p></div>
-                        <div class="userCardProperty"><p>Group02</p></div>
-                        <div class="userCardProperty"><p>Company 1</p></div>
-                        <div class="userCardProperty"><p>2024-11-25</p></div>
-                        <button class = "buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">email</span></button>
-                    </div>
-                    <div class="userCard" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; column-gap: 20px; align-items: center; padding: 10px;">
-                        <!-- User Info -->
-                        <div style="display: flex; column-gap: 10px; align-items: center;">
-                            <p style="font-size: 20px; display: flex; align-items: center; background-color: #7e8a3e; padding: 2px; border-radius: 8px; width: 35px; height: 35px;justify-content: center;">T2</p>
-                            <div>
-                                <h5>Test 2</h5>
-                                <p>test2@test.com</p>
-                            </div>
-                        </div>
-                
-                        <!-- Card Properties -->
-                        <div class="userCardProperty"><p>Guest</p></div>
-                        <div class="userCardProperty"><p>Structural Engineer</p></div>
-                        <div class="userCardProperty"><p>Group02</p></div>
-                        <div class="userCardProperty"><p>Company 2</p></div>
-                        <div class="userCardProperty"><p>2024-12-10</p></div>
-                        <button class = "buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">email</span></button>
-                    </div>
                 </div>
             </div>
         </div>

@@ -11,18 +11,7 @@ export class ProjectsManager {
 
     constructor(container: HTMLElement) {
         this.ui = container;
-    
-        // Query for #projectsList within the provided container projectsPage
-        this.projectsListContainer = this.ui.querySelector("#projectsList");
-    
-        console.log('container:', container); // Log the container to verify it's what you expect
-        console.log('projectsListContainer:', this.projectsListContainer); // Log to see if it's found
-    
-        if (this.projectsListContainer) {
-            console.log("Projects List container found!");
-        } else {
-            console.warn("Wrapper container '#projectsList' not found!");
-        }
+ 
     }
 
    

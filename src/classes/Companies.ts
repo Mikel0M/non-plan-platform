@@ -28,27 +28,27 @@ export class Company implements ICompany{
     }
 
     setUI() {
-        if (this.ui) {return}
-        this.ui = document.createElement("div")
-        this.ui.className = "companyCard"
-        /*this.ui.innerHTML = `
-         <!-- Company Card -->
+        if (!this.ui) { // Ensure ui is created if null
+            this.ui = document.createElement("div");
+        }
+        this.ui.className = "companyCard";
+        this.ui.innerHTML = `
             <div class="userCard" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; column-gap: 20px; align-items: center; padding: 10px;">
-                <!-- User Info -->
                 <div style="display: flex; column-gap: 10px; align-items: center;">
-                    <p style="font-size: 20px; display: flex; align-items: center; background-color: #6491F9; padding: 2px; border-radius: 8px; width: 35px; height: 35px;justify-content: center;">MM</p>
+                    <p style="font-size: 20px; display: flex; align-items: center; background-color: #6491F9; padding: 2px; border-radius: 8px; width: 35px; height: 35px; justify-content: center;">MM</p>
                     <div>
                         <h5>${this.cName}</h5>
                     </div>
                 </div>
                 
-                <!-- Card Properties -->
                 <div class="userCardProperty"><p>${this.cAddress}</p></div>
                 <div class="userCardProperty"><p>${this.cEmail}</p></div>
                 <div class="userCardProperty"><p>${this.cPhone}</p></div>
                 <div class="userCardProperty"><p>2024-12-01</p></div>
-                <button class = "buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">email</span></button>
-
+                <button class="buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;">
+                    <span class="material-icons-round">email</span>
+                </button>
             </div>
-        `*/}
+        `;
+    }
 }

@@ -372,26 +372,26 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
  * - Creates a new project instance using ProjectsManager.
  * - Resets the form and closes the modal dialog for a clean user experience.
  */
-const usersListUI = document.getElementById("usersList") as HTMLElement
-const usersManager = new UsersManager(usersListUI)
+const usersListUI = document.getElementById("usersList") as HTMLElement;
+const usersManager = new UsersManager(usersListUI);
 
-const userForm = document.getElementById("newUserForm")
+const userForm = document.getElementById("newUserForm");
 if (userForm && userForm instanceof HTMLFormElement) {
     userForm.addEventListener("submit", (e) => {
-        e.preventDefault()
-        
-        const formData = new FormData(userForm)
+        e.preventDefault();
+        console.log("So far so good users");
+        const formData = new FormData(userForm);
         const UserData: IUser = {
             name: formData.get("name") as string,
             surname: formData.get("surname") as string,
             email: formData.get("email") as string,
             phone: formData.get("phone") as string,
-            role: formData.get("role") as usersRole,
+            role: formData.get("usersRole") as usersRole,
             access: formData.get("access") as access,
             company: formData.get("company") as string
-        }
-        const user = usersManager.newUser(UserData)
-        userForm.reset()
+        };
+        const user = usersManager.newUser(UserData);
+        userForm.reset();
         if (usersManager.list.length === 0) {
             console.log("No users found.");
         } else {
@@ -402,10 +402,10 @@ if (userForm && userForm instanceof HTMLFormElement) {
                 );
             });
         }
-        closeModal("newUserModal")
-    })
+        closeModal("newUserModal");
+    });
 } else {
-    console.warn("The user form was not found. Check the ID!")
+    console.warn("The user form was not found. Check the ID!");
 }
 
 
@@ -418,7 +418,7 @@ if (userForm && userForm instanceof HTMLFormElement) {
  * - Resets the form and closes the modal dialog for a clean user experience.
  */
 const companyListUI = document.getElementById("companyList") as HTMLElement
-const companyManager = new CompanyManager(usersListUI)
+const companyManager = new CompanyManager(companyListUI)
 
 const companyForm = document.getElementById("newCompanyForm")
 if (companyForm && companyForm instanceof HTMLFormElement) {
@@ -432,6 +432,8 @@ if (companyForm && companyForm instanceof HTMLFormElement) {
             cEmail: formData.get("cEmail") as string,
             cPhone: formData.get("cPhone") as string
         }
+        console.log(CompanyData)
+        console.log(companyManager)
         const company = companyManager.newCompany(CompanyData)
         companyForm.reset()
         if (companyManager.list.length === 0) {
