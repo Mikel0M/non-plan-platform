@@ -148,6 +148,39 @@ buttonBlue:hover {
     column-gap: 10px; 
 }
 
+.formGrid {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+.formColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.separator {
+    width: 2px;
+    background-color: var(--complementary-200);
+    margin: 0 20px;
+}
+
+.separator-horizontal {
+    height: 2px;
+    background-color: var(--complementary-200);
+    margin: 40px 0;
+}
+
+.formFieldContainerToDo,
+.formFieldContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+}
+
 .buttonTextBlue:hover {
     color: var(--primary-200);
     background-color: transparent;
@@ -503,11 +536,20 @@ form h2 {
 }
 
 .userForm {
-    width: 450px;
+    border: 2px solid white; /* Add a white border */
+    border-radius: 10px; /* Optional: Add rounded corners */
+    padding: 20px; /* Optional: Add padding inside the form */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+    background-color: var()var(--background-200); /* Optional: Add a background color */
 }
 
 .toDoForm {
     width: 1200px;
+    border: 2px solid white; /* Add a white border */
+    border-radius: 10px; /* Optional: Add rounded corners */
+    padding: 20px; /* Optional: Add padding inside the form */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+    background-color: var()var(--background-200); /* Optional: Add a background color */
 }
 
 /* Styles for infoForm */
@@ -595,7 +637,7 @@ input:focus, textarea:focus, select:focus {
     column-gap: 100px;
     align-items: center;
     justify-content: start;
-    border: 2px solid #3b3c3f;
+    border: 2px solid white;
     height: 8px;
 }
 
@@ -612,15 +654,8 @@ input:focus, textarea:focus, select:focus {
     cursor: pointer;
 }
 
-.userCard {
-    background-color: var(--background-100);
-    border-radius: 8px;
-    cursor: pointer;
-}
 
-.userCard:hover {
-    outline: 2px solid var(--complementary-200);
-}
+
 
 #loginModal {
     border: 1px solid white; /* Modal border */

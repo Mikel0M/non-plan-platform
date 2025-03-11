@@ -738,79 +738,108 @@
                     </div>
                 </form>
             </dialog>
-            <dialog id = "newToDoModal">
-                <form class="toDoForm" id = "newToDoForm">
-                    <h2>Add To Do</h2>
-                    <div class= "userCard">
-                        <div style="display: flex;flex-direction: row;justify-content: space-between; width: 100%; gap: 20px">
-                            <div class = "formFieldContainerToDo">
-                                <label><span class="material-icons-round">apartment</span>Title</label>
-                                <input name = "Title" type="text" id="toDoNameInput" />
-                                <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short title</label>
+            <dialog id="newToDoModal">
+                <form class="toDoForm" id="newToDoForm">
+                    <div class="userCard">
+                        <div class="formGrid">
+                            <div class="formColumn">
+                                <h2 style="margin: 0;">Add a Task</h2>
+                                <div class="formFieldContainerToDo">
+                                    <label><span class="material-icons-round">apartment</span>Title</label>
+                                    <input name="toDoTitle" type="text" id="toDoTitle" />
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short title</label>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">subject</span>Description</label>
+                                    <textarea name="toDoDescription" cols="30" rows="5" placeholder="Give your project a nice description!" id="toDoDescription"></textarea>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Status</label>
+                                    <select name="toDoStatus" id="toDoStatus">
+                                        <option>Pending</option>
+                                        <option>Active</option>
+                                        <option>Finished</option>
+                                    </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Priority</label>
+                                    <select name="toDoPriority" id="toDoPriority">
+                                        <option>High</option>
+                                        <option>Standard</option>
+                                        <option>Low</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class = "formFieldContainerToDo">
-                                <label><span class="material-icons-round">apartment</span>Title</label>
-                                <h2 data-project-info="toDoProjectName">Project Name</h2>
-                                <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short title</label>
+                            <div class="formColumn">
+                                <div class="formFieldContainerToDo">
+                                    <h2 data-project-info="toDoProjectName" style="margin: 0;">Project Name</h2>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Responsible Person</label>
+                                    <select name="toDoAssignedTo" id="toDoAssignedTo">
+                                       <!-- Options will be dynamically populated -->
+                                    </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Created By</label>
+                                    <select name="toDoCreatedBy" id="toDoCreatedBy">
+                                        <!-- Options will be dynamically populated -->
+                                </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_today</span>To-Do start date</label>
+                                    <span id="currentDate" class="formatted-date"></span>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>To-Do last update date</label>
+                                    <span id="updateDate" class="formatted-date"></span>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">paid</span>Estimated hours</label>
+                                    <input name="toDoEstimatedHours" type="number" placeholder="What's the estimated cost of the project?" id="projectCostInput">
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Estimated hours for the project</label>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">paid</span>Actual hours</label>
+                                    <input name="toDoActualHours" type="number" placeholder="What's the estimated cost of the project?" id="projectCostInput">
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">hours used so far</label>
+                                </div>
                             </div>
                         </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">apartment</span>Name</label>
-                            <input name = "name" type="text" id="projectNameInput" />
-                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short name</label>
+                        <div class="separator-horizontal"></div>
+                        <div class="formGrid">
+                            <div class="formColumn">
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>Due Date</label>
+                                    <input name="toDoDueDate" type="date" id="projectFinishPDInput">
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>Start Date</label>
+                                    <input name="toDoStartDate" type="date" id="projectFinishPDInput">
+                                </div>                              
+                            </div>
+                            <div class="formColumn">
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Dependancies</label>
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">select the tasks this project is dependant of</label>
+                                    <select name="status" id="toDoPriority">
+                                        <option>You</option>
+                                        <option>Standard</option>
+                                        <option>Low</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">subject</span>Description</label>
-                            <textarea name = "description" cols="30" rows="5" placeholder="Give your project a nice description!" id="projectDescriptionInput" ></textarea>
-                        </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">pin_drop</span>Location</label>
-                            <input name = "location" type="text" placeholder="Where is your project located?" id="projectLocationInput">
-                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;"></label>
-                        </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">paid</span>Estimated cost</label>
-                            <input name = "cost" type="number" placeholder="What's the estimated cost of the project?" id="projectCostInput" >
-                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;" >Estimated cost of the project</label>
-                        </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">account_circle</span>Role</label>
-                            <select name = "userRole" id="projectRoleInput">
-                                <option>not defined</option>
-                                <option>Architect</option>
-                                <option>Engineer</option>
-                                <option>Developer</option>
-                            </select>
-                        </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">not_listed_location</span>Status</label>
-                            <select name = "status" id="projectStatusInput">
-                                <option>Pending</option>
-                                <option>Active</option>
-                                <option>Finished</option>
-                            </select>
-                        </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">calendar_view_week</span>Design Phase</label>
-                            <select name = "phase" id="projectPhaseInput">
-                                <option>Design</option>
-                                <option>Construction project</option>
-                                <option>Execution</option>
-                                <option>Construction</option>
-                            </select>
-                        </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">calendar_today</span>Start Date</label>
-                            <input name = startDate type="date" id="projectStartPDInput">
-                        </div>
-                        <div class = "formFieldContainer">
-                            <label><span class="material-icons-round">calendar_month</span>Finish Date</label>
-                            <input name = finishDate type="date" id="projectFinishPDInput">
-                        </div>
+                    <div class="separator-horizontal"></div>
+                    <div class="formFieldContainer">
+                        <label><span class="material-icons-round">subject</span>Comments</label>
+                        <textarea name="toDoComments" cols="30" rows="5" placeholder="Add any clarification comment" id="projectDescriptionInput"></textarea>
                     </div>
-                    <div class= "cancelAccept">
-                        <button type="button" class =cancelButton onclick="closeModal('editProjectModal')">Cancel</button>
-                        <button type="button" class="acceptButton" id="changeProjectButton">Change</button>
+                        
+                    </div>
+                    <div class="cancelAccept">
+                        <button type="button" class="cancelButton" onclick="closeModal('newToDoModal')">Cancel</button>
+                        <button type="submit" class="acceptButton" id="submitToDoButton">Accept</button>
                     </div>
                 </form>
             </dialog>
@@ -863,7 +892,7 @@
                               </div>
                         </div>
                     </div>
-                    <div class="dashboardCard" style="flex-grow: 1;">
+                    <div id="toDoList" class="dashboardCard" style="flex-grow: 1;">
                         <div style="display: flex; align-items: center;flex-direction: row;justify-content:space-between;margin:20px">
                             <h4>To-Do</h4>
                             <div style="display: flex;align-items: center;align-items: center;padding-left: 80px;">
@@ -871,28 +900,6 @@
                                 <input type="text" style="font-size: var(--fontSizeSmall);" placeholder="Search To-Do's by name">
                             </div>
                             <button id = "newToDoBtn" class = "buttonTertiary"><span class="material-icons-round">add</span></button>
-                        </div>
-                        <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
-                            <div class="todoItem">
-                                <div style="display: flex; justify-content: space-between;flex-direction: row;align-items: center;">
-                                    <div style="display:flex;column-gap: 15px;">
-                                        <span class="material-icons-round" style="background-color: #969696; padding: 8px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">construction</span>
-                                        <p>Absolutely nonsense text for testing, so I don't know what I'm writing about</p>
-                                    </div>
-                                    <p style="text-wrap: nowrap; margin-left: 10px;">Fri, 20 sep</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
-                            <div class="todoItem">
-                                <div style="display: flex; justify-content: space-between;flex-direction: row;align-items: center;">
-                                    <div style="display:flex;column-gap: 15px;">
-                                        <span class="material-icons-round" style="background-color: #969696; padding: 8px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">construction</span>
-                                        <p>Absolutely nonsense text for testing, so I don't know what I'm writing about</p>
-                                    </div>
-                                    <p style="text-wrap: nowrap; margin-left: 10px;">Fri, 20 sep</p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -977,14 +984,14 @@
             <header>
                 <h2>Users</h2>
                 <div style="display: flex;flex-direction: row;column-gap: 10px;">
-                    <button id="newUserBtn" class = "buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">person</span></button>
-                    <button id="newCompanyBtn" class = "buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">business</span></button>
+                    <button id="newUserBtn" class="buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">person</span></button>
+                    <button id="newCompanyBtn" class="buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">business</span></button>
                 </div>
             </header>
             <div style="display: flex; flex-direction: row; font-size: var(--fontSizeStandard); height: 40px; column-gap: 100px;padding-left: 30px;">
                 <div style="display: flex; flex-direction: row;">
-                    <label style="padding-left: 10px;">All Users:</label>
-                    <label style="padding-left: 15px;">3</label>
+                    <label style="padding-left: 10px;">Total number of Users:</label>
+                    <label style="padding-left: 15px;" id="userCount">3</label>
                 </div>
                 <div style="position: relative; display: flex; column-gap: 20px; align-items:start;">
                     <span class="material-icons-round" 
@@ -1010,7 +1017,7 @@
             <div>
             </div>
             <div >
-                <div id = "usersList" class="usersList" style="display: flex;flex-direction: column;row-gap: 10px;padding-left: 30px;padding-right: 30px">
+                <div id="usersList" class="usersList" style="display: flex; flex-direction: column; row-gap: 10px; padding-left: 30px; padding-right: 30px">
                 </div>
             </div>
         </div>

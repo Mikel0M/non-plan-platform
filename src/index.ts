@@ -4,6 +4,8 @@ import { IUser, usersRole, access} from "./classes/User"
 import { UsersManager } from "./classes/UsersManager"
 import { ICompany} from "./classes/Companies"
 import { CompanyManager } from "./classes/CompaniesManager"
+import { ItoDo, toDoPriority, toDoStatus, toDoPercentage } from "./classes/toDo"
+import { toDoManager } from "./classes/toDoManager"
 
 
 //Languages import
@@ -375,6 +377,111 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
 const usersListUI = document.getElementById("usersList") as HTMLElement;
 const usersManager = new UsersManager(usersListUI);
 
+// Function to update the user count
+function updateUserCount() {
+    // Assuming you have a list of users in your HTML or you can fetch it from an API
+    const usersList = document.getElementById('usersList');
+    console.log("Let's check if I can read the users list")
+    console.log(usersList)
+    const userCountElement = document.getElementById('userCount');
+
+    if (usersList && userCountElement) {
+        const userCount = usersList.children.length;
+        userCountElement.textContent = String(userCount);
+    }
+}
+
+// Call the function to update the user count when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    updateUserCount();
+});
+
+// Function to populate the select elements with user options
+function populateUserSelects() {
+    const usersList = document.getElementById('usersList');
+    const responsiblePersonSelect = document.getElementById('responsiblePersonSelect');
+    const createdBySelect = document.getElementById('createdBySelect');
+
+    if (usersList && responsiblePersonSelect && createdBySelect) {
+        // Clear existing options
+        responsiblePersonSelect.innerHTML = '';
+        createdBySelect.innerHTML = '';
+
+        // Populate with new options
+        Array.from(usersList.children).forEach((userItem) => {
+            const userName = userItem.querySelector('.fullName')?.textContent || '';
+
+            const option = document.createElement('option');
+            option.value = userName;
+            option.textContent = userName;
+
+            responsiblePersonSelect.appendChild(option.cloneNode(true));
+            createdBySelect.appendChild(option.cloneNode(true));
+        });
+    }
+}
+
+/**
+ * Handles the submission of the "To Do" form:
+ * - Prevents default form submission behavior.
+ * - Extracts form input values using FormData.
+ * - Constructs an IToDo object with the provided data.
+ * - Creates a new project instance using ProjectsManager.
+ * - Resets the form and closes the modal dialog for a clean user experience.
+ */
+const toDoListUI = document.getElementById("toDoList") as HTMLElement;
+const toDoManagerInstance = new toDoManager(toDoListUI);
+console.log("checking toDoListUI:");
+console.log("toDoListUI:", toDoListUI);
+
+const toDoForm = document.getElementById("newToDoForm");
+
+if (toDoForm && toDoForm instanceof HTMLFormElement) {
+    toDoForm.addEventListener("submit", (e) => {
+        console.log("testing toDoForm")
+        e.preventDefault();
+
+        const formData = new FormData(toDoForm);
+        const dependencies = formData.get("toDoDependencies") as string;
+        const toDoData: ItoDo = {
+            title: formData.get("toDoTitle") as string,
+            description: formData.get("toDoDescription") as string,
+            status: formData.get("toDoStatus") as toDoStatus,
+            priority: formData.get("toDoPriority") as toDoPriority,
+            project_id: formData.get("toDoProject") as string,
+            assigned_to: formData.get("toDoAssignedTo") as string,
+            created_by: formData.get("toDoCreatedBy") as string,
+            created_at: formData.get("toDoCreatedAt") as string,
+            updated_at: formData.get("toDoUpdatedAt") as string,
+            due_date: formData.get("toDoDueDate") as string,
+            start_date: formData.get("toDoStartDate") as string,
+            completion_date: formData.get("toDoCompletionDate") as string,
+            estimated_hours: formData.get("toDoEstimatedHours") ? Number(formData.get("toDoEstimatedHours")) : 0,
+            actual_hours: formData.get("toDoActualHours") ? Number(formData.get("toDoActualHours")) : 0,
+            dependencies: dependencies ? dependencies.split(',') : [],
+            progress_percentage: formData.get("toDoProgress") as toDoPercentage,
+            comments: formData.get("toDoComments") ? (formData.get("toDoComments") as string).split(',') : []
+        };
+
+        try {
+            const toDo = toDoManagerInstance.newToDo(toDoData); // Use the instance of toDoManager
+            toDoForm.reset();
+            closeModal("newToDoModal");
+        } catch (error) {
+            alert(error);
+        }
+    });
+} else {
+    console.warn("The to-do form was not found. Check the ID!");
+}
+
+
+// Call the function to populate the select elements when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    populateUserSelects();
+});
+
+// Update the user count and populate the select elements after adding a new user
 const userForm = document.getElementById("newUserForm");
 if (userForm && userForm instanceof HTMLFormElement) {
     userForm.addEventListener("submit", (e) => {
@@ -384,6 +491,8 @@ if (userForm && userForm instanceof HTMLFormElement) {
         const UserData: IUser = {
             name: formData.get("name") as string,
             surname: formData.get("surname") as string,
+            icon: formData.get("icon") as string,
+            color: formData.get("color") as string,
             email: formData.get("email") as string,
             phone: formData.get("phone") as string,
             role: formData.get("usersRole") as usersRole,
@@ -402,11 +511,15 @@ if (userForm && userForm instanceof HTMLFormElement) {
                 );
             });
         }
+        updateUserCount(); // Update the user count after adding a new user
+        populateUserSelects(); // Populate the select elements with the updated user list
         closeModal("newUserModal");
     });
 } else {
     console.warn("The user form was not found. Check the ID!");
 }
+
+
 
 
 /**
@@ -535,5 +648,39 @@ document.addEventListener('DOMContentLoaded', () => {
         if (showMoreButton) showMoreButton.style.display = 'inline-block';
     });
 
+
+});
+
+// Function to format the date as dd.mm.yy
+function formatDate(date: Date): string {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}.${month}.${year}`;
+}
+
+// Get today's date
+const today = new Date();
+
+// Format the date and display it in the span elements
+document.addEventListener('DOMContentLoaded', () => {
+    const currentDateElement = document.getElementById('currentDate');
+    const updateDateElement = document.getElementById('updateDate');
+    if (currentDateElement) {
+        currentDateElement.textContent = formatDate(today);
+    }
+    if (updateDateElement) {
+        updateDateElement.textContent = formatDate(today);
+    }
+});
+
+// Update the update date when the form is submitted
+document.getElementById('newToDoForm')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const updateDateElement = document.getElementById('updateDate');
+    if (updateDateElement) {
+        updateDateElement.textContent = formatDate(new Date());
+    }
+    // Add your form submission logic here
 });
 

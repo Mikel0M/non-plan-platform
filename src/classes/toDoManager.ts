@@ -1,18 +1,17 @@
-import { ItoDo, toDo } from "./toDo"
-import { currentProject } from './ProjectsManager'
+import { ItoDo, toDo } from "./toDo";
 
 export class toDoManager {
-    list: toDo[] = []
-    ui: HTMLElement
+    list: toDo[] = [];
+    ui: HTMLElement;
 
     constructor(container: HTMLElement) {
-        this.ui = container
+        this.ui = container;
     }
 
-    newtoDo(data: ItoDo) {
-        const ToDo = new toDo(data)
-        this.ui.append(ToDo.ui)
-        this.list.push(ToDo)
-        return ToDo
+    newToDo(data: ItoDo) {
+        const ToDo = new toDo(data);
+        this.ui.append(ToDo.ui);
+        this.list.push(ToDo);
+        return ToDo;
     }
 }
