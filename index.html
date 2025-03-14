@@ -843,6 +843,105 @@
                     </div>
                 </form>
             </dialog>
+            <dialog id="editToDoModal">
+                <form class="toDoForm" id="editToDoForm">
+                    <div class="userCard">
+                        <div class="formGrid">
+                            <div class="formColumn">
+                                <h2 style="margin: 0;">Edit Task</h2>
+                                <div class="formFieldContainerToDo">
+                                    <label><span class="material-icons-round">apartment</span>Title</label>
+                                    <input name="toDoTitle" type="text" id="editToDoTitle" />
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short title</label>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">subject</span>Description</label>
+                                    <textarea name="toDoDescription" cols="30" rows="5" placeholder="Give your project a nice description!" id="editToDoDescription"></textarea>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Status</label>
+                                    <select name="toDoStatus" id="editToDoStatus">
+                                        <option>Pending</option>
+                                        <option>Active</option>
+                                        <option>Finished</option>
+                                    </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Priority</label>
+                                    <select name="toDoPriority" id="editToDoPriority">
+                                        <option>High</option>
+                                        <option>Standard</option>
+                                        <option>Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="formColumn">
+                                <div class="formFieldContainerToDo">
+                                    <h2 data-project-info="toDoProjectName" style="margin: 0;">Project Name</h2>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Responsible Person</label>
+                                    <select name="edittoDoAssignedTo" id="editToDoAssignedTo">
+                                       <!-- Options will be dynamically populated -->
+                                    </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Created By</label>
+                                    <select name="edittoDoCreatedBy" id="editToDoCreatedBy">
+                                        <!-- Options will be dynamically populated -->
+                                </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>To-Do last update date</label>
+                                    <input name="editToDoUpdatedAt" type="date" id="editToDoUpdatedAt">
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">paid</span>Estimated hours</label>
+                                    <input name="editToDoEstimatedHours" type="number" placeholder="Estimated hours for the project" id="editToDoEstimatedHours">
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">paid</span>Actual hours</label>
+                                    <input name="editToDoActualHours" type="number" placeholder="Hours used so far" id="editToDoActualHours">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="separator-horizontal"></div>
+                        <div class="formGrid">
+                            <div class="formColumn">
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>Due Date</label>
+                                    <input name="editToDoDueDate" type="date" id="editToDoDueDate">
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>Start Date</label>
+                                    <input name="editToDoStartDate" type="date" id="editToDoStartDate">
+                                </div>                              
+                            </div>
+                            <div class="formColumn">
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Dependencies</label>
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Select the tasks this project is dependent on</label>
+                                    <select name="editToDoDependencies" id="editToDoDependencies">
+                                        <option>You</option>
+                                        <option>Standard</option>
+                                        <option>Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="separator-horizontal"></div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Comments</label>
+                            <textarea name="editToDoComments" cols="30" rows="5" placeholder="Add any clarification comment" id="editToDoComments"></textarea>
+                        </div>
+                            
+                        </div>
+                        <div class="cancelAccept">
+                            <button type="button" class="cancelButton" onclick="closeModal('editToDoModal')">Cancel</button>
+                            <button type="submit" class="acceptButton" id="submitEditToDoButton">Accept</button>
+                        </div>
+                    </form>
+                </dialog>
             <div class = "mainPageContent">
                 <div style="display:flex;flex-direction: column;row-gap: 10px;">
                     <div class="dashboardCard">

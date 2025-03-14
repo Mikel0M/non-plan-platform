@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { showModal, showModalPopulated} from '..';
 
 export type toDoStatus = "Pending" | "In Progress" | "Completed" | "On Hold";
 export type toDoPriority = "Low" | "Medium" | "High" | "Critical";
@@ -89,16 +90,43 @@ export class toDo {
         console.log("testing toDo2");
         this.ui.innerHTML = `
             <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
-                            <div class="todoItem">
-                                <div style="display: flex; justify-content: space-between;flex-direction: row;align-items: center;">
-                                    <div style="display:flex;column-gap: 15px;">
-                                        <span class="material-icons-round" style="background-color: #969696; padding: 8px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">construction</span>
-                                        <p>${this.title}</p>
-                                    </div>
-                                    <p style="text-wrap: nowrap; margin-left: 10px;">Fri, 20 sep</p>
-                                </div>
-                            </div>
+                <div class="todoItem">
+                    <div style="display: flex; justify-content: space-between;flex-direction: row;align-items: center;">
+                        <div style="display:flex;column-gap: 15px;">
+                            <span class="material-icons-round" style="background-color: #969696; padding: 8px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">construction</span>
+                            <p>${this.title}</p>
                         </div>
+                        <p style="text-wrap: nowrap; margin-left: 10px;">${this.due_date}</p>
+                    </div>
+                </div>
+            </div>
         `;
+
+        // Add event listener to open the edit modal when the userCard is clicked
+        this.ui.addEventListener("click", () => {
+            showModalPopulated("editToDoModal", this);
+        });
+    }
+    updateUI() {
+        if (!this.ui) {
+            console.warn(`UI not found for to-do: ${this.title}`);
+            return;
+        }
+
+        // Update the title
+        const titleElement = this.ui.querySelector(".todoItem > div > div > p");
+        if (titleElement) titleElement.textContent = this.title;
+
+        // Update the due date
+        const dueDateElement = this.ui.querySelector(".todoItem > div > p");
+        if (dueDateElement) dueDateElement.textContent = this.due_date;
+
+        // Update other properties if needed
+        // For example, if you have additional properties to display in the UI, update them here
+        // const statusElement = this.ui.querySelector(".statusClass");
+        // if (statusElement) statusElement.textContent = this.status;
+
+        // const priorityElement = this.ui.querySelector(".priorityClass");
+        // if (priorityElement) priorityElement.textContent = this.priority;
     }
 }

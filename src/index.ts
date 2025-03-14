@@ -7,7 +7,9 @@ import { CompanyManager } from "./classes/CompaniesManager"
 import { ItoDo, toDoPriority, toDoStatus, toDoPercentage } from "./classes/toDo"
 import { toDoManager } from "./classes/toDoManager"
 
-
+// Initialize toDoManagerInstance before using it
+const toDoListUI = document.getElementById("toDoList") as HTMLElement;
+const toDoManagerInstance = new toDoManager(toDoListUI);
 //Languages import
 
 let currentLanguage = 'en';
@@ -22,6 +24,32 @@ export function showModal(id: string) {
         modal.showModal()
     }   else {
         console.warn("The provided modal wasn't found. ID: ", id)
+    }
+}
+
+// Function to show a modal and populate it with data
+export function showModalPopulated(id: string, toDo: ItoDo) {
+    const modal = document.getElementById(id);
+    if (modal && modal instanceof HTMLDialogElement) {
+        // Populate the form with existing data 
+        (document.getElementById("editToDoTitle") as HTMLInputElement).value = toDo.title;
+        (document.getElementById("editToDoDescription") as HTMLTextAreaElement).value = toDo.description;
+        (document.getElementById("editToDoStatus") as HTMLSelectElement).value = toDo.status;
+        (document.getElementById("editToDoPriority") as HTMLSelectElement).value = toDo.priority;
+        (document.getElementById("editToDoAssignedTo") as HTMLSelectElement).value = toDo.assigned_to;
+        (document.getElementById("editToDoCreatedBy") as HTMLSelectElement).value = toDo.created_by;
+        (document.getElementById("editToDoStartDate") as HTMLInputElement).value = toDo.start_date;
+        (document.getElementById("editToDoUpdatedAt") as HTMLInputElement).value = toDo.updated_at;
+        (document.getElementById("editToDoEstimatedHours") as HTMLInputElement).value = toDo.estimated_hours.toString();
+        (document.getElementById("editToDoActualHours") as HTMLInputElement).value = toDo.actual_hours.toString();
+        (document.getElementById("editToDoDueDate") as HTMLInputElement).value = toDo.due_date;
+        (document.getElementById("editToDoDependencies") as HTMLInputElement).value = toDo.dependencies.join(", ");
+        (document.getElementById("editToDoComments") as HTMLTextAreaElement).value = toDo.comments.join(", ");
+
+        // Open the modal
+        modal.showModal();
+    } else {
+        console.warn("The provided modal wasn't found. ID: ", id);
     }
 }
 
@@ -399,8 +427,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // Function to populate the select elements with user options
 function populateUserSelects() {
     const usersList = document.getElementById('usersList');
-    const responsiblePersonSelect = document.getElementById('responsiblePersonSelect');
-    const createdBySelect = document.getElementById('createdBySelect');
+    const responsiblePersonSelect = document.getElementById('toDoCreatedBy');
+    const createdBySelect = document.getElementById('toDoAssignedTo');
+    
 
     if (usersList && responsiblePersonSelect && createdBySelect) {
         // Clear existing options
@@ -418,8 +447,15 @@ function populateUserSelects() {
             responsiblePersonSelect.appendChild(option.cloneNode(true));
             createdBySelect.appendChild(option.cloneNode(true));
         });
+    } else {
+        console.warn("One or more elements were not found. Check the IDs!");
     }
 }
+
+// Call the function to populate the select elements when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    populateUserSelects();
+});
 
 /**
  * Handles the submission of the "To Do" form:
@@ -429,12 +465,10 @@ function populateUserSelects() {
  * - Creates a new project instance using ProjectsManager.
  * - Resets the form and closes the modal dialog for a clean user experience.
  */
-const toDoListUI = document.getElementById("toDoList") as HTMLElement;
-const toDoManagerInstance = new toDoManager(toDoListUI);
-console.log("checking toDoListUI:");
-console.log("toDoListUI:", toDoListUI);
 
 const toDoForm = document.getElementById("newToDoForm");
+const editToDoForm = document.getElementById("editToDoForm");
+const submitEditToDoButton = document.getElementById("submitEditToDoButton");
 
 if (toDoForm && toDoForm instanceof HTMLFormElement) {
     toDoForm.addEventListener("submit", (e) => {
@@ -473,6 +507,71 @@ if (toDoForm && toDoForm instanceof HTMLFormElement) {
     });
 } else {
     console.warn("The to-do form was not found. Check the ID!");
+}
+
+if (editToDoForm && editToDoForm instanceof HTMLFormElement) {
+    editToDoForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(editToDoForm);
+        const dependencies = formData.get("toDoDependencies") as string;
+        const toDoData: ItoDo = {
+            title: formData.get("toDoTitle") as string,
+            description: formData.get("toDoDescription") as string,
+            status: formData.get("toDoStatus") as toDoStatus,
+            priority: formData.get("toDoPriority") as toDoPriority,
+            project_id: formData.get("toDoProject") as string,
+            assigned_to: formData.get("toDoAssignedTo") as string,
+            created_by: formData.get("toDoCreatedBy") as string,
+            created_at: formData.get("toDoCreatedAt") as string,
+            updated_at: formData.get("toDoUpdatedAt") as string,
+            due_date: formData.get("toDoDueDate") as string,
+            start_date: formData.get("toDoStartDate") as string,
+            completion_date: formData.get("toDoCompletionDate") as string,
+            estimated_hours: formData.get("toDoEstimatedHours") ? Number(formData.get("toDoEstimatedHours")) : 0,
+            actual_hours: formData.get("toDoActualHours") ? Number(formData.get("toDoActualHours")) : 0,
+            dependencies: dependencies ? dependencies.split(',') : [],
+            progress_percentage: formData.get("toDoProgress") as toDoPercentage,
+            comments: formData.get("toDoComments") ? (formData.get("toDoComments") as string).split(',') : []
+        };
+
+        try {
+            // Update the existing to-do item
+            const toDo = toDoManagerInstance.updateToDo(toDoData); // Implement the updateToDo method in toDoManager
+            //toDoForm.reset(); //to be checked
+            closeModal("editToDoModal");
+        } catch (error) {
+            alert(error);
+        }
+    });
+} else {
+    console.warn("The edit to-do form was not found. Check the ID!");
+}
+
+// Function to open the edit modal and populate it with existing data
+function openEditToDoModal(toDoData: ItoDo) {
+    const editToDoModal = document.getElementById("editToDoModal") as HTMLDialogElement;
+    if (editToDoModal) {
+        // Populate the form with existing data
+        (document.getElementById("editToDoTitle") as HTMLInputElement).value = toDoData.title;
+        (document.getElementById("editToDoDescription") as HTMLTextAreaElement).value = toDoData.description;
+        (document.getElementById("editToDoStatus") as HTMLSelectElement).value = toDoData.status;
+        (document.getElementById("editToDoPriority") as HTMLSelectElement).value = toDoData.priority;
+        (document.getElementById("editToDoAssignedTo") as HTMLSelectElement).value = toDoData.assigned_to;
+        (document.getElementById("editToDoCreatedBy") as HTMLSelectElement).value = toDoData.created_by;
+        (document.getElementById("editToDoStartDate") as HTMLInputElement).value = toDoData.start_date;
+        (document.getElementById("editToDoUpdatedAt") as HTMLInputElement).value = toDoData.updated_at;
+        (document.getElementById("editToDoEstimatedHours") as HTMLInputElement).value = toDoData.estimated_hours.toString();
+        (document.getElementById("editToDoActualHours") as HTMLInputElement).value = toDoData.actual_hours.toString();
+        (document.getElementById("editToDoDueDate") as HTMLInputElement).value = toDoData.due_date;
+        (document.getElementById("editToDoDependencies") as HTMLSelectElement).value = toDoData.dependencies.join(", ");
+        (document.getElementById("editToDoComments") as HTMLTextAreaElement).value = toDoData.comments.join(", ");
+
+        // Open the modal
+        editToDoModal.showModal();
+    } else {
+        console.warn("The edit to-do modal was not found. Check the ID!");
+    }
 }
 
 
