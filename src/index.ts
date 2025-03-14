@@ -429,12 +429,16 @@ function populateUserSelects() {
     const usersList = document.getElementById('usersList');
     const responsiblePersonSelect = document.getElementById('toDoCreatedBy');
     const createdBySelect = document.getElementById('toDoAssignedTo');
+    const editResponsiblePersonSelect = document.getElementById('editToDoCreatedBy');
+    const editCreatedBySelect = document.getElementById('editToDoAssignedTo');
     
 
-    if (usersList && responsiblePersonSelect && createdBySelect) {
+    if (usersList && responsiblePersonSelect && createdBySelect && editResponsiblePersonSelect && editCreatedBySelect) {
         // Clear existing options
         responsiblePersonSelect.innerHTML = '';
         createdBySelect.innerHTML = '';
+        editResponsiblePersonSelect.innerHTML = '';
+        editCreatedBySelect.innerHTML = '';
 
         // Populate with new options
         Array.from(usersList.children).forEach((userItem) => {
@@ -446,6 +450,8 @@ function populateUserSelects() {
 
             responsiblePersonSelect.appendChild(option.cloneNode(true));
             createdBySelect.appendChild(option.cloneNode(true));
+            editResponsiblePersonSelect.appendChild(option.cloneNode(true));
+            editCreatedBySelect.appendChild(option.cloneNode(true));
         });
     } else {
         console.warn("One or more elements were not found. Check the IDs!");
@@ -585,7 +591,6 @@ const userForm = document.getElementById("newUserForm");
 if (userForm && userForm instanceof HTMLFormElement) {
     userForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        console.log("So far so good users");
         const formData = new FormData(userForm);
         const UserData: IUser = {
             name: formData.get("name") as string,
