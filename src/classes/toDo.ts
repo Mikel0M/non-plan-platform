@@ -121,12 +121,52 @@ export class toDo {
         const dueDateElement = this.ui.querySelector(".todoItem > div > p");
         if (dueDateElement) dueDateElement.textContent = this.due_date;
 
-        // Update other properties if needed
-        // For example, if you have additional properties to display in the UI, update them here
-        // const statusElement = this.ui.querySelector(".statusClass");
-        // if (statusElement) statusElement.textContent = this.status;
+        // Update the description
+        const descriptionElement = this.ui.querySelector(".todoItem > div > div > .description");
+        if (descriptionElement) descriptionElement.textContent = this.description;
 
-        // const priorityElement = this.ui.querySelector(".priorityClass");
-        // if (priorityElement) priorityElement.textContent = this.priority;
+        // Update the status
+        const statusElement = this.ui.querySelector(".todoItem > div > div > .status");
+        if (statusElement) statusElement.textContent = this.status;
+
+        // Update the priority
+        const priorityElement = this.ui.querySelector(".todoItem > div > div > .priority");
+        if (priorityElement) priorityElement.textContent = this.priority;
+
+        // Update the assigned_to
+        const assignedToElement = this.ui.querySelector(".todoItem > div > div > .assigned_to");
+        if (assignedToElement) assignedToElement.textContent = this.assigned_to;
+
+        // Update the created_by
+        const createdByElement = this.ui.querySelector(".todoItem > div > div > .created_by");
+        if (createdByElement) createdByElement.textContent = this.created_by;
+
+        // Update the start_date
+        const startDateElement = this.ui.querySelector(".todoItem > div > div > .start_date");
+        if (startDateElement) startDateElement.textContent = this.start_date;
+
+        // Update the updated_at
+        const updatedAtElement = this.ui.querySelector(".todoItem > div > div > .updated_at");
+        if (updatedAtElement) updatedAtElement.textContent = this.updated_at;
+
+        // Update the estimated_hours
+        const estimatedHoursElement = this.ui.querySelector(".todoItem > div > div > .estimated_hours");
+        if (estimatedHoursElement) estimatedHoursElement.textContent = this.estimated_hours.toString();
+
+        // Update the actual_hours
+        const actualHoursElement = this.ui.querySelector(".todoItem > div > div > .actual_hours");
+        if (actualHoursElement) actualHoursElement.textContent = this.actual_hours.toString();
+
+        // Update the dependencies
+        const dependenciesElement = this.ui.querySelector(".todoItem > div > div > .dependencies");
+        if (dependenciesElement) dependenciesElement.textContent = this.dependencies.join(", ");
+
+        // Update the progress_percentage
+        const progressPercentageElement = this.ui.querySelector(".todoItem > div > div > .progress_percentage");
+        if (progressPercentageElement) progressPercentageElement.textContent = this.progress_percentage;
+
+        // Update the comments
+        const commentsElement = this.ui.querySelector(".todoItem > div > div > .comments");
+        if (commentsElement) commentsElement.textContent = this.comments.join(", ");
     }
 }

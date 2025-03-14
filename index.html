@@ -845,6 +845,8 @@
             </dialog>
             <dialog id="editToDoModal">
                 <form class="toDoForm" id="editToDoForm">
+                    <input type="hidden" id="editToDoId" name="editToDoId">
+                    <!-- Other form fields... -->
                     <div class="userCard">
                         <div class="formGrid">
                             <div class="formColumn">
@@ -890,6 +892,10 @@
                                     <select name="edittoDoCreatedBy" id="editToDoCreatedBy">
                                         <!-- Options will be dynamically populated -->
                                 </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_today</span>To-Do start date</label>
+                                    <input name="editToDoStartDate" type="date" id="editToDoStartDate">
                                 </div>
                                 <div class="formFieldContainer">
                                     <label><span class="material-icons-round">calendar_month</span>To-Do last update date</label>

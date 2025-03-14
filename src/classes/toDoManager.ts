@@ -1,47 +1,54 @@
-import { ItoDo, toDo } from "./toDo";
+import { ItoDo, toDo } from './toDo';
 
 export class toDoManager {
-    list: toDo[] = [];
-    ui: HTMLElement;
+    private toDos: toDo[] = [];
+    private toDoListUI: HTMLElement;
 
-    constructor(container: HTMLElement) {
-        this.ui = container;
+    constructor(toDoListUI: HTMLElement) {
+        this.toDoListUI = toDoListUI;
     }
 
-    newToDo(data: ItoDo) {
-        const ToDo = new toDo(data);
-        this.ui.append(ToDo.ui);
-        this.list.push(ToDo);
-        return ToDo;
+    // Method to add a new to-do
+    newToDo(data: ItoDo): toDo {
+        const newToDo = new toDo(data);
+        this.toDos.push(newToDo);
+        this.toDoListUI.appendChild(newToDo.ui);
+        return newToDo;
     }
 
-    updateToDo(data: ItoDo) {
-        const toDoIndex = this.list.findIndex((item) => item.id === data.id);
-        if (toDoIndex !== -1) {
-            const existingToDo = this.list[toDoIndex];
-            existingToDo.title = data.title;
-            existingToDo.description = data.description;
-            existingToDo.status = data.status;
-            existingToDo.priority = data.priority;
-            existingToDo.project_id = data.project_id;
-            existingToDo.assigned_to = data.assigned_to;
-            existingToDo.created_by = data.created_by;
-            existingToDo.created_at = data.created_at;
-            existingToDo.updated_at = data.updated_at;
-            existingToDo.due_date = data.due_date;
-            existingToDo.start_date = data.start_date;
-            existingToDo.completion_date = data.completion_date;
-            existingToDo.estimated_hours = data.estimated_hours;
-            existingToDo.actual_hours = data.actual_hours;
-            existingToDo.dependencies = data.dependencies;
-            existingToDo.progress_percentage = data.progress_percentage;
-            existingToDo.comments = data.comments;
+    // Method to find a to-do by its ID
+    findToDoById(id: string): toDo | undefined {
+        return this.toDos.find(toDo => toDo.id === id);
+    }
+
+    // Method to update an existing to-do
+    updateToDo(data: ItoDo): toDo | undefined {
+        const toDoInstance = this.findToDoById(data.id!);
+        if (toDoInstance) {
+            toDoInstance.id = data.id ?? toDoInstance.id;
+            toDoInstance.title = data.title ?? '';
+            toDoInstance.description = data.description ?? '';
+            toDoInstance.status = data.status ?? 'Pending';
+            toDoInstance.priority = data.priority ?? 'Low';
+            toDoInstance.assigned_to = data.assigned_to ?? '';
+            toDoInstance.project_id = data.project_id ?? '';
+            toDoInstance.created_by = data.created_by ?? '';
+            toDoInstance.created_at = data.created_at ?? '';
+            toDoInstance.updated_at = data.updated_at ?? '';
+            toDoInstance.due_date = data.due_date ?? '';
+            toDoInstance.start_date = data.start_date ?? '';
+            toDoInstance.completion_date = data.completion_date ?? '';
+            toDoInstance.estimated_hours = data.estimated_hours ?? 0;
+            toDoInstance.actual_hours = data.actual_hours ?? 0;
+            toDoInstance.dependencies = data.dependencies ?? [];
+            toDoInstance.progress_percentage = data.progress_percentage ?? '0%';
+            toDoInstance.comments = data.comments ?? [];
 
             // Update the UI
-            existingToDo.setUI();
-            return existingToDo;
+            toDoInstance.setUI();
+            return toDoInstance;
         } else {
-            throw new Error("To-Do item not found");
+            throw new Error("To-Do item not found(manager)");
         }
     }
 }

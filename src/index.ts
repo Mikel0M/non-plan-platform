@@ -31,7 +31,11 @@ export function showModal(id: string) {
 export function showModalPopulated(id: string, toDo: ItoDo) {
     const modal = document.getElementById(id);
     if (modal && modal instanceof HTMLDialogElement) {
-        // Populate the form with existing data 
+        // Populate the select elements with user options
+        populateUserSelects();
+
+        // Populate the form with existing data
+        (document.getElementById("editToDoId") as HTMLInputElement).value = toDo.id ?? '';
         (document.getElementById("editToDoTitle") as HTMLInputElement).value = toDo.title;
         (document.getElementById("editToDoDescription") as HTMLTextAreaElement).value = toDo.description;
         (document.getElementById("editToDoStatus") as HTMLSelectElement).value = toDo.status;
@@ -474,7 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const toDoForm = document.getElementById("newToDoForm");
 const editToDoForm = document.getElementById("editToDoForm");
-const submitEditToDoButton = document.getElementById("submitEditToDoButton");
 
 if (toDoForm && toDoForm instanceof HTMLFormElement) {
     toDoForm.addEventListener("submit", (e) => {
@@ -540,14 +543,14 @@ if (editToDoForm && editToDoForm instanceof HTMLFormElement) {
             progress_percentage: formData.get("toDoProgress") as toDoPercentage,
             comments: formData.get("toDoComments") ? (formData.get("toDoComments") as string).split(',') : []
         };
-
+        console.log("testing editToDoForm")
         try {
             // Update the existing to-do item
             const toDo = toDoManagerInstance.updateToDo(toDoData); // Implement the updateToDo method in toDoManager
-            //toDoForm.reset(); //to be checked
+            editToDoForm.reset(); //to be checked
             closeModal("editToDoModal");
         } catch (error) {
-            alert(error);
+            //alert(error);
         }
     });
 } else {
@@ -788,3 +791,50 @@ document.getElementById('newToDoForm')?.addEventListener('submit', (event) => {
     // Add your form submission logic here
 });
 
+document.getElementById("editToDoForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    // Extract data from form fields
+    const toDoId = (document.getElementById("editToDoId") as HTMLInputElement).value ?? '';
+    const title = (document.getElementById("editToDoTitle") as HTMLInputElement).value ?? '';
+    const description = (document.getElementById("editToDoDescription") as HTMLTextAreaElement).value ?? '';
+    const status = (document.getElementById("editToDoStatus") as HTMLSelectElement).value as toDoStatus ?? 'Pending';
+    const priority = (document.getElementById("editToDoPriority") as HTMLSelectElement).value as toDoPriority ?? 'Low';
+    const assigned_to = (document.getElementById("editToDoAssignedTo") as HTMLSelectElement).value ?? '';
+    const created_by = (document.getElementById("editToDoCreatedBy") as HTMLSelectElement).value ?? '';
+    const start_date = (document.getElementById("editToDoStartDate") as HTMLInputElement).value ?? '';
+    const updated_at = (document.getElementById("editToDoUpdatedAt") as HTMLInputElement).value ?? '';
+    const estimated_hours = parseFloat((document.getElementById("editToDoEstimatedHours") as HTMLInputElement).value ?? '0');
+    const actual_hours = parseFloat((document.getElementById("editToDoActualHours") as HTMLInputElement).value ?? '0');
+    const due_date = (document.getElementById("editToDoDueDate") as HTMLInputElement).value ?? '';
+    const dependencies = (document.getElementById("editToDoDependencies") as HTMLInputElement).value?.split(", ") ?? [];
+    const comments = (document.getElementById("editToDoComments") as HTMLTextAreaElement).value?.split(", ") ?? [];
+
+    // Find the corresponding toDo instance
+    const toDoInstance = toDoManagerInstance.findToDoById(toDoId);
+    if (!toDoInstance) {
+        alert("Error: To-Do item not found");
+        return;
+    }
+
+    // Update the toDo instance
+    toDoInstance.title = title;
+    toDoInstance.description = description;
+    toDoInstance.status = status;
+    toDoInstance.priority = priority;
+    toDoInstance.assigned_to = assigned_to;
+    toDoInstance.created_by = created_by;
+    toDoInstance.start_date = start_date;
+    toDoInstance.updated_at = updated_at;
+    toDoInstance.estimated_hours = estimated_hours;
+    toDoInstance.actual_hours = actual_hours;
+    toDoInstance.due_date = due_date;
+    toDoInstance.dependencies = dependencies;
+    toDoInstance.comments = comments;
+
+    // Update the UI
+    toDoInstance.updateUI();
+
+    // Close the modal
+    closeModal("editToDoModal");
+});
