@@ -125,7 +125,7 @@ export function setCurrentProjectId(projectId: string | null) {
 }}
 
 //the same we do for projects, we do for toDos
-const toDosListUI = document.getElementById("toDoListContainer") as HTMLElement
+const toDosListUI = document.getElementById("toDoList") as HTMLElement
 const toDosManager = new toDoManager(toDosListUI)
 
 // Call this method to set up the "Change" button event listener
