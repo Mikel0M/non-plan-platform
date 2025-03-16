@@ -8,13 +8,58 @@ import { ItoDo, toDoPriority, toDoStatus, toDoPercentage } from "./classes/toDo"
 import { toDoManager } from "./classes/toDoManager"
 
 // Initialize toDoManagerInstance before using it
-const toDoListUI = document.getElementById("toDoList") as HTMLElement;
+const toDoListUI = document.getElementById("toDoListContainer") as HTMLElement;
 const toDoManagerInstance = new toDoManager(toDoListUI);
 //Languages import
 
 let currentLanguage = 'en';
 
 import { translations } from "./text/Language"
+
+export let currentProjectId: string | null = null;
+
+
+
+const projectsManager = new ProjectsManager(document.getElementById('projectsList')!);
+
+document.getElementById('newToDoForm')!.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    if (!currentProjectId) {
+        console.error("currentProjectId is null");
+        return;
+    }
+
+    const newToDoData: ItoDo = {
+        title: (document.getElementById('toDoTitle') as HTMLInputElement).value,
+        description: (document.getElementById('toDoDescription') as HTMLTextAreaElement).value,
+        status: (document.getElementById('toDoStatus') as HTMLSelectElement).value as toDoStatus,
+        priority: (document.getElementById('toDoPriority') as HTMLSelectElement).value as toDoPriority,
+        project_id: currentProjectId,
+        assigned_to: (document.getElementById('toDoAssignedTo') as HTMLSelectElement).value,
+        created_by: (document.getElementById('toDoCreatedBy') as HTMLSelectElement).value,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        due_date: (document.getElementById('toDoDueDate') as HTMLInputElement).value,
+        start_date: (document.getElementById('toDoStartDate') as HTMLInputElement).value,
+        completion_date: '',
+        estimated_hours: parseFloat((document.getElementById('toDoEstimatedHours') as HTMLInputElement).value),
+        actual_hours: parseFloat((document.getElementById('toDoActualHours') as HTMLInputElement).value),
+        dependencies: [],
+        progress_percentage: '0%' as toDoPercentage,
+        comments: []
+    };
+
+    try {
+        const toDo = toDoManagerInstance.newToDo(newToDoData, currentProjectId!); // Use the instance of toDoManager
+        (document.getElementById('newToDoForm') as HTMLFormElement).reset();
+        closeModal('newToDoModal');
+    } catch (error) {
+        alert(error);
+    }
+})
+
+
 
 
 //Shows a modal. If the modal id is not found, it will show an error
@@ -73,8 +118,15 @@ export function closeModal(id: string) {
 (window as any).closeModal = closeModal;
 
 const projectsListUI = document.getElementById("projectsList") as HTMLElement
-const projectsManager = new ProjectsManager(projectsListUI)
 
+export function setCurrentProjectId(projectId: string | null) {
+    if (projectsManager?.currentProject?.id != null) {
+    currentProjectId = projectsManager.currentProject.id;
+}}
+
+//the same we do for projects, we do for toDos
+const toDosListUI = document.getElementById("toDoListContainer") as HTMLElement
+const toDosManager = new toDoManager(toDosListUI)
 
 // Call this method to set up the "Change" button event listener
 projectsManager.setChangeButton();
@@ -100,11 +152,10 @@ const editProjectBtn = document.getElementById("editProject")
 if (editProjectBtn){
     editProjectBtn.addEventListener("click", () => {
         (showModal("editProjectModal"));
-        console.log("now testing again");
         
         // Check if currentProject is not null
         if (projectsManager) {
-            console.log(projectsManager); // Access currentProject.name safely
+            console.log(projectsManager.currentProject?.id); // Access currentProject.name safely
         } else {
             console.warn("projectsManager is null!");
         }
@@ -475,6 +526,11 @@ document.addEventListener('DOMContentLoaded', () => {
  * - Creates a new project instance using ProjectsManager.
  * - Resets the form and closes the modal dialog for a clean user experience.
  */
+ if (projectsManager?.currentProject?.id != null) {
+    const currentID = projectsManager.currentProject.id;
+} else {
+    console.log("ID is null or undefined");
+}
 
 const toDoForm = document.getElementById("newToDoForm");
 const editToDoForm = document.getElementById("editToDoForm");
@@ -486,12 +542,13 @@ if (toDoForm && toDoForm instanceof HTMLFormElement) {
 
         const formData = new FormData(toDoForm);
         const dependencies = formData.get("toDoDependencies") as string;
+        if (projectsManager?.currentProject?.id != null) {
         const toDoData: ItoDo = {
             title: formData.get("toDoTitle") as string,
             description: formData.get("toDoDescription") as string,
             status: formData.get("toDoStatus") as toDoStatus,
             priority: formData.get("toDoPriority") as toDoPriority,
-            project_id: formData.get("toDoProject") as string,
+            project_id: projectsManager.currentProject.id,
             assigned_to: formData.get("toDoAssignedTo") as string,
             created_by: formData.get("toDoCreatedBy") as string,
             created_at: formData.get("toDoCreatedAt") as string,
@@ -507,13 +564,14 @@ if (toDoForm && toDoForm instanceof HTMLFormElement) {
         };
 
         try {
-            const toDo = toDoManagerInstance.newToDo(toDoData); // Use the instance of toDoManager
+            console.log("testing for ID",projectsManager.currentProject?.id)
+            const toDo = toDoManagerInstance.newToDo(toDoData, projectsManager.currentProject?.id); // Use the instance of toDoManager
             toDoForm.reset();
             closeModal("newToDoModal");
         } catch (error) {
             alert(error);
         }
-    });
+    }});
 } else {
     console.warn("The to-do form was not found. Check the ID!");
 }
@@ -837,4 +895,40 @@ document.getElementById("editToDoForm")?.addEventListener("submit", (e) => {
 
     // Close the modal
     closeModal("editToDoModal");
+});
+
+document.getElementById('newToDoForm')!.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    if (!projectsManager.currentProject?.id) {
+        console.error("currentProjectId is null");
+        return;
+    }
+
+    console.log("this is the id in index",projectsManager.currentProject?.id)
+    console.log("this is the list of toDos",toDosManager.getToDoListUI)
+
+    const newToDoData: ItoDo = {
+        title: (document.getElementById('toDoTitle') as HTMLInputElement).value,
+        description: (document.getElementById('toDoDescription') as HTMLTextAreaElement).value,
+        status: (document.getElementById('toDoStatus') as HTMLSelectElement).value as toDoStatus,
+        priority: (document.getElementById('toDoPriority') as HTMLSelectElement).value as toDoPriority,
+        project_id: projectsManager.currentProject?.id,
+        assigned_to: (document.getElementById('toDoAssignedTo') as HTMLSelectElement).value,
+        created_by: (document.getElementById('toDoCreatedBy') as HTMLSelectElement).value,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        due_date: (document.getElementById('toDoDueDate') as HTMLInputElement).value,
+        start_date: (document.getElementById('toDoStartDate') as HTMLInputElement).value,
+        completion_date: '',
+        estimated_hours: parseFloat((document.getElementById('toDoEstimatedHours') as HTMLInputElement).value),
+        actual_hours: parseFloat((document.getElementById('toDoActualHours') as HTMLInputElement).value),
+        dependencies: [],
+        progress_percentage: '0%' as toDoPercentage,
+        comments: []
+    };
+
+    toDoManagerInstance.newToDo(newToDoData, projectsManager.currentProject?.id);
+
+    closeModal('newToDoModal');
 });

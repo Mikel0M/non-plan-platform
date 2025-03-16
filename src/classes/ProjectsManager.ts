@@ -1,5 +1,8 @@
 import { closeModal } from "..";
 import { IProject, Project, userRole, status, phase } from "./Project";
+import { toDoManagerInstance, toDos } from "./toDoManager"; // Import the toDoManager instance
+import { currentProjectId, setCurrentProjectId } from "../index"; // Import the global constant and setter function
+import { toDo, ItoDo } from "./toDo";
 
 export let currentProject: Project | null = null; // Ensure it's globally accessible
 
@@ -11,10 +14,12 @@ export class ProjectsManager {
 
     constructor(container: HTMLElement) {
         this.ui = container;
- 
     }
 
-   
+    // Method to find a project by its ID
+    findProjectById(id: string): Project | undefined {
+        return this.list.find(project => project.id === id);
+    }
 
     newProject(data: IProject) {
         const projectNames = this.list.map((project) => project.name);
@@ -22,43 +27,42 @@ export class ProjectsManager {
         const project = new Project(data);
 
         if (nameInUse) {
-            // Trigger the modal instead of throwing an error
             this.showErrorModalDupName(data.name);
             return null; // Prevent further execution
         }
-        // Add event listener to select project for editing
+
         project.ui.addEventListener("click", () => {
             const projectsPage = document.getElementById("projectsPage");
             const detailsPage = document.getElementById("projectDetails");
             if (!projectsPage || !detailsPage) return;
-            
 
             projectsPage.style.display = "none";
             detailsPage.style.display = "flex";
 
             this.currentProject = project;
+            setCurrentProjectId(project.id); // Update the global constant
             this.setDetailsPage(project);  // Set the details page with the selected project
             this.setProjectsPage(project);  // Set the details page with the selected project
-            // Add event listener to open the  to Do Modal:
-            
-             
 
+            // Call the method to filter and display to-dos by project ID
+            console.log(`Calling filterAndDisplayToDosByProjectId with project ID: ${project.id}`); // Debugging statement
+            this.filterAndDisplayToDosByProjectId(project.id);
+
+            // Access the toDoListUI element
+            const toDoListUI = toDoManagerInstance.getToDoListUI();
+            console.log("toDoListUI content:", toDoListUI.innerHTML); // Debugging statement
         });
 
-        //newtoDotModal 
         const newtoDoModalBtn = document.getElementById("newToDoBtn");
         const modaltoDo = document.getElementById("newToDoModal") as HTMLDialogElement;
-        if (newtoDoModalBtn && modaltoDo){
+        if (newtoDoModalBtn && modaltoDo) {
             const name = modaltoDo.querySelector("[data-project-info='toDoProjectName']");
-            if (name) { name.textContent = data.name}
-            console.log(data.name)
-            newtoDoModalBtn.addEventListener("click", () => {modaltoDo.showModal()})
+            const projectID = modaltoDo.querySelector("[data-project-info='toDoProjectID']");
+            if (name) { name.textContent = data.name }
+            if (projectID) { projectID.textContent = data.id ? data.id : "" }
+            newtoDoModalBtn.addEventListener("click", () => { modaltoDo.showModal() })
         }
 
-        // Add event listener to open the projects tab
-
-
-        // Other checks for project name
         if (data.name.length < 5) {
             this.showErrorModalShortName();
             return null; // Prevent further execution
@@ -68,7 +72,6 @@ export class ProjectsManager {
         this.list.push(project);
         return project;
     }
-
 
     setToDoModal(project: Project) {
         const toDoModal = document.getElementById("editProjectModal");
@@ -318,7 +321,6 @@ export class ProjectsManager {
         const modaltoDo = document.getElementById("newToDoModal") as HTMLDialogElement;
         const name = modaltoDo.querySelector("[data-project-info='toDoProjectName']");
             if (name) { name.textContent = project.name}
-            console.log(project.name)
 
     }
 
@@ -580,4 +582,40 @@ export class ProjectsManager {
 
         input.click();
     }
+
+    // Method to filter to-dos by project ID and update the UI
+    filterAndDisplayToDosByProjectId(projectId: string): void {
+        console.log(`Filtering to-dos for project ID: ${projectId}`); // Debugging statement
+
+        // Log all elements of the toDos list
+        console.log("All to-dos before filtering:", toDos); // Debugging statement
+
+        // Clear existing tasks
+        const toDoListUI = toDoManagerInstance.getToDoListUI();
+        toDoListUI.innerHTML = '';
+
+        // Delete all UI elements
+        toDoManagerInstance.getToDos().forEach(toDo => {
+            toDo.deleteUI();
+        });
+
+        // Log the length of the toDos list
+        console.log(`Number of to-dos before filtering: ${toDoManagerInstance.getToDos().length}`); // Debugging statement
+
+        // Log the title of each task
+        toDoManagerInstance.getToDos().forEach(toDo => {
+            console.log(`Task title: ${toDo.title}`);
+        });
+
+        // Get the filtered tasks
+        const filteredToDos = toDoManagerInstance.getToDos().filter(toDo => toDo.project_id === projectId);
+
+        // Append the filtered tasks to the to-do list container
+        filteredToDos.forEach(toDo => {
+            toDoListUI.appendChild(toDo.ui);
+        });
+
+        console.log(`Displayed ${filteredToDos.length} to-dos for project ID: ${projectId}`); // Debugging statement
+    }
+    
 }

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { showModal, showModalPopulated} from '..';
+import { showModalPopulated } from '..';
 
 export type toDoStatus = "Pending" | "In Progress" | "Completed" | "On Hold";
 export type toDoPriority = "Low" | "Medium" | "High" | "Critical";
@@ -79,15 +79,12 @@ export class toDo {
 
         // Initialize the UI element
         this.ui = document.createElement("div");
-        console.log("UI Element Created:", this.title);
         this.setUI();
     }
 
     setUI() {
         if (!this.ui) { return; }
-        console.log("testing toDo");
         this.ui.className = "userCard";
-        console.log("testing toDo2");
         this.ui.innerHTML = `
             <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
                 <div class="todoItem">
@@ -107,6 +104,7 @@ export class toDo {
             showModalPopulated("editToDoModal", this);
         });
     }
+
     updateUI() {
         if (!this.ui) {
             console.warn(`UI not found for to-do: ${this.title}`);
@@ -168,5 +166,14 @@ export class toDo {
         // Update the comments
         const commentsElement = this.ui.querySelector(".todoItem > div > div > .comments");
         if (commentsElement) commentsElement.textContent = this.comments.join(", ");
+    }
+
+    deleteUI() {
+        if (this.ui && this.ui.parentElement) {
+            this.ui.parentElement.removeChild(this.ui);
+            console.log(`UI for to-do "${this.title}" has been deleted.`);
+        } else {
+            console.warn(`UI not found for to-do: ${this.title}`);
+        }
     }
 }

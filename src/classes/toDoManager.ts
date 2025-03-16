@@ -1,24 +1,41 @@
 import { ItoDo, toDo } from './toDo';
 
+export let toDos: toDo[] = []; // Make toDos public
+
 export class toDoManager {
-    private toDos: toDo[] = [];
-    private toDoListUI: HTMLElement;
+
+    public toDoListUI: HTMLElement;
+    public toDoListContainer: HTMLElement | null = null; // To hold the #toDoList container
 
     constructor(toDoListUI: HTMLElement) {
         this.toDoListUI = toDoListUI;
+        console.log("toDoListUI initialized:", this.toDoListUI); // Debugging statement
+    }
+
+    // Getter method to expose the toDoListUI element
+    getToDoListUI(): HTMLElement {
+        return this.toDoListUI;
+    }
+
+    // Getter method to return the current state of the toDos array
+    getToDos(): toDo[] {
+        return toDos;
     }
 
     // Method to add a new to-do
-    newToDo(data: ItoDo): toDo {
+    newToDo(data: ItoDo, projectId: string): toDo {
+        data.project_id = projectId;
         const newToDo = new toDo(data);
-        this.toDos.push(newToDo);
+        toDos.push(newToDo);
         this.toDoListUI.appendChild(newToDo.ui);
+        console.log(`New to-do added with project ID: ${projectId}`, newToDo); // Debugging statement
+        console.log("Current toDos list after addition:", toDos); // Debugging statement
         return newToDo;
     }
 
     // Method to find a to-do by its ID
     findToDoById(id: string): toDo | undefined {
-        return this.toDos.find(toDo => toDo.id === id);
+        return toDos.find(toDo => toDo.id === id);
     }
 
     // Method to update an existing to-do
@@ -44,11 +61,29 @@ export class toDoManager {
             toDoInstance.progress_percentage = data.progress_percentage ?? '0%';
             toDoInstance.comments = data.comments ?? [];
 
-            // Update the UI
-            toDoInstance.setUI();
+            toDoInstance.updateUI();
+            console.log(`To-do with ID ${data.id} updated`, toDoInstance); // Debugging statement
+            console.log("Current toDos list after update:", toDos); // Debugging statement
             return toDoInstance;
         } else {
             throw new Error("To-Do item not found(manager)");
         }
     }
+
+    // Method to delete a to-do by its ID
+    deleteToDoById(id: string): void {
+        const toDoIndex = toDos.findIndex(toDo => toDo.id === id);
+        if (toDoIndex !== -1) {
+            const toDoInstance = toDos[toDoIndex];
+            toDoInstance.deleteUI();
+            toDos.splice(toDoIndex, 1);
+            console.log(`To-do with ID ${id} deleted`); // Debugging statement
+            console.log("Current toDos list after deletion:", toDos); // Debugging statement
+        } else {
+            console.warn(`To-do with ID ${id} not found`); // Debugging statement
+        }
+    }
 }
+
+// Create and export an instance of toDoManager
+export const toDoManagerInstance = new toDoManager(document.getElementById('toDoListContainer')!);

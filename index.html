@@ -740,6 +740,7 @@
             </dialog>
             <dialog id="newToDoModal">
                 <form class="toDoForm" id="newToDoForm">
+                    <input type="hidden" name="toDoProject" id="toDoProject" />
                     <div class="userCard">
                         <div class="formGrid">
                             <div class="formColumn">
@@ -997,7 +998,7 @@
                               </div>
                         </div>
                     </div>
-                    <div id="toDoList" class="dashboardCard" style="flex-grow: 1;">
+                    <div id="toDoListContainer" class="dashboardCard" style="flex-grow: 1;">
                         <div style="display: flex; align-items: center;flex-direction: row;justify-content:space-between;margin:20px">
                             <h4>To-Do</h4>
                             <div style="display: flex;align-items: center;align-items: center;padding-left: 80px;">
@@ -1007,9 +1008,13 @@
                             <button id = "newToDoBtn" class = "buttonTertiary"><span class="material-icons-round">add</span></button>
                         </div>
                     </div>
+                    <div id="toDoListContainer">
+                        <!-- To-Do list items will be appended here -->
+                    </div>
                 </div>
                 <div id="viewerContainer" class="dashboardCard"></div>  
             </div>
+            
         </div>
         <div class="page" id = "usersPage" style = "display: none">
             <dialog id="newUserModal">
