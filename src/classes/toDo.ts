@@ -6,33 +6,27 @@ export type toDoPriority = "Low" | "Medium" | "High" | "Critical";
 export type toDoPercentage = "25%" | "50%" | "75%" | "100%";
 
 export interface ItoDo {
-    // Basic Fields
     id?: string;
     title: string;
     description: string;
     status: toDoStatus;
     priority: toDoPriority;
-    // Project & Assignment
     project_id: string;
     assigned_to: string;
     created_by: string;
     created_at: string;
     updated_at: string;
-    // Time Management
     due_date: string;
     start_date: string;
     completion_date: string;
     estimated_hours: number;
     actual_hours: number;
-    // Construction-Specific
     dependencies: string[];
-    // Progress Tracking
     progress_percentage: toDoPercentage;
     comments: string[];
 }
 
 export class toDo {
-    // To satisfy ItoDo
     id: string;
     title: string;
     description: string;
@@ -51,14 +45,10 @@ export class toDo {
     dependencies: string[];
     progress_percentage: toDoPercentage;
     comments: string[];
-
-    // Class internals
     ui: HTMLDivElement;
 
     constructor(data: ItoDo) {
-        // Allow existing id, otherwise generate a new one
         this.id = data.id || uuidv4();
-        // Project data definition
         this.title = data.title;
         this.description = data.description;
         this.status = data.status;
@@ -77,18 +67,21 @@ export class toDo {
         this.progress_percentage = data.progress_percentage;
         this.comments = data.comments;
 
-        // Initialize the UI element
         this.ui = document.createElement("div");
+        console.log("UI Element Created:", this.title);
         this.setUI();
     }
 
     setUI() {
+        this.updateColor();
         if (!this.ui) { return; }
+        console.log("testing toDo");
         this.ui.className = "userCard";
+        console.log("testing toDo2");
         this.ui.innerHTML = `
             <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
-                <div class="todoItem">
-                    <div style="display: flex; justify-content: space-between;flex-direction: row;align-items: center;">
+                <div style ="background-color:${this.getColor()};" class="todoItem">
+                    <div style="display: flex; justify-content: space-between; flex-direction: row;align-items: center;">
                         <div style="display:flex;column-gap: 15px;">
                             <span class="material-icons-round" style="background-color: #969696; padding: 8px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">construction</span>
                             <p>${this.title}</p>
@@ -99,7 +92,6 @@ export class toDo {
             </div>
         `;
 
-        // Add event listener to open the edit modal when the userCard is clicked
         this.ui.addEventListener("click", () => {
             showModalPopulated("editToDoModal", this);
         });
@@ -111,61 +103,72 @@ export class toDo {
             return;
         }
 
-        // Update the title
+        this.updateColor();
+
         const titleElement = this.ui.querySelector(".todoItem > div > div > p");
         if (titleElement) titleElement.textContent = this.title;
 
-        // Update the due date
         const dueDateElement = this.ui.querySelector(".todoItem > div > p");
         if (dueDateElement) dueDateElement.textContent = this.due_date;
 
-        // Update the description
         const descriptionElement = this.ui.querySelector(".todoItem > div > div > .description");
         if (descriptionElement) descriptionElement.textContent = this.description;
 
-        // Update the status
         const statusElement = this.ui.querySelector(".todoItem > div > div > .status");
         if (statusElement) statusElement.textContent = this.status;
 
-        // Update the priority
         const priorityElement = this.ui.querySelector(".todoItem > div > div > .priority");
         if (priorityElement) priorityElement.textContent = this.priority;
 
-        // Update the assigned_to
         const assignedToElement = this.ui.querySelector(".todoItem > div > div > .assigned_to");
         if (assignedToElement) assignedToElement.textContent = this.assigned_to;
 
-        // Update the created_by
         const createdByElement = this.ui.querySelector(".todoItem > div > div > .created_by");
         if (createdByElement) createdByElement.textContent = this.created_by;
 
-        // Update the start_date
         const startDateElement = this.ui.querySelector(".todoItem > div > div > .start_date");
         if (startDateElement) startDateElement.textContent = this.start_date;
 
-        // Update the updated_at
         const updatedAtElement = this.ui.querySelector(".todoItem > div > div > .updated_at");
         if (updatedAtElement) updatedAtElement.textContent = this.updated_at;
 
-        // Update the estimated_hours
         const estimatedHoursElement = this.ui.querySelector(".todoItem > div > div > .estimated_hours");
         if (estimatedHoursElement) estimatedHoursElement.textContent = this.estimated_hours.toString();
 
-        // Update the actual_hours
         const actualHoursElement = this.ui.querySelector(".todoItem > div > div > .actual_hours");
         if (actualHoursElement) actualHoursElement.textContent = this.actual_hours.toString();
 
-        // Update the dependencies
         const dependenciesElement = this.ui.querySelector(".todoItem > div > div > .dependencies");
         if (dependenciesElement) dependenciesElement.textContent = this.dependencies.join(", ");
 
-        // Update the progress_percentage
         const progressPercentageElement = this.ui.querySelector(".todoItem > div > div > .progress_percentage");
         if (progressPercentageElement) progressPercentageElement.textContent = this.progress_percentage;
 
-        // Update the comments
         const commentsElement = this.ui.querySelector(".todoItem > div > div > .comments");
         if (commentsElement) commentsElement.textContent = this.comments.join(", ");
+    }
+
+    updateColor() {
+        const color = this.getColor();
+        const todoItemElement = this.ui.querySelector(".todoItem") as HTMLElement;
+        if (todoItemElement) {
+            todoItemElement.style.backgroundColor = color;
+        }
+    }
+
+    getColor(): string {
+        switch (this.status) {
+            case "In Progress":
+                return "#FFA500";
+            case "Completed":
+                return "#008000";
+            case "Pending":
+                return "#969697";
+            case "On Hold":
+                return "#FF0000";
+            default:
+                return "#969696";
+        }
     }
 
     deleteUI() {
