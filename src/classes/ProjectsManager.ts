@@ -3,6 +3,7 @@ import { IProject, Project, userRole, status, phase } from "./Project";
 import { toDoManagerInstance, toDos } from "./toDoManager"; // Import the toDoManager instance
 import { currentProjectId, setCurrentProjectId } from "../index"; // Import the global constant and setter function
 import { toDo, ItoDo } from "./toDo";
+import { IUser, User } from "./User";
 
 export let currentProject: Project | null = null; // Ensure it's globally accessible
 
@@ -527,10 +528,57 @@ export class ProjectsManager {
     }
 
     exportToJSON() {
-        const exportableData = this.list.map(project => {
+        const projects = this.list.map(project => {
             const { ui, ...projectData } = project; // Destructure to exclude `ui`
-            return projectData;
+            return {
+                ...projectData,
+                toDos: toDoManagerInstance.getToDos().filter(toDo => toDo.project_id === project.id).map(toDo => ({
+                    id: toDo.id,
+                    title: toDo.title,
+                    description: toDo.description,
+                    status: toDo.status,
+                    priority: toDo.priority,
+                    project_id: toDo.project_id,
+                    assigned_to: toDo.assigned_to,
+                    created_by: toDo.created_by,
+                    created_at: toDo.created_at,
+                    updated_at: toDo.updated_at,
+                    due_date: toDo.due_date,
+                    start_date: toDo.start_date,
+                    completion_date: toDo.completion_date,
+                    estimated_hours: toDo.estimated_hours,
+                    actual_hours: toDo.actual_hours,
+                    dependencies: toDo.dependencies,
+                    progress_percentage: toDo.progress_percentage,
+                    comments: toDo.comments
+                }))
+            };
         });
+
+        const toDos = toDoManagerInstance.getToDos().map(toDo => ({
+            id: toDo.id,
+            title: toDo.title,
+            description: toDo.description,
+            status: toDo.status,
+            priority: toDo.priority,
+            project_id: toDo.project_id,
+            assigned_to: toDo.assigned_to,
+            created_by: toDo.created_by,
+            created_at: toDo.created_at,
+            updated_at: toDo.updated_at,
+            due_date: toDo.due_date,
+            start_date: toDo.start_date,
+            completion_date: toDo.completion_date,
+            estimated_hours: toDo.estimated_hours,
+            actual_hours: toDo.actual_hours,
+            dependencies: toDo.dependencies,
+            progress_percentage: toDo.progress_percentage,
+            comments: toDo.comments
+        }));
+
+        const exportableData = { projects, toDos };
+
+        console.log("Exporting projects and to-dos to JSON:", exportableData);
 
         const json = JSON.stringify(exportableData, null, 2);
 
@@ -559,16 +607,44 @@ export class ProjectsManager {
             reader.onload = () => {
                 try {
                     const json = reader.result as string;
-                    const projects: IProject[] = JSON.parse(json);
+                    const parsedData: any = JSON.parse(json);
 
+                    // Ensure the parsed data is an object with 'projects' and 'toDos' properties
+                    if (!parsedData.projects || !parsedData.toDos) {
+                        throw new Error("Invalid JSON format. Expected an object with 'projects' and 'toDos' properties");
+                    }
+
+                    const projects: IProject[] = parsedData.projects;
+                    const toDos: ItoDo[] = parsedData.toDos;
+
+                    // Debugging: Log the parsed data
+                    console.log("Parsed projects:", projects);
+                    console.log("Parsed to-dos:", toDos);
+
+                    // Import projects
                     for (const projectData of projects) {
                         try {
+                            if (!projectData.name) {
+                                console.error("Project data is missing the 'name' property:", projectData);
+                                continue;
+                            }
                             this.newProject(projectData);
                         } catch (error) {
                             console.error(`Failed to import project: ${projectData.name}`, error);
                         }
                     }
-                    console.log("Projects imported successfully.");
+
+                    // Import to-dos
+                    for (const toDoData of toDos) {
+                        try {
+                            const newToDo = new toDo(toDoData); // Instantiate the toDo object
+                            toDoManagerInstance.newToDo(newToDo, toDoData.project_id);
+                        } catch (error) {
+                            console.error(`Failed to import to-do: ${toDoData.title}`, error);
+                        }
+                    }
+
+                    console.log("Projects and to-dos imported successfully.");
                 } catch (error) {
                     console.error("Error parsing the JSON file:", error);
                 }
@@ -588,7 +664,7 @@ export class ProjectsManager {
         console.log(`Filtering to-dos for project ID: ${projectId}`); // Debugging statement
 
         // Log all elements of the toDos list
-        console.log("All to-dos before filtering:", toDos); // Debugging statement
+        console.log("All to-dos before filtering:", toDoManagerInstance.getToDos()); // Debugging statement
 
         // Clear existing tasks
         const toDoListUI = toDoManagerInstance.getToDoListUI();
@@ -617,5 +693,20 @@ export class ProjectsManager {
 
         console.log(`Displayed ${filteredToDos.length} to-dos for project ID: ${projectId}`); // Debugging statement
     }
-    
+
+    // Method to gather and return all users
+    exportUsers(): IUser[] {
+        return this.list.flatMap(project => project.users.map(user => ({
+            id: user.id,
+            icon: user.icon,
+            color: user.color,
+            name: user.name,
+            surname: user.surname,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            access: user.access,
+            company: user.company
+        })));
+    }
 }

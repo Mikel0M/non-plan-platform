@@ -6,10 +6,12 @@ import { ICompany} from "./classes/Companies"
 import { CompanyManager } from "./classes/CompaniesManager"
 import { ItoDo, toDoPriority, toDoStatus, toDoPercentage } from "./classes/toDo"
 import { toDoManager } from "./classes/toDoManager"
+import { toDoManagerInstance } from './classes/toDoManager';
+
 
 // Initialize toDoManagerInstance before using it
 const toDoListUI = document.getElementById("toDoListContainer") as HTMLElement;
-const toDoManagerInstance = new toDoManager(toDoListUI);
+//const toDoManagerInstance = new toDoManager(toDoListUI);
 //Languages import
 
 let currentLanguage = 'en';
@@ -932,3 +934,14 @@ document.getElementById('newToDoForm')!.addEventListener('submit', (event) => {
 
     closeModal('newToDoModal');
 });
+
+// Export all to-dos and users
+function exportData() {
+    const toDos = toDoManagerInstance.exportToDos();
+    const users = projectsManager.exportUsers();
+    return { toDos, users };
+}
+
+// Example usage
+const exportedData = exportData();
+console.log("Exported Data:", exportedData);

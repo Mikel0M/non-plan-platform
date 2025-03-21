@@ -1,4 +1,6 @@
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid';
+import { ItoDo, toDo } from './toDo';
+import { IUser, User } from './User';
 
 export type userRole = "not defined" | "Architect" | "Engineer" | "Developer";
 export type status = "Pending" | "Active" | "Finished";
@@ -18,6 +20,8 @@ export interface IProject {
     phase: phase;
     startDate: string;
     finishDate: string;
+    toDos?: ItoDo[];
+    users?: IUser[];
 }
 
 // Function to generate random color
@@ -66,9 +70,9 @@ export class Project implements IProject {
     phase: phase;
     startDate: string;
     finishDate: string;
+    toDos: toDo[]; // Add toDos property
+    users: User[]; // Add users property
     ui: HTMLDivElement;
-
-    
 
     constructor(data: IProject) {
         // Allow existing id, otherwise generate a new one
@@ -93,6 +97,10 @@ export class Project implements IProject {
         for (const key in defaults) {
             this[key] = data[key] || defaults[key];
         }
+
+        // Initialize toDos and users
+        this.toDos = data.toDos?.map(toDoData => new toDo(toDoData)) || [];
+        this.users = data.users?.map(userData => new User(userData)) || [];
 
         // Generate icon and random color
         this.icon = sliceTwoEachWord(this.name);
@@ -166,5 +174,91 @@ export class Project implements IProject {
     
         const progressElement = this.ui.querySelector(".cardProperty:nth-child(4) p:nth-child(2)");
         if (progressElement) progressElement.textContent = `${this.progress}%`;
+    }
+
+    // Method to add a new to-do
+    addToDo(data: ItoDo): toDo {
+        const newToDo = new toDo(data);
+        this.toDos.push(newToDo);
+        return newToDo;
+    }
+
+    // Method to update an existing to-do
+    updateToDo(data: ItoDo): toDo | undefined {
+        const toDoInstance = this.toDos.find(toDo => toDo.id === data.id);
+        if (toDoInstance) {
+            toDoInstance.title = data.title ?? toDoInstance.title;
+            toDoInstance.description = data.description ?? toDoInstance.description;
+            toDoInstance.status = data.status ?? toDoInstance.status;
+            toDoInstance.priority = data.priority ?? toDoInstance.priority;
+            toDoInstance.assigned_to = data.assigned_to ?? toDoInstance.assigned_to;
+            toDoInstance.project_id = data.project_id ?? toDoInstance.project_id;
+            toDoInstance.created_by = data.created_by ?? toDoInstance.created_by;
+            toDoInstance.created_at = data.created_at ?? toDoInstance.created_at;
+            toDoInstance.updated_at = data.updated_at ?? toDoInstance.updated_at;
+            toDoInstance.due_date = data.due_date ?? toDoInstance.due_date;
+            toDoInstance.start_date = data.start_date ?? toDoInstance.start_date;
+            toDoInstance.completion_date = data.completion_date ?? toDoInstance.completion_date;
+            toDoInstance.estimated_hours = data.estimated_hours ?? toDoInstance.estimated_hours;
+            toDoInstance.actual_hours = data.actual_hours ?? toDoInstance.actual_hours;
+            toDoInstance.dependencies = data.dependencies ?? toDoInstance.dependencies;
+            toDoInstance.progress_percentage = data.progress_percentage ?? toDoInstance.progress_percentage;
+            toDoInstance.comments = data.comments ?? toDoInstance.comments;
+
+            toDoInstance.updateUI();
+            return toDoInstance;
+        } else {
+            throw new Error("To-Do item not found(project)");
+        }
+    }
+
+    // Method to delete a to-do by its ID
+    deleteToDoById(id: string): void {
+        const toDoIndex = this.toDos.findIndex(toDo => toDo.id === id);
+        if (toDoIndex !== -1) {
+            const toDoInstance = this.toDos[toDoIndex];
+            toDoInstance.deleteUI();
+            this.toDos.splice(toDoIndex, 1);
+            console.log(`To-do with ID ${id} deleted`); // Debugging statement
+        } else {
+            console.warn(`To-do with ID ${id} not found(project)`); // Debugging statement
+        }
+    }
+
+    // Method to add a new user
+    addUser(data: IUser): User {
+        const newUser = new User(data);
+        this.users.push(newUser);
+        return newUser;
+    }
+
+    // Method to update an existing user
+    updateUser(data: IUser): User | undefined {
+        const userInstance = this.users.find(user => user.id === data.id);
+        if (userInstance) {
+            userInstance.name = data.name ?? userInstance.name;
+            userInstance.surname = data.surname ?? userInstance.surname;
+            userInstance.email = data.email ?? userInstance.email;
+            userInstance.phone = data.phone ?? userInstance.phone;
+            userInstance.role = data.role ?? userInstance.role;
+            userInstance.access = data.access ?? userInstance.access;
+            userInstance.company = data.company ?? userInstance.company;
+
+            userInstance.setUI();
+            return userInstance;
+        } else {
+            throw new Error("User not found(project)");
+        }
+    }
+
+    // Method to delete a user by their ID
+    deleteUserById(id: string): void {
+        const userIndex = this.users.findIndex(user => user.id === id);
+        if (userIndex !== -1) {
+            this.users.splice(userIndex, 1);
+            console.log(`User with ID ${id} deleted`); // Debugging statement
+        } else {
+            console.warn(`User with ID ${id} not found(project)`); // Debugging statement
+        }
     }
 }

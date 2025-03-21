@@ -3,7 +3,6 @@ import { ItoDo, toDo } from './toDo';
 export let toDos: toDo[] = []; // Make toDos public
 
 export class toDoManager {
-
     public toDoListUI: HTMLElement;
     public toDoListContainer: HTMLElement | null = null; // To hold the #toDoList container
 
@@ -82,6 +81,30 @@ export class toDoManager {
         } else {
             console.warn(`To-do with ID ${id} not found`); // Debugging statement
         }
+    }
+
+    // Method to gather and return all to-dos
+    exportToDos(): ItoDo[] {
+        return toDos.map(toDo => ({
+            id: toDo.id,
+            title: toDo.title,
+            description: toDo.description,
+            status: toDo.status,
+            priority: toDo.priority,
+            project_id: toDo.project_id,
+            assigned_to: toDo.assigned_to,
+            created_by: toDo.created_by,
+            created_at: toDo.created_at,
+            updated_at: toDo.updated_at,
+            due_date: toDo.due_date,
+            start_date: toDo.start_date,
+            completion_date: toDo.completion_date,
+            estimated_hours: toDo.estimated_hours,
+            actual_hours: toDo.actual_hours,
+            dependencies: toDo.dependencies,
+            progress_percentage: toDo.progress_percentage,
+            comments: toDo.comments
+        }));
     }
 }
 

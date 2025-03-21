@@ -68,16 +68,12 @@ export class toDo {
         this.comments = data.comments;
 
         this.ui = document.createElement("div");
-        console.log("UI Element Created:", this.title);
         this.setUI();
     }
 
     setUI() {
         this.updateColor();
-        if (!this.ui) { return; }
-        console.log("testing toDo");
         this.ui.className = "userCard";
-        console.log("testing toDo2");
         this.ui.innerHTML = `
             <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
                 <div style ="background-color:${this.getColor()};" class="todoItem">
