@@ -7,7 +7,8 @@ import { CompanyManager } from "./classes/CompaniesManager"
 import { ItoDo, toDoPriority, toDoStatus, toDoPercentage } from "./classes/toDo"
 import { toDoManager } from "./classes/toDoManager"
 import { toDoManagerInstance } from './classes/toDoManager';
-import { usersManagerInstance } from "./classes/UsersManager";
+import { usersManagerInstance, users } from "./classes/UsersManager";
+
 
 
 // Initialize toDoManagerInstance before using it
@@ -692,7 +693,6 @@ if (userForm && userForm instanceof HTMLFormElement) {
 
 
 
-
 /**
  * Handles the submission of the "New Company" form:
  * - Prevents default form submission behavior.
@@ -949,3 +949,140 @@ function exportData() {
 // Example usage
 const exportedData = exportData();
 console.log("Exported Data:", exportedData);
+
+// Open Change User Modal
+export function openChangeUserModal(userId: string) {
+    console.log(`openChangeUserModal called for userId: ${userId}`);
+
+    // Find the user in the global users array
+    const user = users.find(u => u.id === userId);
+    if (!user) {
+        console.error(`User with ID ${userId} not found in the users array`);
+        console.log("Current users array:", users);
+        return;
+    }
+
+    console.log("User found:", user);
+
+    // Get the form fields in the ChangeUserModal
+    const nameInput = document.querySelector<HTMLInputElement>("input[name='CH_name']");
+    if (!nameInput) console.error("Name input field not found");
+
+    const surnameInput = document.querySelector<HTMLInputElement>("input[name='CH_surname']");
+    if (!surnameInput) console.error("Surname input field not found");
+
+    const emailInput = document.querySelector<HTMLInputElement>("input[name='CH_email']");
+    if (!emailInput) console.error("Email input field not found");
+
+    const phoneInput = document.querySelector<HTMLInputElement>("input[name='CH_phone']");
+    if (!phoneInput) console.error("Phone input field not found");
+
+    const roleSelect = document.querySelector<HTMLSelectElement>("select[name='CH_usersRole']");
+    if (!roleSelect) console.error("Role select field not found");
+
+    const accessSelect = document.querySelector<HTMLSelectElement>("select[name='CH_access']");
+    if (!accessSelect) console.error("Access select field not found");
+
+    const companyInput = document.querySelector<HTMLInputElement>("input[name='CH_company']");
+    if (!companyInput) console.error("Company input field not found");
+
+    // Prefill the form fields with the user's data
+    if (nameInput) nameInput.value = user.name;
+    if (surnameInput) surnameInput.value = user.surname;
+    if (emailInput) emailInput.value = user.email;
+    if (phoneInput) phoneInput.value = user.phone;
+    if (roleSelect) roleSelect.value = user.role;
+    if (accessSelect) accessSelect.value = user.access;
+    if (companyInput) companyInput.value = user.company;
+
+    // Open the ChangeUserModal
+    const changeUserModal = document.getElementById("ChangeUserModal") as HTMLDialogElement;
+    if (changeUserModal) {
+        console.log("Opening modal...");
+        changeUserModal.dataset.userId = userId; // Store the user's id in the modal
+        changeUserModal.showModal(); // Open the modal
+        console.log("Modal opened successfully");
+    } else {
+        console.error("ChangeUserModal not found in the DOM");
+    }
+}
+
+document.getElementById("UserChangeButton")?.addEventListener("click", (event) => {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    // Get the modal and the user ID stored in its dataset
+    const changeUserModal = document.getElementById("ChangeUserModal") as HTMLDialogElement;
+    const userId = changeUserModal?.dataset.userId;
+
+    if (!userId) {
+        console.error("User ID not found in modal dataset");
+        return;
+    }
+
+    // Find the user in the global users array
+    const user = users.find(u => u.id === userId);
+    if (!user) {
+        console.error("User not found");
+        return;
+    }
+
+    // Get the form fields in the ChangeUserModal
+    const nameInput = document.querySelector<HTMLInputElement>("input[name='CH_name']");
+    const surnameInput = document.querySelector<HTMLInputElement>("input[name='CH_surname']");
+    const emailInput = document.querySelector<HTMLInputElement>("input[name='CH_email']");
+    const phoneInput = document.querySelector<HTMLInputElement>("input[name='CH_phone']");
+    const roleSelect = document.querySelector<HTMLSelectElement>("select[name='CH_usersRole']");
+    const accessSelect = document.querySelector<HTMLSelectElement>("select[name='CH_access']");
+    const companyInput = document.querySelector<HTMLInputElement>("input[name='CH_company']");
+
+    // Update the user's data
+    if (nameInput) user.name = nameInput.value;
+    if (surnameInput) user.surname = surnameInput.value;
+    if (emailInput) user.email = emailInput.value;
+    if (phoneInput) user.phone = phoneInput.value;
+    if (roleSelect) user.role = roleSelect.value as usersRole; // Cast to usersRole
+    if (accessSelect) user.access = accessSelect.value as access; // Cast to access
+    if (companyInput) user.company = companyInput.value;
+
+    console.log("User updated successfully:", user);
+
+    // Refresh the users UI
+    console.log("Clearing and regenerating users UI...");
+    usersManagerInstance.refreshUsersUI(); // Call the method on the instance
+
+    // Delete the UI for each user in the users array
+    console.log("Updating the UI for all users...");
+    users.forEach(user => {
+        console.log("Updating UI for user:", user);
+        user.updateUserUI(user); // Call the updateUI method for each user
+    });
+
+    // Close the modal
+    if (changeUserModal) {
+        changeUserModal.close();
+    }
+
+    // Debugging: Print the updated users array
+    console.log("Updated users array:", users);
+
+
+    // deleting all UI
+    
+});
+
+const userChangeButton = document.getElementById("UserChangeButton");
+if (userChangeButton) {
+    console.log("UserChangeButton found, attaching event listener...");
+    userChangeButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        console.log("UserChangeButton clicked");
+        // Rest of the code...
+    });
+} else {
+    console.error("UserChangeButton not found in the DOM");
+}
+
+console.log("Refreshing users UI...");
+usersManagerInstance.refreshUsersUI();
+
+

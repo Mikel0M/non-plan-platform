@@ -1066,6 +1066,53 @@
                     </div>
                 </form>
             </dialog>
+            <dialog id="ChangeUserModal">
+                <form class="userForm" id="newUserForm">
+                    <h2>Change User</h2>
+                    <div class="userCard">
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Name</label>
+                            <input name="CH_name" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Surname</label>
+                            <input name="CH_surname" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">email</span>Email Address</label>
+                            <input name="CH_email" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">call</span>Telephone Number</label>
+                            <input name="CH_phone" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">account_circle</span>Role</label>
+                            <select name="CH_usersRole">
+                                <option>Architect</option>
+                                <option>Engineer</option>
+                                <option>Developer</option>
+                            </select>
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">vpn_key</span>Access rights</label>
+                            <select name="CH_access">
+                                <option>Administrator</option>
+                                <option>Editor</option>
+                                <option>Guest</option>
+                            </select>
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">business</span>Company Name</label>
+                            <input name="CH_company" type="text">
+                        </div>
+                    </div>
+                    <div class="cancelAccept">
+                        <button type="button" class="cancelButton" onclick="closeModal('ChangeUserModal')">Cancel</button>
+                        <button type="submit" class="acceptButton" id="UserChangeButton">Accept</button>
+                    </div>
+                </form>
+            </dialog>
             <dialog id="newCompanyModal">
                 <form class="userForm" id="newCompanyForm">
                     <h2>New Company</h2>

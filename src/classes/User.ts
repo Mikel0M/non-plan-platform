@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { openChangeUserModal } from "../index";
 
 export type usersRole = "Architect" | "Engineer" | "Developer";
 export type access = "Administrator" | "Editor" | "Guest";
@@ -79,18 +80,51 @@ export class User implements IUser {
         this.setUI();
     }
 
+    updateUI() {
+        if (!this.ui) {
+            console.warn(`UI not found for user: ${this.name}`);
+            return;
+        }
+    
+        const header = this.ui.querySelector(".cardHeader");
+        if (header) {
+            const icon = header.querySelector("p");
+            if (icon) icon.style.backgroundColor = this.color;
+    
+            const name = header.querySelector("h5");
+            if (name) name.textContent = this.name;
+    
+            const surname = header.querySelector("p + div p");
+            if (surname) surname.textContent = this.surname;
+
+            const email = header.querySelector("p + div p");
+            if (email) email.textContent = this.email;
+        }
+    
+        // Correct selectors for each property
+        const statusElement = this.ui.querySelector(".cardProperty:nth-child(1) p:nth-child(2)");
+        if (statusElement) statusElement.textContent = this.access;
+    
+        const userAccess = this.ui.querySelector(".cardProperty:nth-child(2) p:nth-child(2)");
+        if (userAccess) userAccess.textContent = this.role;
+    
+        const userCompany = this.ui.querySelector(".cardProperty:nth-child(3) p:nth-child(2)");
+        if (userCompany) userCompany.textContent = `${this.company}$`;
+
+    }
+
     setUI() {
         if (this.ui) { return; }
         this.ui = document.createElement("div");
         this.ui.className = "userCard";
         this.ui.innerHTML = `
-         <!-- User Card -->
+            <!-- User Card -->
             <div class="userCard" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; column-gap: 20px; align-items: center; padding: 10px;">
                 <!-- User Info -->
                 <div style="display: flex; column-gap: 10px; align-items: center;">
                     <p style="font-size: 20px; display: flex; align-items: center; background-color: ${this.color}; padding: 10px; width: 40px; height: 40px; justify-content: center; border-radius: 8px; aspect-ratio: 1;">
-                ${this.icon}
-            </p>
+                        ${this.icon}
+                    </p>
                     <div>
                         <h5 class="fullName">${this.name} ${this.surname}</h5>
                         <p>${this.email}</p>
@@ -103,7 +137,102 @@ export class User implements IUser {
                 <div class="userCardProperty"><p>${this.company}</p></div>
                 <div class="userCardProperty"><p>2024-12-01</p></div>
                 <button class="buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">email</span></button>
+                <button class="buttonTertiary changeUserButton" id="changeUserButton-${this.id}" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">edit</span></button>
             </div>
         `;
+
+        // Attach event listener to the changeUserButton
+        const changeUserButton = this.ui.querySelector(`#changeUserButton-${this.id}`);
+        if (changeUserButton) {
+            console.log(`Attaching event listener to button with id: changeUserButton-${this.id}`);
+            changeUserButton.addEventListener("click", () => {
+                console.log(`Button clicked for user: ${this.id}`);
+                openChangeUserModal(this.id); // Pass the user's id to the modal
+            });
+        } else {
+            console.warn(`Button with id changeUserButton-${this.id} not found`);
+        }
+    }
+
+    deleteUI() {
+        if (this.ui && this.ui.parentElement) {
+            console.log(`Deleting UI for user: ${this.name} ${this.surname}`);
+            this.ui.parentElement.removeChild(this.ui); // Remove the UI element from the DOM
+        } else {
+            console.warn(`UI not found for user: ${this.name} ${this.surname}`);
+        }
+    }
+
+    updateUserCards(user: User) {
+        const projectsPage = document.getElementById("projectsPage");
+        if (!projectsPage) return;
+
+        const setText = (selector: string, value: string | number) => {
+            const element = projectsPage.querySelector(`[data-user-info='${selector}']`);
+            if (element) element.textContent = value.toString();
+        };
+
+        setText("iconUD", user.icon);
+        setText("nameUD", user.name);
+        setText("surnameUD", user.surname);
+        setText("emailUD", user.email);
+        setText("phoneUD", user.phone);
+        setText("roleUD", user.role);
+        setText("accessUD", user.access);
+        setText("companyUD", user.company);
+
+        const setInputValue = (id: string, value: string | number) => {
+            const input = document.getElementById(id) as HTMLInputElement;
+            if (input) input.value = value.toString();
+        };
+
+        setInputValue("userNameInput", user.name);
+        setInputValue("userSurnameInput", user.surname);
+        setInputValue("userEmailInput", user.email);
+        setInputValue("userPhoneInput", user.phone);
+        setInputValue("userRoleInput", user.role);
+        setInputValue("userAccessInput", user.access);
+        setInputValue("userCompanyInput", user.company);
+
+        const iconElement = document.getElementById("iconUD");
+        if (iconElement) {
+            (iconElement as HTMLElement).style.backgroundColor = user.color;
+        }
+    }
+
+    updateUserUI(user: User) {
+        const detailsPage = document.getElementById("userDetails");
+        if (!detailsPage) {
+            console.warn("Details page not found");
+            return;
+        }
+
+        const setText = (selector: string, value: string | number) => {
+            const element = detailsPage.querySelector(`[data-user-info='${selector}']`);
+            if (element) {
+                element.textContent = value.toString();
+                console.log(`Updated ${selector} to:`, value);
+            } else {
+                console.warn(`Element with selector [data-user-info='${selector}'] not found`);
+            }
+        };
+
+        setText("iconUD", user.icon);
+        setText("nameUD", user.name);
+        setText("surnameUD", user.surname);
+        setText("emailUD", user.email);
+        setText("phoneUD", user.phone);
+        setText("roleUD", user.role);
+        setText("accessUD", user.access);
+        setText("companyUD", user.company);
+
+        const iconElement = document.getElementById("iconUD");
+        if (iconElement) {
+            (iconElement as HTMLElement).style.backgroundColor = user.color;
+            console.log("Updated icon background color to:", user.color);
+        } else {
+            console.warn("Icon element not found");
+        }
     }
 }
+

@@ -25,10 +25,23 @@ export class UsersManager {
     }
 
     refreshUsersUI() {
-        this.ui.innerHTML = "";
+        const usersList = document.getElementById("usersList");
+        if (!usersList) {
+            console.error("Users list container not found");
+            return;
+        }
+    
+        // Clear the existing user list
+        usersList.innerHTML = "";
+    
+        // Regenerate the user list from the global users array
         users.forEach(user => {
-            this.ui.append(user.ui);
+            user.setUI(); // Ensure the UI is created
+            usersList.appendChild(user.ui); // Append the updated UI to the users list
+            console.log("Appended UI for user:", user.name);
         });
+    
+        console.log("Users UI refreshed");
     }
 }
 
