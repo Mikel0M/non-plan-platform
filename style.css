@@ -1,16 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 :root{
-    --primary: #db9900;
-    --primary-100: #FFB70F;
-    --primary-200: #f9cc64;
-    --primary-300: #fae4b1;
-    --primary-400: #fff6e0;
-    --complementary: #0042DB;
-    --complementary-100: #0F57FF;
-    --complementary-200: #6491F9;
-    --complementary-300: #B1C7FA;
-    --complementary-400: #E0E9FF;
+    --primary: #1CFFCA;
+    --primary-100: #4FFFD6;
+    --primary-200: #80FFE2;
+    --primary-300: #B3FFEF;
+    --primary-400: #E6FFFB;
+    --complementary: #300B5F;
+    --complementary-100: #593A85;
+    --complementary-200: #8666A8;
+    --complementary-300: #B495CC;
+    --complementary-400: #E2CFF0;
+    --gray: #969696;
     --background: #202124;
     --background-100: #26282b;
     --background-200: #3b3c3f;

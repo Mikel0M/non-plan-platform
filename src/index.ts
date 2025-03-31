@@ -7,6 +7,7 @@ import { CompanyManager } from "./classes/CompaniesManager"
 import { ItoDo, toDoPriority, toDoStatus, toDoPercentage } from "./classes/toDo"
 import { toDoManager } from "./classes/toDoManager"
 import { toDoManagerInstance } from './classes/toDoManager';
+import { usersManagerInstance } from "./classes/UsersManager";
 
 
 // Initialize toDoManagerInstance before using it
@@ -390,7 +391,6 @@ usersBtn?.addEventListener("click", () => {
     detailsPage.style.display = "none";
     introPage.style.display = "none";
     sidebar.style.display = "flex";
-    
 
     // Set Users button to active style
     if (usersBtn) {
@@ -403,6 +403,10 @@ usersBtn?.addEventListener("click", () => {
         projectsBtn.classList.remove("active"); // Remove the active class
         projectsBtn.innerHTML = `<span class="material-icons-round">maps_home_work</span> Projects`; // Keep the icon and text
     }
+
+    // Refresh the users UI
+    console.log("Refreshing users UI...");
+    usersManagerInstance.refreshUsersUI();
 });
 
 /**

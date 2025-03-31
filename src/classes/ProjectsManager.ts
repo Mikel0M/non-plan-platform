@@ -4,6 +4,7 @@ import { toDoManagerInstance, toDos } from "./toDoManager"; // Import the toDoMa
 import { currentProjectId, setCurrentProjectId } from "../index"; // Import the global constant and setter function
 import { toDo, ItoDo } from "./toDo";
 import { IUser, User } from "./User";
+import { users } from "./UsersManager";
 
 export let currentProject: Project | null = null; // Ensure it's globally accessible
 
@@ -576,9 +577,23 @@ export class ProjectsManager {
             comments: toDo.comments
         }));
 
-        const exportableData = { projects, toDos };
+        const usersExports = this.exportUsers();
+        const usersJSON = usersExports.map(user => ({
+            id: user.id,
+            icon: user.icon,
+            color: user.color,
+            name: user.name,
+            surname: user.surname,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            access: user.access,
+            company: user.company
+        }));
 
-        console.log("Exporting projects and to-dos to JSON:", exportableData);
+        const exportableData = { projects, toDos, usersJSON };
+
+        console.log("Exporting projects, to-dos and users to JSON:", exportableData);
 
         const json = JSON.stringify(exportableData, null, 2);
 
@@ -616,10 +631,12 @@ export class ProjectsManager {
 
                     const projects: IProject[] = parsedData.projects;
                     const toDos: ItoDo[] = parsedData.toDos;
+                    const importedUsers: IUser[] = parsedData.usersJSON || [];
 
                     // Debugging: Log the parsed data
                     console.log("Parsed projects:", projects);
                     console.log("Parsed to-dos:", toDos);
+                    console.log("Parsed users:", importedUsers);
 
                     // Import projects
                     for (const projectData of projects) {
@@ -633,6 +650,21 @@ export class ProjectsManager {
                             console.error(`Failed to import project: ${projectData.name}`, error);
                         }
                     }
+
+                    // Import users
+                    for (const userData of importedUsers) {
+                        try {
+                            const user = new User(userData); // Create a User instance
+                            users.push(user); // Add the user to the global users array
+                            console.log("User imported successfully:", user); // Debugging statement
+                        } catch (error) {
+                            console.error("Failed to import user:", userData, error);
+                        }
+                    }
+
+                    console.log("Users imported successfully.");
+                    console.log(users); // Debugging statement
+                    
 
                     // Import to-dos
                     for (const toDoData of toDos) {
@@ -696,7 +728,7 @@ export class ProjectsManager {
 
     // Method to gather and return all users
     exportUsers(): IUser[] {
-        return this.list.flatMap(project => project.users.map(user => ({
+        return users.map(user => ({
             id: user.id,
             icon: user.icon,
             color: user.color,
@@ -707,6 +739,23 @@ export class ProjectsManager {
             role: user.role,
             access: user.access,
             company: user.company
-        })));
+        }));
     }
+
+    // Method to import users from JSON data
+    importUsers(usersData: IUser[]): void {
+        console.log("Importing users from JSON..."); // Debugging statement
+
+        usersData.forEach(userData => {
+            try {
+                const user = new User(userData); // Create a User instance
+                users.push(user); // Add the user to the global users array
+                console.log("User imported successfully:", user); // Debugging statement
+            } catch (error) {
+                console.error("Failed to import user:", userData, error);
+        }
+    });
+
+    console.log("All users imported successfully. Total users:", users.length); // Debugging statement
+}
 }

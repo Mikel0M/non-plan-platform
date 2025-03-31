@@ -21,7 +21,7 @@ export interface IProject {
     startDate: string;
     finishDate: string;
     toDos?: ItoDo[];
-    users?: IUser[];
+    PUsers?: IUser[];
 }
 
 // Function to generate random color
@@ -71,7 +71,7 @@ export class Project implements IProject {
     startDate: string;
     finishDate: string;
     toDos: toDo[]; // Add toDos property
-    users: User[]; // Add users property
+    PUsers: User[]; // Add users property
     ui: HTMLDivElement;
 
     constructor(data: IProject) {
@@ -100,7 +100,7 @@ export class Project implements IProject {
 
         // Initialize toDos and users
         this.toDos = data.toDos?.map(toDoData => new toDo(toDoData)) || [];
-        this.users = data.users?.map(userData => new User(userData)) || [];
+        this.PUsers = data.PUsers?.map(userData => new User(userData)) || [];
 
         // Generate icon and random color
         this.icon = sliceTwoEachWord(this.name);
@@ -228,13 +228,13 @@ export class Project implements IProject {
     // Method to add a new user
     addUser(data: IUser): User {
         const newUser = new User(data);
-        this.users.push(newUser);
+        this.PUsers.push(newUser);
         return newUser;
     }
 
     // Method to update an existing user
     updateUser(data: IUser): User | undefined {
-        const userInstance = this.users.find(user => user.id === data.id);
+        const userInstance = this.PUsers.find(user => user.id === data.id);
         if (userInstance) {
             userInstance.name = data.name ?? userInstance.name;
             userInstance.surname = data.surname ?? userInstance.surname;
@@ -253,9 +253,9 @@ export class Project implements IProject {
 
     // Method to delete a user by their ID
     deleteUserById(id: string): void {
-        const userIndex = this.users.findIndex(user => user.id === id);
+        const userIndex = this.PUsers.findIndex(user => user.id === id);
         if (userIndex !== -1) {
-            this.users.splice(userIndex, 1);
+            this.PUsers.splice(userIndex, 1);
             console.log(`User with ID ${id} deleted`); // Debugging statement
         } else {
             console.warn(`User with ID ${id} not found(project)`); // Debugging statement
