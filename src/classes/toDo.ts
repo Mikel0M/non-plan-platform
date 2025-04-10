@@ -73,24 +73,31 @@ export class toDo {
 
     setUI() {
         this.updateColor();
-        this.ui.className = "userCard";
+        this.ui.className = "todoItem"; // Use a consistent class for To-Do items
+        this.ui.style.backgroundColor = this.getColor(); // Set the background color dynamically
+
         this.ui.innerHTML = `
-            <div style="display: flex;flex-direction: column; margin-top: 10px; margin-left: 20px; margin-right: 20px;">
-                <div style ="background-color:${this.getColor()};" class="todoItem">
-                    <div style="display: flex; justify-content: space-between; flex-direction: row;align-items: center;">
-                        <div style="display:flex;column-gap: 15px;">
-                            <span class="material-icons-round" style="background-color: #969696; padding: 8px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">construction</span>
-                            <p>${this.title}</p>
-                        </div>
-                        <p style="text-wrap: nowrap; margin-left: 10px;">${this.due_date}</p>
-                    </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+                <div style="display: flex; column-gap: 15px; align-items: center;">
+                    <span class="material-icons-round" style="background-color: #969696; padding: 8px; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">construction</span>
+                    <p>${this.title}</p>
                 </div>
+                <p style="white-space: nowrap; margin-left: 10px;">${this.due_date}</p>
             </div>
         `;
 
+        // Add click event to open the edit modal
         this.ui.addEventListener("click", () => {
             showModalPopulated("editToDoModal", this);
         });
+
+        // Append the To-Do item to the correct container
+        const toDoContainer = document.getElementById("toDoContainer");
+        if (toDoContainer) {
+            toDoContainer.appendChild(this.ui);
+        } else {
+            console.warn("To-Do container not found");
+        }
     }
 
     updateUI() {
@@ -99,6 +106,7 @@ export class toDo {
             return;
         }
 
+        // Update the color based on the status
         this.updateColor();
 
         const titleElement = this.ui.querySelector(".todoItem > div > div > p");
@@ -142,28 +150,32 @@ export class toDo {
 
         const commentsElement = this.ui.querySelector(".todoItem > div > div > .comments");
         if (commentsElement) commentsElement.textContent = this.comments.join(", ");
+
+        console.log(`UI updated for to-do: ${this.title}`);
     }
 
     updateColor() {
         const color = this.getColor();
-        const todoItemElement = this.ui.querySelector(".todoItem") as HTMLElement;
-        if (todoItemElement) {
-            todoItemElement.style.backgroundColor = color;
+        if (this.ui) {
+            this.ui.style.backgroundColor = color; // Apply the color to the main To-Do item container
+            console.log(`Color updated for to-do "${this.title}" to: ${color}`);
+        } else {
+            console.warn(`UI not found for to-do: ${this.title}`);
         }
     }
 
     getColor(): string {
         switch (this.status) {
             case "In Progress":
-                return "#FFA500";
+                return "#FFA500"; // Orange
             case "Completed":
-                return "#008000";
+                return "var(--primary)"; // Primary color
             case "Pending":
-                return "#969697";
+                return "#969697"; // Gray
             case "On Hold":
-                return "#FF0000";
+                return "var(--red)"; // Red
             default:
-                return "#969696";
+                return "#969697"; // Default gray
         }
     }
 

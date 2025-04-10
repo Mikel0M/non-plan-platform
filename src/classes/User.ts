@@ -105,6 +105,9 @@ export class User implements IUser {
         if (companyElement) companyElement.textContent = this.company;
 
         console.log(`UI updated for user: ${this.name}`);
+
+        // Update ToDo fields
+        this.updateToDoFields();
     }
 
     setUI() {
@@ -245,6 +248,22 @@ export class User implements IUser {
         } else {
             console.warn("Icon element not found");
         }
+    }
+
+    updateToDoFields() {
+        // Update "responsible person" fields
+        const responsiblePersonElements = document.querySelectorAll(`[data-responsible-id='${this.id}']`);
+        responsiblePersonElements.forEach(element => {
+            element.textContent = `${this.name} ${this.surname}`;
+            console.log(`Updated responsible person to: ${this.name} ${this.surname}`);
+        });
+
+        // Update "created by" fields
+        const createdByElements = document.querySelectorAll(`[data-created-by-id='${this.id}']`);
+        createdByElements.forEach(element => {
+            element.textContent = `${this.name} ${this.surname}`;
+            console.log(`Updated created by to: ${this.name} ${this.surname}`);
+        });
     }
 }
 

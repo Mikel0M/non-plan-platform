@@ -6,6 +6,7 @@
     --primary-200: #80FFE2;
     --primary-300: #B3FFEF;
     --primary-400: #E6FFFB;
+    --red:#FC3140;
     --complementary: #300B5F;
     --complementary-100: #593A85;
     --complementary-200: #8666A8;
@@ -467,14 +468,14 @@ header {
 }
 
 .todoItem {
-    padding: 20px;
-    background-color: var(--background-200);
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.todoItem:hover {
-    background-color: var(--complementary-200);
+    background-color: #444; /* Slightly lighter dark background for To-Do items */
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    color: #fff; /* White text color */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Form Styles */
@@ -765,4 +766,11 @@ input:focus, textarea:focus, select:focus {
 
 .hidden {
     display: none;
+}
+
+.darkRectangle {
+    background-color: #333; /* Dark background color */
+    padding: 20px;
+    border-radius: 8px;
+    color: #fff; /* White text color */
 }
