@@ -1007,60 +1007,12 @@ export function openChangeUserModal(userId: string) {
     }
 }
 
-document.getElementById("UserChangeButton")?.addEventListener("click", (event) => {
-    event.preventDefault(); // Prevent the default form submission behavior
 
-    // Get the modal and the user ID stored in its dataset
-    const changeUserModal = document.getElementById("ChangeUserModal") as HTMLDialogElement;
-    const userId = changeUserModal?.dataset.userId;
 
-    if (!userId) {
-        console.error("User ID not found in modal dataset");
-        return;
-    }
+    // Update the user's UI
+    usersManagerInstance.setUserChangeButton(); // Ensure the change button is set
 
-    // Find the user in the global users array
-    const user = users.find(u => u.id === userId);
-    if (!user) {
-        console.error("User not found");
-        return;
-    }
 
-    // Get the form fields in the ChangeUserModal
-    const nameInput = document.querySelector<HTMLInputElement>("input[name='CH_name']");
-    const surnameInput = document.querySelector<HTMLInputElement>("input[name='CH_surname']");
-    const emailInput = document.querySelector<HTMLInputElement>("input[name='CH_email']");
-    const phoneInput = document.querySelector<HTMLInputElement>("input[name='CH_phone']");
-    const roleSelect = document.querySelector<HTMLSelectElement>("select[name='CH_usersRole']");
-    const accessSelect = document.querySelector<HTMLSelectElement>("select[name='CH_access']");
-    const companyInput = document.querySelector<HTMLInputElement>("input[name='CH_company']");
-
-    // Update the user's data
-    if (nameInput) user.name = nameInput.value;
-    if (surnameInput) user.surname = surnameInput.value;
-    if (emailInput) user.email = emailInput.value;
-    if (phoneInput) user.phone = phoneInput.value;
-    if (roleSelect) user.role = roleSelect.value as usersRole; // Cast to usersRole
-    if (accessSelect) user.access = accessSelect.value as access; // Cast to access
-    if (companyInput) user.company = companyInput.value;
-
-    console.log("User updated successfully:", user);
-
-    // Refresh the users UI
-    console.log("Clearing and regenerating users UI...");
-    usersManagerInstance.refreshUsersUI(); // Call the method on the instance
-
-    // Delete the UI for each user in the users array
-    console.log("Updating the UI for all users...");
-    users.forEach(user => {
-        console.log("Updating UI for user:", user);
-        user.updateUserUI(user); // Call the updateUI method for each user
-    });
-
-    // Close the modal
-    if (changeUserModal) {
-        changeUserModal.close();
-    }
 
     // Debugging: Print the updated users array
     console.log("Updated users array:", users);
@@ -1068,21 +1020,8 @@ document.getElementById("UserChangeButton")?.addEventListener("click", (event) =
 
     // deleting all UI
     
-});
 
-const userChangeButton = document.getElementById("UserChangeButton");
-if (userChangeButton) {
-    console.log("UserChangeButton found, attaching event listener...");
-    userChangeButton.addEventListener("click", (event) => {
-        event.preventDefault();
-        console.log("UserChangeButton clicked");
-        // Rest of the code...
-    });
-} else {
-    console.error("UserChangeButton not found in the DOM");
-}
 
-console.log("Refreshing users UI...");
-usersManagerInstance.refreshUsersUI();
+
 
 

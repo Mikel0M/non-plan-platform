@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { openChangeUserModal } from "../index";
+import { UsersManager, usersManagerInstance } from "./UsersManager";
+
+const usersListUI = document.getElementById("usersList") as HTMLElement;
 
 export type usersRole = "Architect" | "Engineer" | "Developer";
 export type access = "Administrator" | "Editor" | "Guest";
@@ -85,42 +88,32 @@ export class User implements IUser {
             console.warn(`UI not found for user: ${this.name}`);
             return;
         }
-    
-        const header = this.ui.querySelector(".cardHeader");
-        if (header) {
-            const icon = header.querySelector("p");
-            if (icon) icon.style.backgroundColor = this.color;
-    
-            const name = header.querySelector("h5");
-            if (name) name.textContent = this.name;
-    
-            const surname = header.querySelector("p + div p");
-            if (surname) surname.textContent = this.surname;
 
-            const email = header.querySelector("p + div p");
-            if (email) email.textContent = this.email;
-        }
-    
-        // Correct selectors for each property
-        const statusElement = this.ui.querySelector(".cardProperty:nth-child(1) p:nth-child(2)");
-        if (statusElement) statusElement.textContent = this.access;
-    
-        const userAccess = this.ui.querySelector(".cardProperty:nth-child(2) p:nth-child(2)");
-        if (userAccess) userAccess.textContent = this.role;
-    
-        const userCompany = this.ui.querySelector(".cardProperty:nth-child(3) p:nth-child(2)");
-        if (userCompany) userCompany.textContent = `${this.company}$`;
+        const fullNameElement = this.ui.querySelector(".fullName");
+        if (fullNameElement) fullNameElement.textContent = `${this.name} ${this.surname}`;
 
+        const emailElement = this.ui.querySelector(".userCardProperty:nth-child(2) p");
+        if (emailElement) emailElement.textContent = this.email;
+
+        const roleElement = this.ui.querySelector(".userCardProperty:nth-child(3) p");
+        if (roleElement) roleElement.textContent = this.role;
+
+        const accessElement = this.ui.querySelector(".userCardProperty:nth-child(4) p");
+        if (accessElement) accessElement.textContent = this.access;
+
+        const companyElement = this.ui.querySelector(".userCardProperty:nth-child(5) p");
+        if (companyElement) companyElement.textContent = this.company;
+
+        console.log(`UI updated for user: ${this.name}`);
     }
 
     setUI() {
-        if (this.ui) { return; }
+        if (this.ui) return; // Prevent creating duplicate UI
+
         this.ui = document.createElement("div");
         this.ui.className = "userCard";
         this.ui.innerHTML = `
-            <!-- User Card -->
             <div class="userCard" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; column-gap: 20px; align-items: center; padding: 10px;">
-                <!-- User Info -->
                 <div style="display: flex; column-gap: 10px; align-items: center;">
                     <p style="font-size: 20px; display: flex; align-items: center; background-color: ${this.color}; padding: 10px; width: 40px; height: 40px; justify-content: center; border-radius: 8px; aspect-ratio: 1;">
                         ${this.icon}
@@ -130,33 +123,52 @@ export class User implements IUser {
                         <p>${this.email}</p>
                     </div>
                 </div>
-                
-                <!-- Card Properties -->
                 <div class="userCardProperty"><p>${this.access}</p></div>
                 <div class="userCardProperty"><p>${this.role}</p></div>
                 <div class="userCardProperty"><p>${this.company}</p></div>
                 <div class="userCardProperty"><p>2024-12-01</p></div>
-                <button class="buttonTertiary" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">email</span></button>
-                <button class="buttonTertiary changeUserButton" id="changeUserButton-${this.id}" style="height: 40px;width: 40px;display: flex;justify-self: end;"><span class="material-icons-round">edit</span></button>
+                <button class="buttonTertiary changeUserButton" id="changeUserButton-${this.id}" style="height: 40px;width: 40px;display: flex;justify-self: end;">
+                    <span class="material-icons-round">edit</span>
+                </button>
             </div>
         `;
 
-        // Attach event listener to the changeUserButton
-        const changeUserButton = this.ui.querySelector(`#changeUserButton-${this.id}`);
-        if (changeUserButton) {
-            console.log(`Attaching event listener to button with id: changeUserButton-${this.id}`);
-            changeUserButton.addEventListener("click", () => {
-                console.log(`Button clicked for user: ${this.id}`);
-                openChangeUserModal(this.id); // Pass the user's id to the modal
+        // Add event listener to the "Edit" button
+        const editButton = this.ui.querySelector(`#changeUserButton-${this.id}`);
+        if (editButton) {
+            editButton.addEventListener("click", () => {
+                console.log(`Edit button clicked for user: ${this.name}`);
+                usersManagerInstance.currentUser = this; // Set the current user
+
+                const modal = document.getElementById("ChangeUserModal") as HTMLDialogElement;
+                if (modal) {
+                    modal.dataset.userId = this.id; // Store the user ID in the modal
+
+                    // Populate the form fields with the user's data
+                    const nameInput = document.querySelector<HTMLInputElement>("input[name='CH_name']");
+                    const surnameInput = document.querySelector<HTMLInputElement>("input[name='CH_surname']");
+                    const emailInput = document.querySelector<HTMLInputElement>("input[name='CH_email']");
+                    const phoneInput = document.querySelector<HTMLInputElement>("input[name='CH_phone']");
+                    const roleSelect = document.querySelector<HTMLSelectElement>("select[name='CH_usersRole']");
+                    const accessSelect = document.querySelector<HTMLSelectElement>("select[name='CH_access']");
+                    const companyInput = document.querySelector<HTMLInputElement>("input[name='CH_company']");
+
+                    if (nameInput) nameInput.value = this.name;
+                    if (surnameInput) surnameInput.value = this.surname;
+                    if (emailInput) emailInput.value = this.email;
+                    if (phoneInput) phoneInput.value = this.phone;
+                    if (roleSelect) roleSelect.value = this.role;
+                    if (accessSelect) accessSelect.value = this.access;
+                    if (companyInput) companyInput.value = this.company;
+
+                    modal.showModal(); // Open the modal
+                }
             });
-        } else {
-            console.warn(`Button with id changeUserButton-${this.id} not found`);
         }
     }
 
     deleteUI() {
         if (this.ui && this.ui.parentElement) {
-            console.log(`Deleting UI for user: ${this.name} ${this.surname}`);
             this.ui.parentElement.removeChild(this.ui); // Remove the UI element from the DOM
         } else {
             console.warn(`UI not found for user: ${this.name} ${this.surname}`);
