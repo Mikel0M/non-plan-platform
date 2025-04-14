@@ -1,3 +1,4 @@
+import * as THREE from "three"
 import { IProject, status, userRole, phase, Project} from "./classes/Project"
 import { ProjectsManager } from "./classes/ProjectsManager"
 import { IUser, usersRole, access} from "./classes/User"
@@ -8,7 +9,6 @@ import { ItoDo, toDoPriority, toDoStatus, toDoPercentage } from "./classes/toDo"
 import { toDoManager } from "./classes/toDoManager"
 import { toDoManagerInstance } from './classes/toDoManager';
 import { usersManagerInstance, users } from "./classes/UsersManager";
-
 
 
 // Initialize toDoManagerInstance before using it
@@ -296,9 +296,9 @@ if (newAccountBtn) {
 } else {
     console.warn("newAccountBtn was not found");
 }
+/*
 
-
-/*Button Login temporary:
+//Button Login temporary:
 const logINBtn = document.getElementById("logINBtn");
 
 if (logINBtn) {
@@ -310,7 +310,8 @@ if (logINBtn) {
 } else {
     console.warn("logINBtn was not found");
 }
-    */
+  */  
+
 
 //Add event listener to logIn button(Main Page)
 const logINBtn = document.getElementById("logINBtn");
@@ -1009,17 +1010,15 @@ export function openChangeUserModal(userId: string) {
 
 
 
-    // Update the user's UI
-    usersManagerInstance.setUserChangeButton(); // Ensure the change button is set
+// Update the user's UI
+usersManagerInstance.setUserChangeButton(); // Ensure the change button is set
 
 
 
-    // Debugging: Print the updated users array
-    console.log("Updated users array:", users);
+// Debugging: Print the updated users array
+console.log("Updated users array:", users);
 
 
-    // deleting all UI
-    
 
 
 

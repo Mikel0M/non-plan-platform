@@ -1,27 +1,193 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Ebene_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 419.5 297.6">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="Ebene_1"
+   version="1.1"
+   viewBox="0 0 328.59998 52.600001"
+   sodipodi:docname="RZ_LOGO_NNPLN_NEG_2025.svg"
+   width="328.59998"
+   height="52.600002"
+   inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)"
+   inkscape:export-filename="C:\Users\studi\Dropbox\02 Marketing\logo\03_ABGABE\03_ABGABE\EMAIL\Logo_E-Mail.png"
+   inkscape:export-xdpi="100"
+   inkscape:export-ydpi="100">
+  <metadata
+     id="metadata933">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     id="namedview931"
+     showgrid="false"
+     inkscape:zoom="2.671371"
+     inkscape:cx="164.15"
+     inkscape:cy="35"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Ebene_1" />
   <!-- Generator: Adobe Illustrator 29.3.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 151)  -->
-  <defs>
-    <style>
+  <defs
+     id="defs886">
+    <style
+       id="style884">
       .st0 {
         fill: #1cffca;
       }
     </style>
   </defs>
-  <g>
-    <rect class="st0" x="247.3" y="178.5" width="34.8" height="9.3"/>
-    <g>
-      <g>
-        <polygon class="st0" points="191.6 141.3 182.4 141.3 182.4 150.6 191.6 150.6 191.6 178.5 200.9 178.5 200.9 113.5 191.6 113.5 191.6 141.3"/>
-        <rect class="st0" x="173.1" y="132.1" width="9.3" height="9.3"/>
-        <polygon class="st0" points="163.8 122.8 163.8 113.5 154.5 113.5 154.5 178.5 163.8 178.5 163.8 132.1 173.1 132.1 173.1 122.8 163.8 122.8"/>
-      </g>
-      <g>
-        <polygon class="st0" points="219.5 122.8 210.2 122.8 210.2 178.5 219.5 178.5 219.5 159.9 247.3 159.9 247.3 150.6 219.5 150.6 219.5 122.8"/>
-        <rect class="st0" x="219.5" y="113.5" width="27.8" height="9.3"/>
-        <rect class="st0" x="247.3" y="122.8" width="9.3" height="27.8"/>
-      </g>
-    </g>
-  </g>
-  <polygon class="st0" points="247.3 206.5 123.1 206.5 123.1 82.6 300.2 82.6 300.2 187.7 291.4 187.7 291.4 91.5 131.9 91.5 131.9 197.7 247.3 197.7 247.3 206.5"/>
+  <polygon
+     class="st0"
+     points="65.3,140.1 71.9,140.1 71.9,159.8 78.4,159.8 78.4,113.8 71.9,113.8 71.9,133.5 65.3,133.5 "
+     id="polygon888"
+     transform="translate(-45.6,-113.8)" />
+  <rect
+     class="st0"
+     x="13.1"
+     y="13.2"
+     width="6.5999999"
+     height="6.5999999"
+     id="rect890" />
+  <polygon
+     class="st0"
+     points="45.6,113.8 45.6,159.8 52.2,159.8 52.2,127 58.7,127 58.7,120.4 52.2,120.4 52.2,113.8 "
+     id="polygon892"
+     transform="translate(-45.6,-113.8)" />
+  <rect
+     class="st0"
+     x="39.400002"
+     y="6.6000013"
+     width="6.5999999"
+     height="32.900002"
+     id="rect894" />
+  <rect
+     class="st0"
+     x="65.700005"
+     y="6.6000013"
+     width="6.5999999"
+     height="32.900002"
+     id="rect896" />
+  <rect
+     class="st0"
+     x="46"
+     y="39.500004"
+     width="19.700001"
+     height="6.5999999"
+     id="rect898" />
+  <rect
+     class="st0"
+     x="46"
+     y="3.0517579e-06"
+     width="19.700001"
+     height="6.5999999"
+     id="rect900" />
+  <polygon
+     class="st0"
+     points="269,120.4 262.5,120.4 262.5,159.8 269,159.8 269,146.7 288.8,146.7 288.8,159.8 295.3,159.8 295.3,120.4 288.8,120.4 288.8,140.1 269,140.1 "
+     id="polygon902"
+     transform="translate(-45.6,-113.8)" />
+  <rect
+     class="st0"
+     x="223.39999"
+     y="3.0517579e-06"
+     width="19.700001"
+     height="6.5999999"
+     id="rect904" />
+  <rect
+     class="st0"
+     x="184"
+     y="3.0517579e-06"
+     width="6.5999999"
+     height="39.400002"
+     id="rect906" />
+  <rect
+     class="st0"
+     x="190.59999"
+     y="39.500004"
+     width="19.700001"
+     height="6.5999999"
+     id="rect908" />
+  <rect
+     class="st0"
+     x="295.69998"
+     y="46.000004"
+     width="32.900002"
+     height="6.5999999"
+     id="rect910" />
+  <polygon
+     class="st0"
+     points="144.2,140.1 150.7,140.1 150.7,159.8 157.3,159.8 157.3,113.8 150.7,113.8 150.7,133.5 144.2,133.5 "
+     id="polygon912"
+     transform="translate(-45.6,-113.8)" />
+  <rect
+     class="st0"
+     x="92.000008"
+     y="13.2"
+     width="6.5999999"
+     height="6.5999999"
+     id="rect914" />
+  <polygon
+     class="st0"
+     points="124.5,113.8 124.5,159.8 131,159.8 131,127 137.6,127 137.6,120.4 131,120.4 131,113.8 "
+     id="polygon916"
+     transform="translate(-45.6,-113.8)" />
+  <polygon
+     class="st0"
+     points="321.6,140.1 328.2,140.1 328.2,159.8 334.8,159.8 334.8,113.8 328.2,113.8 328.2,133.5 321.6,133.5 "
+     id="polygon918"
+     transform="translate(-45.6,-113.8)" />
+  <rect
+     class="st0"
+     x="269.5"
+     y="13.2"
+     width="6.5999999"
+     height="6.5999999"
+     id="rect920" />
+  <polygon
+     class="st0"
+     points="301.9,113.8 301.9,159.8 308.5,159.8 308.5,127 315.1,127 315.1,120.4 308.5,120.4 308.5,113.8 "
+     id="polygon922"
+     transform="translate(-45.6,-113.8)" />
+  <polygon
+     class="st0"
+     points="190.2,159.8 196.7,159.8 196.7,146.7 216.5,146.7 216.5,140.1 196.7,140.1 196.7,120.4 190.2,120.4 "
+     id="polygon924"
+     transform="translate(-45.6,-113.8)" />
+  <rect
+     class="st0"
+     x="151.09999"
+     y="3.0517579e-06"
+     width="19.700001"
+     height="6.5999999"
+     id="rect926" />
+  <rect
+     class="st0"
+     x="170.89999"
+     y="6.6000013"
+     width="6.5999999"
+     height="19.700001"
+     id="rect928" />
 </svg>

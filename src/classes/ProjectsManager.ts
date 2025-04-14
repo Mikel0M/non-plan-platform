@@ -1,3 +1,9 @@
+import * as THREE from "three"
+import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js"
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { closeModal } from "..";
 import { IProject, Project, userRole, status, phase } from "./Project";
 import { toDoManagerInstance, toDos } from "./toDoManager"; // Import the toDoManager instance
@@ -5,6 +11,7 @@ import { currentProjectId, setCurrentProjectId } from "../index"; // Import the 
 import { toDo, ItoDo } from "./toDo";
 import { IUser, User } from "./User";
 import { users } from "./UsersManager";
+import { color } from "three/examples/jsm/nodes/Nodes.js";
 
 export let currentProject: Project | null = null; // Ensure it's globally accessible
 
@@ -16,6 +23,7 @@ export class ProjectsManager {
 
     constructor(container: HTMLElement) {
         this.ui = container;
+        
     }
 
     // Method to find a project by its ID
@@ -162,7 +170,140 @@ export class ProjectsManager {
             } else {
                 console.warn(`Element not found for ${selector}`);
             }
-        };
+        // THREE JS
+        // ThreeJS viewer
+        const scene = new THREE.Scene()
+
+        const viewerContainer = document.getElementById("viewerContainer") as HTMLDivElement
+       
+        const camera = new THREE.PerspectiveCamera(75)
+        camera.position.z = 5
+
+        // Clear the container
+        viewerContainer.innerHTML = "";
+
+        // Create and append the renderer
+        const renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+        viewerContainer.append(renderer.domElement);
+
+    function resizeViewer(){
+        const containerDimensions = viewerContainer.getBoundingClientRect()
+        renderer.setSize(containerDimensions.width, containerDimensions.height)
+        const aspectRatio = containerDimensions.width / containerDimensions.height
+        camera.aspect = aspectRatio
+        camera.updateProjectionMatrix()
+    }
+
+        window.addEventListener("resize", resizeViewer)
+
+        resizeViewer()
+
+        renderer.render(scene, camera)
+
+        const boxGeometry = new THREE.BoxGeometry()
+        const material = new THREE.MeshStandardMaterial()
+        const cube = new THREE.Mesh(boxGeometry, material)
+        
+        //create spot Light
+        const spotLight = new THREE.SpotLight()
+        spotLight.position.set(2, 2, 2)
+        spotLight.intensity = 0.5
+        
+        
+        //const directionalLight = new THREE.DirectionalLight()
+        const ambientLight = new THREE.AmbientLight()
+        ambientLight.intensity = 0.4
+
+        
+
+        const cameraControls = new OrbitControls(camera, viewerContainer)
+
+        
+        function renderScene() {
+            renderer.render(scene, camera)
+            requestAnimationFrame(renderScene)
+        }
+
+        renderScene()
+        
+        const axes = new THREE.AxesHelper()
+        const grid = new THREE.GridHelper(10, 10)
+        grid.material.transparent = true
+        grid.material.opacity = 1
+        grid.material.color = new THREE.Color("#1CFFCA")
+
+        
+
+        scene.add(axes, grid)
+
+        const gui = new GUI()
+        const cubeControls = gui.addFolder("Cube")
+        //code for the spot light
+        const spotLightControls = gui.addFolder("Spot_Light")
+        spotLightControls.add(spotLight.position, "x", -10, 10, 0.1)
+        spotLightControls.add(spotLight.position, "y", -10, 10, 0.1)
+        spotLightControls.add(spotLight.position, "z", -10, 10, 0.1)
+        spotLightControls.add(spotLight, "intensity", 0, 10, 0.1).name("Intensity")
+        spotLightControls.addColor(spotLight, "color").name("Color")
+        spotLightControls.add(spotLight, "visible").name("Visible")
+
+        //code for the cube control
+        cubeControls.add(cube.position, "x", -10, 10, 0.1)
+        cubeControls.add(cube.position, "y", -10, 10, 0.1)
+        cubeControls.add(cube.position, "z", -10, 10, 0.1)
+        cubeControls.add(cube, "visible")
+        cubeControls.addColor(cube.material, "color")
+        // Create a parent object for the light
+        const lightParent = new THREE.Object3D();
+        scene.add(lightParent);
+        // Create the directional light and add it to the parent
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        lightParent.add(directionalLight);
+        // Add a GUI folder for light rotation
+        const directionalLightRotationControls = gui.addFolder("Directional Light Rotation");
+        directionalLightRotationControls.add(lightParent.rotation, "x", 0, Math.PI * 2, 0.01).name("Rotation X");
+        directionalLightRotationControls.add(lightParent.rotation, "y", 0, Math.PI * 2, 0.01).name("Rotation Y");
+        directionalLightRotationControls.add(lightParent.rotation, "z", 0, Math.PI * 2, 0.01).name("Rotation Z");
+        directionalLightRotationControls.open();
+        //code for directional light
+        const directionalLightControls = gui.addFolder("Directional_Light")
+        directionalLightControls.add(directionalLight.position, "x", -10, 10, 0.1)
+        directionalLightControls.add(directionalLight.position, "y", -10, 10, 0.1)
+        directionalLightControls.add(directionalLight.position, "z", -10, 10, 0.1)
+        directionalLightControls.add(directionalLight, "intensity", 0, 10, 0.1).name("Intensity")
+        directionalLightControls.addColor(directionalLight, "color").name("Color")
+        directionalLightControls.add(directionalLight, "visible").name("Visible")
+
+        scene.add(directionalLight,ambientLight, spotLight)
+
+        
+        
+        //OBJ LOADER 
+        /*const objLoader = new OBJLoader()
+        const mtlLoader = new MTLLoader()
+
+        
+
+        mtlLoader.load("/assets/Gear/Gear1.mtl", (materials) => {
+            materials.preload()
+            objLoader.setMaterials(materials)
+            objLoader.load("/assets/Gear/Gear1.obj", (mesh) => {
+                scene.add(mesh)
+            })
+            })
+        */
+
+        //GLTF LOADER
+        const gltfLoader = new GLTFLoader()
+        gltfLoader.load("/assets/fossil/scene.gltf", (gltf) => {
+            scene.add(gltf.scene)
+        })
+        
+
+        
+    
+    }
 
         this.updateProgressBar(project.progress)
 

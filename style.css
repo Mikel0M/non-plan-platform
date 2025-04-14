@@ -4,8 +4,9 @@
     --primary: #1CFFCA;
     --primary-100: #4FFFD6;
     --primary-200: #80FFE2;
-    --primary-300: #B3FFEF;
-    --primary-400: #E6FFFB;
+    --primary-300: #E6FFFB;
+    --primary-400: #B3FFEF;
+    --primary-500: #E6FFFB;
     --red:#FC3140;
     --complementary: #300B5F;
     --complementary-100: #593A85;
@@ -13,9 +14,9 @@
     --complementary-300: #B495CC;
     --complementary-400: #E2CFF0;
     --gray: #969696;
-    --background: #202124;
-    --background-100: #26282b;
-    --background-200: #3b3c3f;
+    --background: #300B5F;
+    --background-100: #4B2680;
+    --background-200: #6540A1;
     --fontSizeSmallest: 10px;
     --fontSizeSmall: 12px;
     --fontSizeStandard: 14px;
@@ -106,7 +107,7 @@ button {
     height: 40px;
     font-size: var(--fontSizeMedium);
     background-color: var(--primary);
-    color: white;
+    color: var(--complementary);
     border-radius: 100px;
     border: none;
     display: flex;
@@ -115,7 +116,7 @@ button {
 }
 
 button:hover {
-    background-color: var(--complementary-200);
+    background-color: var(--primary-300);
 }
 
 buttonBlue {
@@ -142,7 +143,7 @@ buttonBlue:hover {
     height: 40px;
     font-size: var(--fontSizeMedium);
     background-color: transparent;
-    color: var(--complementary-200);
+    color: var(--primary);
     border-radius: 100px;
     border: none;
     display: flex;
@@ -184,7 +185,7 @@ buttonBlue:hover {
 }
 
 .buttonTextBlue:hover {
-    color: var(--primary-200);
+    color: var(--primary-300);
     background-color: transparent;
 }
 
@@ -267,9 +268,10 @@ buttonBlue:hover {
 
 .buttonSecondary {
     background-color: transparent;
-    outline: 2px solid #969696;
+    outline: 2px solid var(--primary);
     width: 20%;
     text-align: center;
+    color: var(--primary);
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
@@ -278,7 +280,8 @@ buttonBlue:hover {
 }
 
 .buttonSecondary:hover {
-    background-color: var(--complementary-200);
+    background-color: var(--primary);
+    color: var(--complementary);
     outline: none;
 }
 
@@ -301,7 +304,7 @@ buttonBlue:hover {
     width: 55px;
     font-size: var(--fontSizeMedium);
     background-color: transparent;
-    color: white;
+    color: var(--primary);
     border-radius: 50%;
     border: none;
     display: flex;
@@ -309,11 +312,11 @@ buttonBlue:hover {
     column-gap: 0px;
     display: flex;
     justify-content: center;
-    border: 2px solid var(--complementary-200);
+    border: 2px solid var(--primary);
 }
 
 .buttonTertiary:hover {
-    background-color: var(--complementary-200);
+    background-color: var(--primary-300);
     outline: none;
     
 }
@@ -725,7 +728,7 @@ input:focus, textarea:focus, select:focus {
     width: 55px;
     font-size: var(--fontSizeMedium);
     background-color: transparent;
-    color: white;
+    color: var(--primary);
     border-radius: 50%;
     border: none;
     display: flex;
@@ -733,11 +736,11 @@ input:focus, textarea:focus, select:focus {
     column-gap: 0px;
     display: flex;
     justify-content: center;
-    border: 2px solid var(--complementary-200);
+    border: 2px solid var(--primary);
 }
 
 .languageButton:hover {
-    background-color: var(--complementary-200);
+    background-color: var(--primary-300);
     outline: none;
     
 }
@@ -747,10 +750,11 @@ input:focus, textarea:focus, select:focus {
     top: 100%;
     left: 0;
     margin: 0;
+    color: var(--primary);
     padding: 0;
     list-style: none;
     background-color: var(--background-200);
-    border: 1px solid var(--complementary-200);
+    border: 1px solid var(--primary);
     width: 150px;
     z-index: 1000;
 }
@@ -761,7 +765,8 @@ input:focus, textarea:focus, select:focus {
 }
 
 #languageMenu li:hover {
-    background-color: var(--complementary-200);
+    background-color: var(--primary);
+    color: var(--complementary);
 }
 
 .hidden {
