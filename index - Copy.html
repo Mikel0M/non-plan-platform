@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>non-plan</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+    <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
+</head>
+<body>        <header id="navigationHeader" style="position: fixed;">
+            <img id="non-plan-logo" src="./assets/non-plan-logo.svg" alt="non-plan" style="transform: scale(2.5); margin-left: 0px;">
+            <div style="display: flex;flex-direction: row;column-gap: 10px;">
+                <button id="insightsBtn" class="buttonTextBlue" style="font-size: var(--fontSizeBig); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -150px;" data-lang="insights">insights</button>
+                <button id="servicesBtn" class="buttonTextBlue" style="font-size: var(--fontSizeBig); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -100px;" data-lang="services">services</button>
+                <button id="npInfoBtn" class="buttonTextBlue" style="font-size: var(--fontSizeBig); display: flex; align-items: center; border-radius: 45px; width: 200px; height: 45px; justify-content: center; position: relative; left: -50px;" >non-plan Platform</button>
+                <div class="language-selector">
+                    <button class="languageButton" id="languageButton" style="font-size: var(--fontSizeMedium); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -50px;"><span class="material-icons-round">language</span> ▼</button>
+                    <ul id="languageMenu" class="hidden">
+                        <li data-lang="en">EN</li>
+                        <li data-lang="de">DE</li>
+                    </ul>
+                </div>
+                <dialog id="insightsModal">
+                    <form class="infoForm" id="insightsForm">
+                        <div class="infoCard">
+                            <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                                <h2 style="padding-left: 30px;color: var(--complementary-200);"></h2>
+                                <div class="cancelAccept">
+                                    <button type="button" class="buttonSecondary" style="width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;" onclick="closeModal('insightsModal')">
+                                        <span class="material-icons-round" style="font-size: 24px;">close</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="display: flex; background-color: transparent; flex-direction: column; align-items: center; padding-left: 20px;padding-right: 20px; text-align: left; border-radius: 10px; justify-content: center;">   
+                                <!-- Cards -->
+                                <div id="insightsCard1" class="card" style="display: flex; width: 100%; height: 400px;">
+                                    <div>
+                                        <div
+                                            style="flex: 1; background-image: url('./assets/IntroPage/Pictures/Insights.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var(--complementary-200);">
+                                            <div style="width: 100%; text-align: right; margin-top: 10px; color:#969696; font-size: 14px;padding-top: 415px;">
+                                                <span data-lang="start_Mbuso_credit">Photo by Marta Buso</span>
+                                            </div>
+                                            <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px;padding-top: 10px;"
+                                                data-lang="start_innovateText2">
+                                                Tailor-Made Digital Solutions for AEC Excellence: Streamlining Workflows, Automating Tasks, and Enhancing Visualization with Custom Tools for Architecture, Engineering, and Construction Professionals.
+                                            </p>
+                                        </div>
+                                    </div>    
+                                </div>
+                                <div id="insightsCard2" class="card" style="display: none; width: 100%; height: 400px;">
+                                    <div
+                                        style="flex: 1; background-image: url('./assets/IntroPage/Pictures/Habegger.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var(--complementary-200);">
+                                        <p style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 450px;"
+                                            data-lang="start_AR">
+                                            Augmented Reality
+                                        </p>
+                                        <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 0px;"
+                                            data-lang="start_AREngie">
+                                            Engie Habegger Project: Swissbau 2022 AR experience.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="insightsCard3" class="card" style="display: none; width: 100%; height: 400px;">
+                                    <div  style="flex: 1; background-image: url('./assets/IntroPage/Pictures/Biennale.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var(--complementary-200);">
+                                        <div style="width: 100%; text-align: right; margin-top: 10px; color:#969696; font-size: 14px;padding-top: 415px;">
+                                            <span data-lang="start_Mbuso_credit">Photo by Marta Buso</span>
+                                        </div>
+                                        <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 10px;"
+                                            data-lang="start_AR">
+                                            Augmented Reality
+                                        </p>
+                                        <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 0px;"
+                                            data-lang="start_ARLiechtenstein">
+                                            University of Liechtenstein Biennale App: Highlighting e-waste connections between Liechtenstein and Ghana.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="insightsCard4" class="card" style="display: none; width: 100%; height: 400px;">
+                                    <div  style="flex: 1; background-image: url('./assets/IntroPage/Pictures/Hohrainli.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var(--complementary-200);">
+                                        <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 450px;"
+                                            data-lang="start_Hohrainli">
+                                            Parametric study for the efficient positioning of reused facade elements, created using Grasshopper/Python for the research project GartenPark Hohrainli by the Institute for Environment and Natural Resources at ZHAW.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="insightsCard5" class="card" style="display: none; width: 100%; height: 400px;">
+                                    <div  style="flex: 1; background-image: url('./assets/IntroPage/Pictures/Generator.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var(--complementary-200);">
+                                        <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 450px;"
+                                            data-lang="start_Generator">
+                                            Parametric study for generating a compatibility program that integrates different spaces, inspired by Cedric Price and presented at HSLU Luzern.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="insightsCard6" class="card" style="display: none; width: 100%; height: 400px;">
+                                    <div  style="flex: 1; background-image: url('./assets/IntroPage/Pictures/start_GIS.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var(--complementary-200);">
+                                        <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 450px;"
+                                            data-lang="start_GIS">
+                                            GIS Importer for Archicad: A Grasshopper script commissioned by OOS that reads GIS data, including topography and materials, and imports 3D landscape elements into Archicad, separating them by material and including buildings.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="insightsCard7" class="card" style="display: none; width: 100%; height: 400px;">
+                                    <div  style="flex: 1; background-image: url('./assets/IntroPage/Pictures/start_SCH.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var(--complementary-200);">
+                                        <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 450px;"
+                                            data-lang="start_Shade">
+                                            Shadow Overlap Calculator for Grasshopper: A script commissioned by OOS that calculates overlapping shadows over a 3-hour period, in accordance with Kanton Zurich regulations.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="insightsCard8" class="card" style="display: none; width: 100%; height: 400px;">
+                                    <div  style="flex: 1; background-image: url('./assets/IntroPage/Pictures/Python.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var(--complementary-200);">
+                                        <p  style="font-size: var(--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 450px;"
+                                            data-lang="start_PythonMat">
+                                            Material Room Tags for Archicad: A Python script commissioned by OOS that automates room tags for materials directly within Archicad.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="insightsCard9" class="card" style="display: none; width: 100%; height: 400px;">
+                                    <div  style="flex: 1; background-image: url('./assets/IntroPage/Pictures/CircularChaos.jpg'); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: left; border-radius: 30px; height: 100%;color: var (--complementary-200);">
+                                        <p  style="font-size: var (--fontSizeBig); justify-content: left; line-height: 1.6; color: white; max-width: 800px; padding-top: 450px;"
+                                            data-lang="start_Chaos">
+                                            Circular Chaos, an application to replace geometries from reusable element lists
+                                        </p>
+                                    </div>
+                                </div>
+                                <!-- Navigation Buttons -->
+                                <div style=" display: flex; justify-content: space-between; flex-direction: row; column-gap: 20px;padding-top: 180px;">
+                                    <button type="button" class="buttonSecondary" style= "width: 40px;" onclick="navigateInsightsCard(-1)"><span class="material-icons-round" style="font-size: 24px;">arrow_back_ios</span></button>
+                                    <button type="button" class="buttonSecondary" style= "width: 40px;" onclick="navigateInsightsCard(1)"><span class="material-icons-round" style="font-size: 24px;">arrow_forward_ios</span></button>
+                                </div>
+                            </div>
+                        </div>   
+                    </form>
+                </dialog>
+                <script>
+                    let currentCard = 1; // Start with the first card
+                
+                    function navigateInsightsCard(direction) {
+                        // Hide the current card
+                        document.getElementById(`insightsCard${currentCard}`).style.display = 'none';
+                
+                        // Update current card index
+                        currentCard += direction;
+                
+                        // Ensure the index is within bounds
+                        const totalCards = 9; // Update this if more cards are added
+                        if (currentCard < 1) currentCard = totalCards;
+                        if (currentCard > totalCards) currentCard = 1;
+                
+                        // Show the new current card
+                        document.getElementById(`insightsCard${currentCard}`).style.display = 'flex';
+                    }
+                </script>
+                <dialog id = "servicesModal">
+                    <form class="infoForm" id="servicesForm">
+                        <div class="infoCard">
+                            <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                                <h1 data-lang="start_ServicesTitle" style="display: flex;padding-left: 30px;">Services</h1>
+                                <div class="cancelAccept">
+                                    <button type="button" class="buttonSecondary" style="width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;" onclick="closeModal('servicesModal')">
+                                        <span class="material-icons-round" style="font-size: 24px;">close</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="display: flex; background-color: transparent; flex-direction: column; align-items: center; padding-left: 20px;padding-right: 20px; text-align: left; border-radius: 10px; justify-content: center;">   
+                                <!-- Cards -->
+                                <div id="servicesCard1" class="card" style="display: flex; width: 100%; height: 410px;">
+                                    <div style="flex: 1; background-color: var(--background-200); background-size: cover; background-position: center; align-items: start; padding: 20px; text-align: center; border-radius: 30px; height: auto; color: white;">
+                                        <div style="display: flex; justify-content: space-between; gap: 20px; padding-top: 100px;">
+                                            <!-- Plugin Development -->
+                                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 100px;">
+                                                <span class="material-icons-round" style="font-size: 100px;">extension</span>
+                                                <h3 data-lang="start_service1Titel">Plugin Development</h3>
+                                            </div>
+                                
+                                            <!-- VR/AR Apps -->
+                                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 100px;">
+                                                <span class="material-icons-round" style="font-size: 100px;">view_in_ar</span>
+                                                <h3 data-lang="start_service2Titel">Web Applications</h3>
+                                            </div>
+                                
+                                            <!-- Web Applications -->
+                                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 100px;">
+                                                <span class="material-icons-round" style="font-size: 100px;">code</span>
+                                                <h3 data-lang="start_service3Titel">VR/AR Apps</h3>
+                                            </div>
+                                
+                                            <!-- BIM Consulting -->
+                                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 100px;">
+                                                <span class="material-icons-round" style="font-size: 100px;">architecture</span>
+                                                <h3 data-lang="start_service4Titel">BIM Consulting</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="servicesCard2" class="card" style="display: none; width: 100%; height: 410px;">
+                                    <div style="flex: 1; background-color: var(--background-200); background-size: cover; background-position: center; align-items: center; padding: 20px; text-align: center; border-radius: 30px; height: auto; color: white;">
+                                        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                                            <!-- Plugin Development -->
+                                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;">
+                                                <!-- Icon -->
+                                                <span class="material-icons-round" style="font-size: 200px;">extension</span>
+                                
+                                                <!-- Title -->
+                                                <h3 data-lang="start_service1Titel" style="padding-top: 160px;">Plugin Development</h3>
+                                
+                                                <!-- Description -->
+                                                <p data-lang="start_service1Content" style="padding-top: 10px;">
+                                                    We specialize in creating bespoke plugins for tools like Archicad, Rhinoceros, and Grasshopper to cater to the unique needs of the AEC industry. By closely collaborating with clients, we identify bottlenecks and inefficiencies, then craft custom solutions that seamlessly integrate into existing workflows. Our plugins enhance functionality, streamline repetitive tasks, and solve complex challenges, ensuring your tools are more powerful, adaptable, and efficient in handling intricate design and engineering projects.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="servicesCard3" class="card" style="display: none; width: 100%; height: 410px;">
+                                    <div style="flex: 1; background-color: var(--background-200); background-size: cover; background-position: center; align-items: center; padding: 20px; text-align: center; border-radius: 30px; height: auto; color: white;">
+                                        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                                            <!-- Plugin Development -->
+                                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;">
+                                                <!-- Icon -->
+                                                <span class="material-icons-round" style="font-size: 200px;">code</span>
+                                
+                                                <!-- Title -->
+                                                <h3 data-lang="start_service2Titel" style="padding-top: 160px;">Web Applications</h3>
+                                
+                                                <!-- Description -->
+                                                <p data-lang="start_service2Content" style="padding-top: 10px;">
+                                                    We design and build custom applications that empower teams to work smarter, not harder. By translating complex processes into user-friendly interfaces, we enable you to access your models, data, and tools anytime, anywhere. Our solutions are collaborative, scalable, and tailored to fit seamlessly into your workflows, making project management, data visualization, and team communication more efficient. We transform your digital platform into one that boosts productivity and keeps everyone aligned.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="servicesCard4" class="card" style="display: none; width: 100%; height: 410px;">
+                                    <div style="flex: 1; background-color: var(--background-200); background-size: cover; background-position: center; align-items: center; padding: 20px; text-align: center; border-radius: 30px; height: auto; color: white;">
+                                        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                                            <!-- Plugin Development -->
+                                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;">
+                                                <!-- Icon -->
+                                                <span class="material-icons-round" style="font-size: 200px;">view_in_ar</span>
+                                
+                                                <!-- Title -->
+                                                <h3 data-lang="start_service3Titel" style="padding-top: 160px;">VR/AR Apps</h3>
+                                
+                                                <!-- Description -->
+                                                <p data-lang="start_service3Content" style="padding-top: 10px;">
+                                                    Harness the power of virtual and augmented reality to elevate your designs and presentations. Using Unity, we develop immersive apps that allow you to visualize, interact with, and refine your models in real time. Whether you’re exploring materials, testing design variations, or showcasing ideas to clients, our VR/AR solutions enable you to make informed decisions with confidence. We focus on creating intuitive, impactful experiences that bring your projects to life and facilitate better communication and understanding.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="servicesCard5" class="card" style="display: none; width: 100%; height: 410px;">
+                                    <div style="flex: 1; background-color: var(--background-200); background-size: cover; background-position: center; align-items: center; padding: 20px; text-align: center; border-radius: 30px; height: auto; color: white;">
+                                        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                                            <!-- Plugin Development -->
+                                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;">
+                                                <!-- Icon -->
+                                                <span class="material-icons-round" style="font-size: 200px;">architecture</span>
+                                
+                                                <!-- Title -->
+                                                <h3 data-lang="start_service4Titel" style="padding-top: 160px;">BIM Consulting</h3>
+                                
+                                                <!-- Description -->
+                                                <p data-lang="start_service4Content" style="padding-top: 10px;">
+                                                    With years of experience teaching and working with leading architecture firms, we  provide comprehensive BIM consulting services. From optimizing  workflows to implementing advanced modeling strategies tailor-made for your company, we help you unlock the full potential of BIM technology. Our expertise ensures your  projects are delivered more efficiently, with fewer errors and better coordination across teams. Whether you’re adopting BIM for the first  time or refining your existing processes, we provide the guidance and  tools you need to succeed.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Navigation Buttons -->
+                                <div style=" display: flex; justify-content: space-between; flex-direction: row; column-gap: 20px;padding-top: 50px;">
+                                    <button type="button" class="buttonSecondary" style= "width: 40px;" onclick="navigateServicesCard(-1)"><span class="material-icons-round" style="font-size: 24px;">arrow_back_ios</span></button>
+                                    <button type="button" class="buttonSecondary" style= "width: 40px;" onclick="navigateServicesCard(1)"><span class="material-icons-round" style="font-size: 24px;">arrow_forward_ios</span></button>
+                                </div>
+                            </div>
+                        </div>        
+                    </form>
+                </dialog>
+                <script>
+                    let currentCardServices = 1; // Start with the first card
+                
+                    function navigateServicesCard(direction) {
+                        // Hide the current card
+                        document.getElementById(`servicesCard${currentCardServices}`).style.display = 'none';
+                
+                        // Update current card index
+                        currentCardServices += direction;
+                
+                        // Ensure the index is within bounds
+                        const totalCards = 5; // Update this if more cards are added
+                        if (currentCardServices < 1) currentCardServices = totalCards;
+                        if (currentCardServices > totalCards) currentCardServices = 1;
+                
+                        // Show the new current card
+                        document.getElementById(`servicesCard${currentCardServices}`).style.display = 'flex';
+                    }
+                </script>
+                </dialog>
+                <dialog id = "npInfoModal">
+                    <form class="infoForm" id = "npInfoForm">
+                        <div class= "infoCard">
+                            <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                                <h2 style="padding-left: 30px;">non-plan Platform</h2>
+                                <h2 data-lang="start_npInfoSoon" style="padding-left: 30px;">more information coming soon...</h2>
+                                <div class="cancelAccept">
+                                    <button type="button" class="buttonSecondary" style="width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;" onclick="closeModal('npInfoModal')">
+                                        <span class="material-icons-round" style="font-size: 24px;">close</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </dialog>
+                <dialog id = "newAccountModal">
+                    <form class="infoForm" id = "newAccountForm">
+                        <div class= "infoCard">
+                            <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                                <h2 style="padding-left: 30px;">non-plan Platform</h2>
+                                <h2 data-lang="start_npInfoSoon" style="padding-left: 30px;">more information coming soon...</h2>
+                                <div class="cancelAccept">
+                                    <button type="button" class="buttonSecondary" style="width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;" onclick="closeModal('newAccountModal')">
+                                        <span class="material-icons-round" style="font-size: 24px;">close</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </dialog>
+                <dialog id = "loginModal" style="text-align: center; align-items: center;">
+                    <form class="loginForm" id = "loginForm" >
+                        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                            <h2 style="padding-left: 30px;"></h2>
+                            <div class="cancelAccept">
+                                <button type="button" class="buttonSecondary" style="width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;" onclick="closeModal('loginModal')">
+                                    <span class="material-icons-round" style="font-size: 24px;">close</span>
+                                </button>
+                            </div>
+                        </div>
+                        <img id="non-plan-logo" src="./assets/non-plan-logo.svg" alt="non-plan" style="padding-top: 20px; transform: scale(0.8);">
+                        <h1 style="padding: 20px;" data-lang="start_loginWelcome1">Welcome</h1>
+                        <h4 data-lang="start_loginWelcome2">Login to the non-plan Platform</h4>
+                        <div class= "loginCard">
+                            <div class = "formFieldContainer">
+                                <input name = "UserName" type="string" placeholder="Username or email address*" data-lang="start_UsernameEmail">
+                            </div>
+                            <div class = "formFieldContainer">
+                                <input name = "UserPassword" type="string" placeholder="Password*" data-lang="start_Password" >
+                            </div>
+                            <button id="forgotPassword" class="buttonTextBlue" style="font-size: var(--fontSizeSmall); padding: 0px; display: flex; align-items:start; border-radius: 45px; width: 400px; height: 45px; justify-content:left;" data-lang="start_forgotPassword" >Forgot your password?</button>
+                            <button type="button" id="logINBtn" class =loginButton onclick="closeModal('loginModal')" style = "width: 400px; padding: 0px; display: flex; align-items:center;text-align: center; border-radius: 45px; width: 400px; height: 45px; justify-content: center;" data-lang="start_continue">Continue</button>     
+                        </div>
+                        <div style="display: flex; flex-direction: row; padding-left: 20px;">
+                            <h5 style="display: flex; width: 300px;" data-lang="start_newAccount">Don't have an account? </h5>
+                            <button id="newAccountBtn" class="buttonTextBlue" style="font-size: var(--fontSizeMedium); padding: 0px; display: flex; align-items:start; border-radius: 45px; width: 400px; height: 45px; justify-content:left;">Sign in</button>
+                        </div>
+                        
+                    </form>
+                </dialog> 
+                <button id="infoLogINBtn" class="buttonTertiary" style="font-size: var(--fontSizeMedium); display: flex; align-items: center; border-radius: 45px; width: 100px; height: 45px; justify-content: center; position: relative; left: -50px;">LOG IN</button>
+            </div>     
+        </header>
+        <div>
+            <section class="page" id="intro" style="width: 100%; position: absolute; display: flex; flex-direction: column; row-gap: 0px; text-align:left ;padding-top: 30px;">
+                <h1 style="margin-top: 0px;color: var(--primary); padding-left: 90px; font-size: var(--fontSizeGiantXXXL);" data-lang="start_welcome">Welcome to non-plan</h1>
+            
+                <!-- First Section: Introduction to the Company -->
+                <div style="display: flex; background-color: var(--background); flex-direction: column; align-items: center; padding-left: 60px; padding-right: 60px; padding-bottom: 60px; padding-top: 30px; text-align: left; border-radius: 10px; justify-content: center;">
+                    <div style="display: flex; flex-direction: row; align-items: center; column-gap: 60px; justify-content: space-between; width: 100%;">
+                     <!-- Wrapping the picture in a clickable link -->
+                        <a class="buttonMainPage" id="insightsBtn2" style="flex: 1; display: block; position: relative; aspect-ratio: 2; border-radius: 30px; overflow: hidden; text-decoration: none;">
+                            <!-- Background image with brightness filter -->
+                            <div style="filter: brightness(60%); position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; background-image: url('./assets/IntroPage/Pictures/Seq_small.gif'); background-size: cover; background-position: center;"></div>
+                            <!-- Text on top of the image -->
+                            <h0 data-lang="start_innovateHeading" style="color: white; margin-bottom: 20px; position: relative; z-index: 2; padding: 30px; top: 30px; text-align: center;">
+                                Transforming the AEC Industry with Innovation: Discover How We Make an Impact
+                            </h0>
+                        </a>
+                    </div>
+                    <!-- Adding text below the image -->
+                    <div style="width: 100%; text-align: right; margin-top: 10px; color:#969696; font-size: 14px;">
+                        <span data-lang="start_OOS_credit">Script for the 'Josef will wohnen' project, written for OOS</span>
+                    </div>
+                </div>
+    
+                <!-- Second Section: non-plan Platform & non-plan services -->
+                <div style="display: flex; background-color: var(--background-200); flex-direction: column; align-items: center; padding: 60px; text-align: left; border-radius: 10px; justify-content: center;">
+                    <div style="display: flex; flex-direction: row; align-items: center; column-gap: 60px; justify-content: space-between; width: 100%;">
+                        <!-- First clickable image -->
+                         
+                        <a id="servicesBtn2" class="buttonMainPage" style="flex: 1; display: block; position: relative; aspect-ratio: 1; border-radius: 30px; overflow: hidden; text-decoration: none;">
+                            <!-- Background image with brightness filter -->
+                            <div style="filter: brightness(60%); position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; background-image: url('./assets/IntroPage/Pictures/Services.jpg'); background-size: cover; background-position: center;"></div>
+                            <!-- Text on top of the image -->
+                            <h1 data-lang="start_innovateText" style="color: white; margin-bottom: 20px; position: relative; z-index: 2; top: 30px; left: 30px; text-align: left; max-width: 90%; word-wrap: break-word;">
+                                Tailor-Made Digital Solutions for AEC Excellence: Streamlining Workflows, Automating Tasks, and Enhancing Visualization with Custom Tools for Architecture, Engineering, and Construction Professionals
+                            </h1>
+                            
+                        </a>
+                        
+    
+                        <!-- Second clickable image -->
+                        <a id="npInfoBtn2" class="buttonMainPage" style="flex: 1; display: block; position: relative; aspect-ratio: 1; border-radius: 30px; overflow: hidden; text-decoration: none;">
+                            <!-- Background image with brightness filter -->
+                            <div style="filter: brightness(60%); position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; background-image: url('./assets/IntroPage/Pictures/platform_preview.jpg'); background-size: cover; background-position: center;"></div>
+                            <!-- Text on top of the image -->
+                            <h1 data-lang="start_introPlatform" style="color: white; margin-bottom: 20px; position: relative; z-index: 2; top: 30px; left: 30px; text-align: left; max-width: 90%; word-wrap: break-word;">
+                                Simplify AEC Management with the Non-Plan Platform: Coming soon, this app will streamline workflows, track projects, and visualize sustainable solutions—all in one place.
+                            </h1>
+                        </a>
+                    </div>
+                    <div style="width: 100%; text-align: left; margin-top: 10px; color:#969696; font-size: 14px;">
+                        <span data-lang="start_Mbuso_credit">Photo by Marta Buso</span>
+                    </div>
+                </div>
+    
+                <!-- Third Section: Who We Are -->
+                <div style="display: flex; background-color: var(--background); flex-direction: column; row-gap: 20px; align-items: center; padding: 30px; text-align:start; border-radius: 10px;">
+                    <!-- Section Title -->
+                    <h0 style="color: var(--primary-200); margin-bottom: 20px;" data-lang="start_whoTitle">Who We Are</h0>
+                    <!-- Section Text -->
+                    <p data-land="start_whoText" style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 1200px;justify-content: start;" data-lang="start_projectsText">
+                        non-plan is a team of architects, designers, and innovators dedicated to redefining the AEC industry through digital transformation and creative collaboration.Our collective expertise bridges the gap between traditional architectural practice and cutting-edge technology, fostering a culture of experimentation and innovation.
+                    </p>
+                    <!-- Grid Container for Team Members -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); max-width: 700px; gap: 20px; justify-content: center; align-items: center; width: 100%; padding: 40px; background-color: transparent; border-radius: 10px;">
+                        <!-- Circle 1 -->
+                        <a class="buttonMainPage" href="https://www.linkedin.com/in/katrin-milanzi-262a692a/" target="_blank" style="text-decoration: none; border-radius: 50%; display: block; width: 300px; height: 300px; overflow: hidden; position: relative;">
+                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
+                                <img src="./assets/IntroPage/People/Non-Plan_222105387.jpg" alt="Katrin" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px; text-align: center;">Katrin</div>
+                            </div>
+                        </a>
+                    
+                        <!-- Circle 2 -->
+                        <a class="buttonMainPage" href="https://www.linkedin.com/in/mikel-martinez-6a2a9635/" target="_blank" style="text-decoration: none; border-radius: 50%; display: block; width: 300px; height: 300px; overflow: hidden; position: relative;">
+                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
+                                <img src="./assets/IntroPage/People/Non-Plan_222105335.jpg" alt="Mikel" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; bottom: 10px; background: rgba(0, 0, 0, 0.6); color: white; padding: 5px 10px; border-radius: 5px; text-align: center;">Mikel</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <!-- Fourth Section: Highlighting Key Projects and Collaborations -->
+                <div style="display: flex; background-color: var(--background-100); flex-direction: column; row-gap: 0px; align-items: center; padding: 30px; text-align:start; border-radius: 10px;">
+                    <h2  style=" justify-content: left; line-height: 1.6; color: var(--complementary200); padding-top: 10px;"
+                    data-lang="start_Collaborations">We have proudly worked with the following companies and public institutions , delivering impactful solutions
+                    </h2>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 80px; padding: 20px; padding-top: 50px;">
+                        <img src="./assets/IntroPage/Logos/oos_ag_logo.png" alt="OOS AG Logo" style="max-width: 150px; height: auto; object-fit: contain;">
+                        <img src="./assets/IntroPage/Logos/logo-habegger.png" alt="Habegger Logo" style="max-width: 150px; height: auto; object-fit: contain;">
+                        <img src="./assets/IntroPage/Logos/Universität_Liechtenstein_logo.svg.png" alt="Universität Liechtenstein Logo" style="max-width: 200px; height: auto; object-fit: contain;">
+                    </div>
+                    <h4 data-lang="start_Collaborations2" style=" justify-content: left; padding-left: 0px; padding-top: 20px; padding-bottom: 10px;">These collaborations highlight our commitment to bridging innovation and sustainability within the AEC industry.</h4>
+                  <!-- Grid Container -->
+                  <div id="gridContainer" style="display: grid; grid-template-columns: repeat(auto-fit, 450px); gap: 0px; justify-content: center; width: 100%; padding: 40px; background-color: transparent; border-radius: 10px;">
+                      <!-- Images -->
+                      <div class="grid-item" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                          <img src="./assets/IntroPage/LinkedIn/LinkedIn_15.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 1">
+                      </div>
+                      <div class="grid-item" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                         <img src="./assets/IntroPage/LinkedIn/LinkedIn_16.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 2">
+                      </div>
+                      <div class="grid-item" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                          <img src="./assets/IntroPage/LinkedIn/LinkedIn_04.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 3">
+                     </div>
+                     <!-- Hidden items -->
+                        <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                            <img src="./assets/IntroPage/LinkedIn/LinkedIn_02.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 5">
+                        </div>      
+                        <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                            <img src="./assets/IntroPage/LinkedIn/LinkedIn_03.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 5">
+                       </div>
+                       <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                           <img src="./assets/IntroPage/LinkedIn/LinkedIn_06.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 6">
+                       </div>
+                        <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                            <img src="./assets/IntroPage/LinkedIn/LinkedIn_07.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 7">
+                     </div>
+                     <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                         <img src="./assets/IntroPage/LinkedIn/LinkedIn_08.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                     </div>
+                     <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                        <img src="./assets/IntroPage/LinkedIn/LinkedIn_09.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                    </div>
+                    <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                        <img src="./assets/IntroPage/LinkedIn/LinkedIn_10.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                    </div>
+                    <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                        <img src="./assets/IntroPage/LinkedIn/LinkedIn_11.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                    </div>
+                    <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                        <img src="./assets/IntroPage/LinkedIn/LinkedIn_12.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                    </div>
+                    <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                        <img src="./assets/IntroPage/LinkedIn/LinkedIn_13.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                    </div>
+                    <div class="grid-item hidden" style="padding: 30px; text-align: left; border-radius: 30px; overflow: hidden; transform: scale(1); transition: transform 0.3s ease;">
+                        <img src="./assets/IntroPage/LinkedIn/LinkedIn_14.jpg" style="width: 100%; height: auto; border-radius: 30px;" alt="LinkedIn 8">
+                    </div>
+                     <!-- Add more as needed -->
+                 </div>
+                 <!-- Show More Button -->
+                 <button id="showMoreButton" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Show More</button>
+                 <button id="showLessButton" style="padding: 10px 20px; font-size: 16px; cursor: pointer; display: none;">Show Less</button>
+             
+                </div>    
+            
+                <!-- Fifth Section: Call to Action for WebApp Login -->
+                <div style="display: flex; background-color: var(--background-100); flex-direction: column; row-gap: 20px; align-items: center; padding: 30px; text-align: left; border-radius: 10px;">
+                    <h0 style="color: var(--primary); margin-bottom: 20px; text-align: center;" data-lang="start_accessTitle">Access the non-plan Platform</h0>
+                    <p style="font-size: var(--fontSizeBiggest); line-height: 1.6; color: var(--textColor); max-width: 800px; text-align: justify;" data-lang="start_accessText">
+                        Unlock the full potential of your projects with the non-plan WebApp. Our platform offers a wide range of features to streamline your project management, automate workflows, and generate sustainable design solutions. Whether you're a project manager, architect, contractor, or developer, our web application can help you optimize your work processes and make informed decisions.
+                    </p>
+                    <button id="logINBtnEnd" class="buttonTertiary" style="font-size: var(--fontSizeBig); display: flex; align-items: center; justify-content: center; border-radius: 45px; width: 300px; height: 45px;" data-lang="start_logIn">Log in to Non-Plan Platform</button>
+                </div>
+            
+                
+                <!-- Contact -->
+                <div style="display: flex; background-color: var(--background); flex-direction: row; justify-content: space-evenly; align-items: center; padding-left: 20px; padding-right: 20px; padding-bottom: 30px;padding-top: 20px;">
+                    <img id="non-plan-logo" src="./assets/non-plan-logo.svg" alt="non-plan" style="transform: scale(0.8);">
+                    <div>
+                        <h5 style="color: var(--primary-200); text-align: left; color: #969696;">CONTACT</h5>
+                        <h5 style="color: var(--primary-200); text-align: left; color: #969696; padding-top: 10px;">
+                            <a href="mailto:studio@non-plan.com" style="color: #969696;">studio@non-plan.com</a>
+                        </h5>
+                    </div>
+                    <div>
+                        <h5 style="color: var(--primary-200); text-align: left; color: #969696;">FOLLOW US</h5>
+                        <div style="display: flex; flex-direction: row; padding-top: 10px;">
+                            <a href="https://www.linkedin.com/search/results/all/?fetchDeterministicClustersOnly=true&heroEntityKey=urn%3Ali%3Aorganization%3A72712946&keywords=non-plan%20&origin=RICH_QUERY_TYPEAHEAD_HISTORY&position=0&searchId=07827e74-2cca-4132-a36a-3ee337c792e6&sid=UZN&spellCorrectionEnabled=true" target="_blank" style="color: #969696; margin-right: 10px;">
+                                <img id="non-plan-logo" src="./assets/IntroPage/Logos/icons8-linkedin-50.png" alt="non-plan" style="padding-top: 0px;transform: scale(0.75);">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            
+                <hr style="width: 100%; border: 0; border-top: 0.1px solid --primary;background-color: var(--background);">
+                <!-- Footer -->
+                <div style="display:  flex; flex-direction: row;background-color: var(--background-100); justify-content: space-between; padding-left: 20px; padding-right: 20px; margin-top: 0px; padding-bottom: 40px; padding-top: 20px;">
+                    <h6 style="color: var(--primary-200); text-align: left; color: #969696;">©2025, non-plan GmbH</h6>
+                    <h6 style="color: var(--primary-200); text-align: left; color: #969696;">Privacy Policy</h6>
+                    <h6 style="color: var(--primary-200); text-align: left; color: #969696;">Legal Notice</h6>
+                </div>
+            </section>           
+
+    </div>
+    <main id="content" >
+        <div class="page" id = "projectsPage" style = "display: none"> 
+            <dialog id = "newProjectModal">
+                <form class="userForm" id = "newProjectForm">
+                    <h2>New Project</h2>
+                    <div class= "userCard">
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">apartment</span>Name</label>
+                            <input name = "name" type="text" placeholder="What's the name of your project?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short name</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Description</label>
+                            <textarea name = "description" cols="30" rows="5" placeholder="Give your project a nice description!"></textarea>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">pin_drop</span>Location</label>
+                            <input name = "location" type="text" placeholder="Where is your project located?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;"></label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">paid</span>Estimated cost</label>
+                            <input name = "cost" type="number" placeholder="What's the estimated cost of the project?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Estimated cost of the project</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">percent</span>Estimated Progress</label>
+                            <input name = "progress" type="number" placeholder="What's the estimated completion progress of the project?">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Estimated progress percentage of the project</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">account_circle</span>Role</label>
+                            <select name = "userRole">
+                                <option>not defined</option>
+                                <option>Architect</option>
+                                <option>Engineer</option>
+                                <option>Developer</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">not_listed_location</span>Status</label>
+                            <select name = "status">
+                                <option>Pending</option>
+                                <option>Active</option>
+                                <option>Finished</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_view_week</span>Design Phase</label>
+                            <select name = "phase">
+                                <option>Design</option>
+                                <option>Construction project</option>
+                                <option>Execution</option>
+                                <option>Construction</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_today</span>Start Date</label>
+                            <input name = startDate type="date">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_month</span>Finish Date</label>
+                            <input name = finishDate type="date">
+                        </div>
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('newProjectModal')">Cancel</button>
+                        <button type="submit" class =acceptButton>Accept</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id="newProjectErrorModal">
+                <form class="userForm" id="newProjectErrorForm" method="dialog" style="box-sizing: border-box;">
+                    <h2 style="display: flex; align-items: center; gap: 8px; font-size: 20px; padding: 10px; margin: 0;">
+                        <span class="material-icons-round" style="font-size: 20px; vertical-align: middle;">warning</span>
+                        Error
+                    </h2>
+                    <div style="border-top: 2px solid var(--complementary200); margin-top: 8px; margin-bottom: 16px;"></div>
+                
+                    <p id="errorMessage" style="display: flex; justify-content: center;">Error message placeholder</p>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                        <button onclick="closeModal('newProjectErrorModal')" type="button" class="cancelButton" style="margin-right: 10px; height: 30px;">OK</button>
+                    </div>
+                </form>
+            </dialog>
+            <header>
+                <h2>Projects</h2>
+                <div style="display: flex;flex-direction: row;column-gap: 10px;">
+                    <button id="importProjectsBtn" class = "buttonTertiary"><span class="material-icons-round">file_download</span><span class="material-icons-round">foundation</span></button>
+                    <button id="exportProjectsBtn" class = "buttonTertiary"><span class="material-icons-round">file_upload</span><span class="material-icons-round">foundation</span></button>
+                    <button id="newProjectBtn" class = "buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">foundation</span></button>
+                </div>
+            </header>
+            <div id="projectsList" class="projectsList">
+            </div>  
+        </div>
+        <div class="page" id = "projectDetails" style = "display: none">
+            <dialog id = "DeleteProjectModal">
+                <form class="userForm" id = "DeleteNewUserForm">
+                    <h2>Are you sure you want to delete the project?</h2>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('DeleteProjectModal')">Cancel</button>
+                        <button type="button" class="acceptButton" id="ConfirmDeleteButton">Delete</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id = "editProjectModal">
+                <form class="userForm" id = "editProjectForm">
+                    <h2>Edit Project</h2>
+                    <div class= "userCard">
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">apartment</span>Name</label>
+                            <input name = "name" type="text" id="projectNameInput" />
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short name</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Description</label>
+                            <textarea name = "description" cols="30" rows="5" placeholder="Give your project a nice description!" id="projectDescriptionInput" ></textarea>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">pin_drop</span>Location</label>
+                            <input name = "location" type="text" placeholder="Where is your project located?" id="projectLocationInput">
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;"></label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">percent</span>Estimated progress</label>
+                            <input name = "progress" type="number" placeholder="What's the estimated progress of the project?" id="projectProgressInput" >
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;" >Estimated cost of the project</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">paid</span>Estimated cost</label>
+                            <input name = "cost" type="number" placeholder="What's the estimated cost of the project?" id="projectCostInput" >
+                            <label style="font-size: 12px; font-style: italic; padding-top: 5px;" >Estimated cost of the project</label>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">account_circle</span>Role</label>
+                            <select name = "userRole" id="projectRoleInput">
+                                <option>not defined</option>
+                                <option>Architect</option>
+                                <option>Engineer</option>
+                                <option>Developer</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">not_listed_location</span>Status</label>
+                            <select name = "status" id="projectStatusInput">
+                                <option>Pending</option>
+                                <option>Active</option>
+                                <option>Finished</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_view_week</span>Design Phase</label>
+                            <select name = "phase" id="projectPhaseInput">
+                                <option>Design</option>
+                                <option>Construction project</option>
+                                <option>Execution</option>
+                                <option>Construction</option>
+                            </select>
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_today</span>Start Date</label>
+                            <input name = startDate type="date" id="projectStartPDInput">
+                        </div>
+                        <div class = "formFieldContainer">
+                            <label><span class="material-icons-round">calendar_month</span>Finish Date</label>
+                            <input name = finishDate type="date" id="projectFinishPDInput">
+                        </div>
+                    </div>
+                    <div class= "cancelAccept">
+                        <button type="button" class =cancelButton onclick="closeModal('editProjectModal')">Cancel</button>
+                        <button type="button" class="acceptButton" id="changeProjectButton">Change</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id="newToDoModal">
+                <form class="toDoForm" id="newToDoForm">
+                    <input type="hidden" name="toDoProject" id="toDoProject" />
+                    <div class="userCard">
+                        <div class="formGrid">
+                            <div class="formColumn">
+                                <h2 style="margin: 0;">Add a Task</h2>
+                                <div class="formFieldContainerToDo">
+                                    <label><span class="material-icons-round">apartment</span>Title</label>
+                                    <input name="toDoTitle" type="text" id="toDoTitle" />
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short title</label>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">subject</span>Description</label>
+                                    <textarea name="toDoDescription" cols="30" rows="5" placeholder="Give your project a nice description!" id="toDoDescription"></textarea>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Status</label>
+                                    <select name="toDoStatus" id="toDoStatus">
+                                        <option>Pending</option>
+                                        <option>In Progress</option>
+                                        <option>Completed</option>
+                                        <option>On Hold</option>
+                                    </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Priority</label>
+                                    <select name="toDoPriority" id="toDoPriority">
+                                        <option>High</option>
+                                        <option>Standard</option>
+                                        <option>Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="formColumn">
+                                <div class="formFieldContainerToDo">
+                                    <h2 data-project-info="toDoProjectName" style="margin: 0;">Project Name</h2>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Responsible Person</label>
+                                    <select name="toDoAssignedTo" id="toDoAssignedTo">
+                                       <!-- Options will be dynamically populated -->
+                                    </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Created By</label>
+                                    <select name="toDoCreatedBy" id="toDoCreatedBy">
+                                        <!-- Options will be dynamically populated -->
+                                </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_today</span>To-Do start date</label>
+                                    <span id="currentDate" class="formatted-date"></span>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>To-Do last update date</label>
+                                    <span id="updateDate" class="formatted-date"></span>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">paid</span>Estimated hours</label>
+                                    <input name="toDoEstimatedHours" type="number" placeholder="What's the estimated cost of the project?" id="projectCostInput">
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Estimated hours for the project</label>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">paid</span>Actual hours</label>
+                                    <input name="toDoActualHours" type="number" placeholder="What's the estimated cost of the project?" id="projectCostInput">
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">hours used so far</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="separator-horizontal"></div>
+                        <div class="formGrid">
+                            <div class="formColumn">
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>Due Date</label>
+                                    <input name="toDoDueDate" type="date" id="projectFinishPDInput">
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>Start Date</label>
+                                    <input name="toDoStartDate" type="date" id="projectFinishPDInput">
+                                </div>                              
+                            </div>
+                            <div class="formColumn">
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Dependancies</label>
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">select the tasks this project is dependant of</label>
+                                    <select name="status" id="toDoPriority">
+                                        <option>You</option>
+                                        <option>Standard</option>
+                                        <option>Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    <div class="separator-horizontal"></div>
+                    <div class="formFieldContainer">
+                        <label><span class="material-icons-round">subject</span>Comments</label>
+                        <textarea name="toDoComments" cols="30" rows="5" placeholder="Add any clarification comment" id="projectDescriptionInput"></textarea>
+                    </div>
+                        
+                    </div>
+                    <div class="cancelAccept">
+                        <button type="button" class="cancelButton" onclick="closeModal('newToDoModal')">Cancel</button>
+                        <button type="submit" class="acceptButton" id="submitToDoButton">Accept</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id="editToDoModal">
+                <form class="toDoForm" id="editToDoForm">
+                    <input type="hidden" id="editToDoId" name="editToDoId">
+                    <!-- Other form fields... -->
+                    <div class="userCard">
+                        <div class="formGrid">
+                            <div class="formColumn">
+                                <h2 style="margin: 0;">Edit Task</h2>
+                                <div class="formFieldContainerToDo">
+                                    <label><span class="material-icons-round">apartment</span>Title</label>
+                                    <input name="toDoTitle" type="text" id="editToDoTitle" />
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">TIP give it a short title</label>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">subject</span>Description</label>
+                                    <textarea name="toDoDescription" cols="30" rows="5" placeholder="Give your project a nice description!" id="editToDoDescription"></textarea>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Status</label>
+                                    <select name="toDoStatus" id="editToDoStatus">
+                                        <option>Pending</option>
+                                        <option>In Progress</option>
+                                        <option>Completed</option>
+                                        <option>On Hold</option>
+                                    </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Priority</label>
+                                    <select name="toDoPriority" id="editToDoPriority">
+                                        <option>High</option>
+                                        <option>Standard</option>
+                                        <option>Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="formColumn">
+                                <div class="formFieldContainerToDo">
+                                    <h2 data-project-info="toDoProjectName" style="margin: 0;">Project Name</h2>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Responsible Person</label>
+                                    <select name="edittoDoAssignedTo" id="editToDoAssignedTo">
+                                       <!-- Options will be dynamically populated -->
+                                    </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Created By</label>
+                                    <select name="edittoDoCreatedBy" id="editToDoCreatedBy">
+                                        <!-- Options will be dynamically populated -->
+                                </select>
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_today</span>To-Do start date</label>
+                                    <input name="editToDoStartDate" type="date" id="editToDoStartDate">
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>To-Do last update date</label>
+                                    <input name="editToDoUpdatedAt" type="date" id="editToDoUpdatedAt">
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">paid</span>Estimated hours</label>
+                                    <input name="editToDoEstimatedHours" type="number" placeholder="Estimated hours for the project" id="editToDoEstimatedHours">
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">paid</span>Actual hours</label>
+                                    <input name="editToDoActualHours" type="number" placeholder="Hours used so far" id="editToDoActualHours">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="separator-horizontal"></div>
+                        <div class="formGrid">
+                            <div class="formColumn">
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>Due Date</label>
+                                    <input name="editToDoDueDate" type="date" id="editToDoDueDate">
+                                </div>
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">calendar_month</span>Start Date</label>
+                                    <input name="editToDoStartDate" type="date" id="editToDoStartDate">
+                                </div>                              
+                            </div>
+                            <div class="formColumn">
+                                <div class="formFieldContainer">
+                                    <label><span class="material-icons-round">not_listed_location</span>Dependencies</label>
+                                    <label style="font-size: 12px; font-style: italic; padding-top: 5px;">Select the tasks this project is dependent on</label>
+                                    <select name="editToDoDependencies" id="editToDoDependencies">
+                                        <option>You</option>
+                                        <option>Standard</option>
+                                        <option>Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="separator-horizontal"></div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Comments</label>
+                            <textarea name="editToDoComments" cols="30" rows="5" placeholder="Add any clarification comment" id="editToDoComments"></textarea>
+                        </div>
+                            
+                        </div>
+                        <div class="cancelAccept">
+                            <button type="button" class="cancelButton" onclick="closeModal('editToDoModal')">Cancel</button>
+                            <button type="submit" class="acceptButton" id="submitEditToDoButton">Accept</button>
+                        </div>
+                    </form>
+                </dialog>
+            <div class = "mainPageContent">
+                <div style="display:flex;flex-direction: column;row-gap: 10px;">
+                    <div class="dashboardCard">
+                        <div class ="upperDashboard">
+                            <p id="iconPD" style="font-size: var(--fontSizeBig); display: flex; align-items: center; justify-content: center; background-color: #6491F9; padding: 5px; border-radius: 50%; aspect-ratio: 1; width: 40px; height: 40px; color: white;" data-project-info="iconPD">
+                                HC
+                            </p>
+                            
+                            <div style="display: flex; flex-direction: row; gap: 20px;">
+                                <button id="editProject" class="buttonSecondary" style="display: flex; align-items: center; justify-content: center; width: 100px; height: 40px; font-size: var(--fontSizeStandard);">
+                                    Edit
+                                </button>    
+                                <button id="deleteProjectBtn" class="buttonSecondary" style="display: flex; align-items: center; justify-content: center; width: 100px; height: 40px; font-size: var(--fontSizeStandard);">
+                                    Delete
+                                </button>          
+                            </div>
+                        </div>
+                        <div class ="middleDashboard">
+                            <h5 data-project-info="nameBigPD">Hospital Center</h5>
+                            <p data-project-info="descriptionPD">Community hospital located in downtown</p>
+                        </div>
+                        <div class = "bottomDashboard">
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Status</p>
+                                <p data-project-info="statusPD">Active</p>
+                            </div>
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Cost</p>
+                                <p data-project-info="costPD">2'542.00 CHF</p>
+                            </div>
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Role</p>
+                                <p data-project-info="rolePD">Engineer</p>
+                            </div>
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Start Date</p>
+                                <p data-project-info="startPD">2023-05-01</p>
+                            </div>
+                            <div>
+                                <p style="color: #969696; font-size: var(--fontSizeSmall);">Finish Date</p>
+                                <p data-project-info="finishPD">2023-05-01</p>
+                            </div>
+                        </div>
+                        <div style="background-color: #404040; width: calc(100% - 40px); height: 25px; border-radius: 50px; overflow: hidden; margin: 20px auto 30px auto; position: relative;">
+                            <div id="percentageDiv" style="width: 0%; height: 100%; background-color: green; border-radius: 10px 0 0 10px; display: flex; justify-content: center; align-items: center; position: relative; color: white; font-weight: bold;">
+                                <span id="progressText" style="position: absolute; width: 100%; text-align: center; left: 0;">0%</span>
+                              </div>
+                        </div>
+                    </div>
+                    <div id="toDoList" class="dashboardCard" style="flex-grow: 1;">
+                        <div style="display: flex; align-items: center;flex-direction: row;justify-content:space-between;margin:20px">
+                            <h4>To-Do</h4>
+                            <div style="display: flex;align-items: center;align-items: center;padding-left: 80px;">
+                                <span class="material-icons-round" style="padding-right: 10px;">search</span>
+                                <input type="text" style="font-size: var(--fontSizeSmall);" placeholder="Search To-Do's by name">
+                            </div>
+                            <button id = "newToDoBtn" class = "buttonTertiary"><span class="material-icons-round">add</span></button>
+                        </div>
+                    </div>
+                    <div id="toDoListContainer">
+                        <!-- To-Do list items will be appended here -->
+                    </div>
+                </div>
+                <div id="viewerContainer" class="dashboardCard"></div>  
+            </div>
+            
+        </div>
+        <div class="page" id = "usersPage" style = "display: none">
+            <dialog id="newUserModal">
+                <form class="userForm" id="newUserForm">
+                    <h2>New User</h2>
+                    <div class="userCard">
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Name</label>
+                            <input name="name" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Surname</label>
+                            <input name="surname" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">email</span>Email Address</label>
+                            <input name="email" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">call</span>Telephone Number</label>
+                            <input name="phone" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">account_circle</span>Role</label>
+                            <select name="usersRole">
+                                <option>Architect</option>
+                                <option>Engineer</option>
+                                <option>Developer</option>
+                            </select>
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">vpn_key</span>Access rights</label>
+                            <select name="access">
+                                <option>Administrator</option>
+                                <option>Editor</option>
+                                <option>Guest</option>
+                            </select>
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">business</span>Company Name</label>
+                            <input name="company" type="text">
+                        </div>
+                    </div>
+                    <div class="cancelAccept">
+                        <button type="button" class="cancelButton" onclick="closeModal('newUserModal')">Cancel</button>
+                        <button type="submit" class="acceptButton" id="UserCreateButton">Accept</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id="ChangeUserModal">
+                <form class="userForm" id="newUserForm">
+                    <h2>Change User</h2>
+                    <div class="userCard">
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Name</label>
+                            <input name="CH_name" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Surname</label>
+                            <input name="CH_surname" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">email</span>Email Address</label>
+                            <input name="CH_email" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">call</span>Telephone Number</label>
+                            <input name="CH_phone" type="text">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">account_circle</span>Role</label>
+                            <select name="CH_usersRole">
+                                <option>Architect</option>
+                                <option>Engineer</option>
+                                <option>Developer</option>
+                            </select>
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">vpn_key</span>Access rights</label>
+                            <select name="CH_access">
+                                <option>Administrator</option>
+                                <option>Editor</option>
+                                <option>Guest</option>
+                            </select>
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">business</span>Company Name</label>
+                            <input name="CH_company" type="text">
+                        </div>
+                    </div>
+                    <div class="cancelAccept">
+                        <button type="button" class="cancelButton" onclick="closeModal('ChangeUserModal')">Cancel</button>
+                        <button type="submit" class="acceptButton" id="UserChangeAcceptButton">Accept</button>
+                    </div>
+                </form>
+            </dialog>
+            <dialog id="newCompanyModal">
+                <form class="userForm" id="newCompanyForm">
+                    <h2>New Company</h2>
+                    <div class="userCard">
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Company Name</label>
+                            <input type="text" name="cName">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">subject</span>Company Address</label>
+                            <input type="text" name="cAddress">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">email</span>Contact Email</label>
+                            <input type="text" name="cEmail">
+                        </div>
+                        <div class="formFieldContainer">
+                            <label><span class="material-icons-round">call</span>Telephone Number</label>
+                            <input type="tel" name="cPhone">
+                        </div>
+                    </div>
+                    <div class="cancelAccept">
+                        <button type="button" class="cancelButton" onclick="closeModal('newCompanyModal')">Cancel</button>
+                        <button type="submit" class="acceptButton">Accept</button>
+                    </div>
+                </form>
+            </dialog>     
+            <header>
+                <h2>Users</h2>
+                <div style="display: flex;flex-direction: row;column-gap: 10px;">
+                    <button id="newUserBtn" class="buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">person</span></button>
+                    <button id="newCompanyBtn" class="buttonTertiary"><span class="material-icons-round">add</span><span class="material-icons-round">business</span></button>
+                </div>
+            </header>
+            <div style="display: flex; flex-direction: row; font-size: var(--fontSizeStandard); height: 40px; column-gap: 100px;padding-left: 30px;">
+                <div style="display: flex; flex-direction: row;">
+                    <label style="padding-left: 10px;">Total number of Users:</label>
+                    <label style="padding-left: 15px;" id="userCount">3</label>
+                </div>
+                <div style="position: relative; display: flex; column-gap: 20px; align-items:start;">
+                    <span class="material-icons-round" 
+                          style="position: absolute; left: 10px; top: calc(50% - 12px); font-size: 24px; color: #969696;">
+                        search
+                    </span>
+                    <input type="text" placeholder="Search" 
+                           style="padding-left: 40px; height: 10px; width: 200px; font-size: var(--fontSizeStandard); line-height: 10px;">
+                    <button class="buttonSecondary" 
+                            style="width: 60px; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons-round">filter_list</span>
+                    </button>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr; padding-left: 30px;padding-right: 30px;padding-top: 30px; column-gap: 20px; align-items: center;">
+                <label style="padding-left: 10px;">User name</label>
+                <label>Access</label>
+                <label>Role</label>
+                <label>Company</label>
+                <label>Last active</label>
+                <label style="justify-self: end;">Edit</label>
+            </div>
+            <div>
+            </div>
+            <div >
+                <div id="usersList" class="usersList" style="display: flex; flex-direction: column; row-gap: 10px; padding-left: 30px; padding-right: 30px">
+                </div>
+            </div>
+        </div>
+    </main>
+    <script type="module" src="./src/index.ts"></script>
+</body>
+</html>

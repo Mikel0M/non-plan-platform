@@ -38,7 +38,7 @@
 }
 
 
-body {
+#app {
     margin-top: 70px; /* Adjust based on your header height */
     display: grid;
     grid-template-areas:
@@ -51,6 +51,34 @@ body {
     color: #fff;
     vertical-align: middle;
 }
+
+#banner {
+    margin-top: 70px; /* Adjust based on your header height */
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "sidebar main";
+    grid-template-rows: 70px 1fr; /* Adjust the second row to take remaining space */
+    grid-template-columns: 200px auto;
+    height: 100vh;
+    background-color: var(--background);
+    color: #fff;
+    vertical-align: middle;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    
+}
+
+
+
 
 #navigationHeader {
     position: fixed;
@@ -353,6 +381,8 @@ buttonBlue:hover {
     row-gap: 20px;
     height: calc(100vh - 70px);
     margin-top: 0px; /* Adjust based on header height */
+    z-index: 10; /* Sidebar should be above other elements */
+    position: relative;
     
 }
 
@@ -617,6 +647,8 @@ input:focus, textarea:focus, select:focus {
 }
 
 #projectDetails > .mainPageContent {
+    z-index: 5; /* Ensure it doesn't overlap the sidebar */
+    position: relative;
     display:grid;
     padding: 20px 40px;
     gap: 30px;

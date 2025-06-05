@@ -23,5 +23,9 @@
     "three": "0.152.2",
     "uuid": "^11.0.3"
   },
+  "compilerOptions": {
+    "lib": ["dom", "esnext"]
+  },
+
   "description": ""
 }

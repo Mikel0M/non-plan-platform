@@ -17,12 +17,10 @@ export let currentProject: Project | null = null; // Ensure it's globally access
 
 export class ProjectsManager {
     list: Project[] = [];
-    ui: HTMLElement;
     currentProject: Project | null = null;
     projectsListContainer: HTMLElement | null = null; // To hold the #projectsList container
 
-    constructor(container: HTMLElement) {
-        this.ui = container;
+    constructor() {
         
     }
 
@@ -78,7 +76,7 @@ export class ProjectsManager {
             return null; // Prevent further execution
         }
 
-        this.ui.append(project.ui);
+
         this.list.push(project);
         return project;
     }

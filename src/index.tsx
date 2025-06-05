@@ -1,4 +1,8 @@
-import * as THREE from "three"
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
+import {Sidebar} from './react-components/Sidebar';
+import { ProjectsPage } from './react-components/ProjectsPage';
+import {Banner} from './react-components/Banner';
 import { IProject, status, userRole, phase, Project} from "./classes/Project"
 import { ProjectsManager } from "./classes/ProjectsManager"
 import { IUser, usersRole, access} from "./classes/User"
@@ -10,6 +14,19 @@ import { toDoManager } from "./classes/toDoManager"
 import { toDoManagerInstance } from './classes/toDoManager';
 import { usersManagerInstance, users } from "./classes/UsersManager";
 
+const rootElement = document.getElementById('app') as HTMLDivElement;
+const appRoot = ReactDOM.createRoot(rootElement)
+appRoot.render(
+    <>  
+        <Sidebar customStyle={{ zIndex: 1, position: "relative" }} />
+        <ProjectsPage customStyle={{ zIndex: 2, position: "relative" }} />
+        <Banner customStyle={{ zIndex: 3, position: "relative" }} />
+        
+        
+    </>
+);
+
+
 
 // Initialize toDoManagerInstance before using it
 const toDoListUI = document.getElementById("toDoListContainer") as HTMLElement;
@@ -19,12 +36,14 @@ const toDoListUI = document.getElementById("toDoListContainer") as HTMLElement;
 let currentLanguage = 'en';
 
 import { translations } from "./text/Language"
+import { Side } from 'three';
 
 export let currentProjectId: string | null = null;
 
 
 
-const projectsManager = new ProjectsManager(document.getElementById('projectsList')!);
+const projectsListElement = document.getElementById('projectsList') as HTMLElement;
+//const projectsManager = new ProjectsManager(projectsListElement);
 
 document.getElementById('newToDoForm')!.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -122,6 +141,7 @@ export function closeModal(id: string) {
 (window as any).closeModal = closeModal;
 
 const projectsListUI = document.getElementById("projectsList") as HTMLElement
+const projectsManager = new ProjectsManager(projectsListUI)
 
 export function setCurrentProjectId(projectId: string | null) {
     if (projectsManager?.currentProject?.id != null) {
@@ -296,21 +316,6 @@ if (newAccountBtn) {
 } else {
     console.warn("newAccountBtn was not found");
 }
-/*
-
-//Button Login temporary:
-const logINBtn = document.getElementById("logINBtn");
-
-if (logINBtn) {
-    logINBtn.addEventListener("click", (event) => {
-        event.preventDefault(); // Prevents the form from submitting
-        console.log("logINBtn clicked");
-        showModal("newAccountModal");
-    });
-} else {
-    console.warn("logINBtn was not found");
-}
-  */  
 
 
 //Add event listener to logIn button(Main Page)
