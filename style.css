@@ -464,7 +464,7 @@ header {
 }
 
 .projectCard:hover {
-    outline: 2px solid var(--complementary-200);
+    outline: 2px solid var(--primary);
 }
 
 .cardHeader {
@@ -473,8 +473,8 @@ header {
     padding: 15px 20px;
     align-items: center;
     justify-content: start;
-    border-bottom: 2px solid #3b3c3f;
-    height: 8px;
+    border-bottom: 2px solid var(--complementary-300);
+    min-height: 60px; /* Optional: set a reasonable min-height */
 }
 
 .cardContent {

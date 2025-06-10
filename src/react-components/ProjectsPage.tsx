@@ -1,8 +1,20 @@
 import * as React from 'react';
-import { IProject, userRole, status, phase } from '../classes/Project'; // Importing enums for user role, status, and phase
-import { ProjectsManager } from '../classes/ProjectsManager'; // Importing ProjectsManager class for project management
+import { IProject, userRole, status, phase, Project } from '../classes/Project';
+import { ProjectsManager } from '../classes/ProjectsManager';
+import { ProjectCard } from './ProjectCard';
+
 export function ProjectsPage({ customStyle }: { customStyle?: React.CSSProperties }) {
-    const projectsManager = new ProjectsManager(); // Creating an instance of ProjectsManager
+    // Only create ProjectsManager once
+    const [projectsManager] = React.useState(() => new ProjectsManager());
+    const [projects, setProjects] = React.useState<Project[]>(projectsManager.list)
+    projectsManager.onProjectCreated = () => {setProjects([...projectsManager.list])}
+    projectsManager.onProjectDeleted = () => {setProjects([...projectsManager.list])}
+
+    const projectCards = projects.map((project) => {
+        return <ProjectCard project={project} key= {project.id} />
+    })
+
+    React.useEffect(() => {console.log("Projects state updated", projects)}, [projects])
     
 
     const onNewProjectClick = () => {
@@ -48,7 +60,7 @@ export function ProjectsPage({ customStyle }: { customStyle?: React.CSSPropertie
 
         try {
             const project = projectsManager.newProject(ProjectData);
-            console.log(project);
+            setProjects([...projectsManager.list]); // Force update after new project
             projectForm.reset(); // Reset the form
             const modal = document.getElementById("newProjectModal")
             if (!(modal && modal instanceof HTMLDialogElement)) {return}
@@ -277,8 +289,8 @@ export function ProjectsPage({ customStyle }: { customStyle?: React.CSSPropertie
                     </button>
                 </div>
             </header>
-            <div id="projectsList" className="projectsList"></div>
+            <div id="projectsList" className="projectsList">{ projectCards}</div>
     </div>
 
-    );
+    )
 }

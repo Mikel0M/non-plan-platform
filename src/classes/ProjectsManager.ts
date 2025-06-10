@@ -1,26 +1,39 @@
 import * as THREE from "three"
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
-import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
-import { closeModal } from "..";
 import { IProject, Project, userRole, status, phase } from "./Project";
-import { toDoManagerInstance, toDos } from "./toDoManager"; // Import the toDoManager instance
-import { currentProjectId, setCurrentProjectId } from "../index"; // Import the global constant and setter function
+import { toDoManagerInstance } from "./toDoManager"; // Import the toDoManager instance
+import { setCurrentProjectId } from "../index"; // Import the global constant and setter function
 import { toDo, ItoDo } from "./toDo";
 import { IUser, User } from "./User";
 import { users } from "./UsersManager";
-import { color } from "three/examples/jsm/nodes/Nodes.js";
 
 export let currentProject: Project | null = null; // Ensure it's globally accessible
 
 export class ProjectsManager {
     list: Project[] = [];
+    onProjectCreated = (project: Project) => {}; // Callback for when a project is created
+    onProjectDeleted = () => {}; 
     currentProject: Project | null = null;
     projectsListContainer: HTMLElement | null = null; // To hold the #projectsList container
 
     constructor() {
+        const project = this.newProject({
+            name: "Default Project",
+            description: "This is a default project",
+            status: "Pending",
+            userRole: "Architect",
+            finishDate: "2023-12-31",
+            icon: "MM",                // <-- Add a default icon
+            color: "#e0e0e0",          // <-- Add a default color
+            location: "Unknown",       // <-- Add a default location
+            progress: 0,               // <-- Add a default progress
+            cost: 0,                   // <-- Add a default cost
+            startDate: "2023-01-01",   // <-- Add a default start date
+            phase: "Design",           // <-- Add a default phase if required
+            id: crypto.randomUUID?.() || Math.random().toString(36).slice(2), // <-- Add a default id if required
+        })
         
     }
 
@@ -33,13 +46,14 @@ export class ProjectsManager {
         const projectNames = this.list.map((project) => project.name);
         const nameInUse = projectNames.includes(data.name);
         const project = new Project(data);
+        this.onProjectCreated(project)
 
         if (nameInUse) {
             this.showErrorModalDupName(data.name);
             return null; // Prevent further execution
         }
 
-        project.ui.addEventListener("click", () => {
+        /*project.ui.addEventListener("click", () => {
             const projectsPage = document.getElementById("projectsPage");
             const detailsPage = document.getElementById("projectDetails");
             if (!projectsPage || !detailsPage) return;
@@ -51,6 +65,7 @@ export class ProjectsManager {
             setCurrentProjectId(project.id); // Update the global constant
             this.setDetailsPage(project);  // Set the details page with the selected project
             this.setProjectsPage(project);  // Set the details page with the selected project
+            
 
             // Call the method to filter and display to-dos by project ID
             console.log(`Calling filterAndDisplayToDosByProjectId with project ID: ${project.id}`); // Debugging statement
@@ -60,7 +75,7 @@ export class ProjectsManager {
             const toDoListUI = toDoManagerInstance.getToDoListUI();
             console.log("toDoListUI content:", toDoListUI.innerHTML); // Debugging statement
         });
-
+        */
         const newtoDoModalBtn = document.getElementById("newToDoBtn");
         const modaltoDo = document.getElementById("newToDoModal") as HTMLDialogElement;
         if (newtoDoModalBtn && modaltoDo) {
@@ -326,8 +341,8 @@ export class ProjectsManager {
         setInputValue("projectNameInput", project.name);
         setInputValue("projectLocationInput", project.location);
         setInputValue("projectDescriptionInput", project.description);
-        setInputValue("projectProgressInput", project.progress);
         setInputValue("projectCostInput", project.cost);
+        setInputValue("projectProgressInput", project.progress);
         setInputValue("projectStatusInput", project.status);
         setInputValue("projectRoleInput", project.userRole);
         setInputValue("projectStartPDInput", project.startDate);
@@ -514,7 +529,7 @@ export class ProjectsManager {
         project.startDate = getInputValue("projectStartPDInput");
         project.finishDate = getInputValue("projectFinishPDInput");
 
-        this.updateProjectUI(project);
+        //this.updateProjectUI(project);
         this.updateProjectCards(project);
 
     }
@@ -562,6 +577,7 @@ export class ProjectsManager {
 
     }
 
+    
     updateProjectUI(project: Project) {
         const detailsPage = document.getElementById("projectDetails");
         if (!detailsPage) return;
@@ -638,9 +654,12 @@ export class ProjectsManager {
 
     deleteProject(id: string) {
         const project = this.getProject(id);
-        if (!project) return;
-        project.ui.remove();
-        this.list = this.list.filter((project) => project.id !== id);
+        if (!project) { return }
+        const remaining = this.list.filter((project) => {
+            return project.id !== id;
+        })
+        this.list = remaining
+        this.onProjectDeleted();
     }
 
     getProjectbyName(name: string) {

@@ -106,42 +106,9 @@ export class Project implements IProject {
         this.icon = sliceTwoEachWord(this.name);
         this.color = getRandomColor();
         
-        this.setUI();
     }
 
-    setUI() {
-        if (this.ui) { return; }
-        this.ui = document.createElement("div");
-        this.ui.className = "projectCard";
-        this.ui.innerHTML = `
-        <div class="cardHeader" style="height: 35px;">
-            <p style="font-size: 20px; display: flex; align-items: center; background-color: ${this.color}; padding: 10px; width: 40px; height: 40px; justify-content: center; border-radius: 8px; aspect-ratio: 1;">
-                ${this.icon}
-            </p>
-            <div>
-                <h5>${this.name}</h5>
-                <p>${this.description}</p>
-            </div>
-        </div>
-        <div class="cardContent">
-            <div class="cardProperty">
-                <p style="color: #969696;">Status</p>
-                <p>${this.status}</p>
-            </div>
-            <div class="cardProperty">
-                <p style="color: #969696;">User Role</p>
-                <p>${this.userRole}</p>
-            </div>
-            <div class="cardProperty">
-                <p style="color: #969696;">Cost</p>
-                <p>${this.cost}$</p>    
-            </div>
-            <div class="cardProperty">
-                <p style="color: #969696;">Progress</p>
-                <p>${this.progress}%</p>    
-            </div>     
-        </div>`;
-    }
+    
 
     updateUI() {
         if (!this.ui) {
