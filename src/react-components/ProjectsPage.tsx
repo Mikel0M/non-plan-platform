@@ -1,40 +1,49 @@
 import * as React from 'react';
+import * as Router from 'react-router-dom';
 import { IProject, userRole, status, phase, Project } from '../classes/Project';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { ProjectCard } from './ProjectCard';
 
-export function ProjectsPage({ customStyle }: { customStyle?: React.CSSProperties }) {
-    // Only create ProjectsManager once
-    const [projectsManager] = React.useState(() => new ProjectsManager());
-    const [projects, setProjects] = React.useState<Project[]>(projectsManager.list)
-    projectsManager.onProjectCreated = () => {setProjects([...projectsManager.list])}
-    projectsManager.onProjectDeleted = () => {setProjects([...projectsManager.list])}
+interface Props {
+    projectManager: ProjectsManager;
+    customStyle?: React.CSSProperties;
+}
+
+export function ProjectsPage({ projectManager, customStyle }: Props) {
+    const [projects, setProjects] = React.useState<Project[]>(projectManager.list)
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [isErrorModalOpen, setIsErrorModalOpen] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
+    projectManager.onProjectCreated = () => { setProjects([...projectManager.list]) }
+    projectManager.onProjectDeleted = () => { setProjects([...projectManager.list]) }
 
     const projectCards = projects.map((project) => {
-        return <ProjectCard project={project} key= {project.id} />
+        return (
+            <Router.Link to={`/project/${project.id}`} key={project.id} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div>
+                    <ProjectCard project={project} />
+                </div>
+            </Router.Link>
+        )
     })
 
     React.useEffect(() => {console.log("Projects state updated", projects)}, [projects])
     
 
     const onNewProjectClick = () => {
-        const modal = document.getElementById("newProjectModal")
-        if (!(modal && modal instanceof HTMLDialogElement)) {
-            return;
-        }
-        modal.showModal(); // Show the modal dialog
+        setIsModalOpen(true);
     };
 
     const onExportClick = () => {
-        projectsManager.exportToJSON()
+        projectManager.exportToJSON()
     }
     
 
     const onImportClick = () => {
-        projectsManager.importFromJSON()
+        projectManager.importFromJSON()
     }
-    
-    
+
+
     const onFormSubmit = (e: React.FormEvent) => {
         const projectForm = document.getElementById("newProjectForm");
         if (!(projectForm && projectForm instanceof HTMLFormElement)) {
@@ -59,225 +68,225 @@ export function ProjectsPage({ customStyle }: { customStyle?: React.CSSPropertie
         };
 
         try {
-            const project = projectsManager.newProject(ProjectData);
-            setProjects([...projectsManager.list]); // Force update after new project
+            const project = projectManager.newProject(ProjectData);
+            setProjects([...projectManager.list]); // Force update after new project
             projectForm.reset(); // Reset the form
-            const modal = document.getElementById("newProjectModal")
-            if (!(modal && modal instanceof HTMLDialogElement)) {return}
-            modal.close(); // Show the modal dialog
+            setIsModalOpen(false);
         } catch (error) {
-            alert(error);
+            setErrorMessage(error.message);
+            setIsErrorModalOpen(true);
         }
     };
 
     return (
-        <div className="page" id="projectsPage" style={{ display: "flex", ...customStyle }}>
-            <dialog id="newProjectModal">
-                <form onSubmit={(e) => {onFormSubmit(e)}} className="userForm" id="newProjectForm">
-                <h2>New Project</h2>
-                <div className="userCard">
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">apartment</span>Name
-                    </label>
-                    <input
-                        name="name"
-                        type="text"
-                        placeholder="What's the name of your project?"
-                    />
-                    <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-                        TIP give it a short name
-                    </label>
+        <div className="page" id="projectsPage" style={{ display: "flex", padding: 0, margin: 0, marginTop: "20px", marginLeft: "0px", marginRight: "0px", ...customStyle }}>
+            {isModalOpen && (
+                <dialog id="newProjectModal" open>
+                    <form onSubmit={(e) => {onFormSubmit(e)}} className="userForm" id="newProjectForm" style={{width: 500, maxWidth: '95vw', minWidth: 350, boxSizing: 'border-box'}}>
+                    <h2>New Project</h2>
+                    <div className="userCard">
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">apartment</span>Name
+                        </label>
+                        <input
+                            name="name"
+                            type="text"
+                            placeholder="What's the name of your project?"
+                        />
+                        <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
+                            TIP give it a short name
+                        </label>
+                        </div>
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">subject</span>Description
+                        </label>
+                        <textarea
+                            name="description"
+                            cols={30}
+                            rows={5}
+                            placeholder="Give your project a nice description!"
+                            defaultValue={""}
+                        />
+                        </div>
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">pin_drop</span>Location
+                        </label>
+                        <input
+                            name="location"
+                            type="text"
+                            placeholder="Where is your project located?"
+                        />
+                        <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }} />
+                        </div>
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">paid</span>Estimated cost
+                        </label>
+                        <input
+                            name="cost"
+                            type="number"
+                            placeholder="What's the estimated cost of the project?"
+                        />
+                        <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
+                            Estimated cost of the project
+                        </label>
+                        </div>
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">percent</span>Estimated
+                            Progress
+                        </label>
+                        <input
+                            name="progress"
+                            type="number"
+                            placeholder="What's the estimated completion progress of the project?"
+                        />
+                        <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
+                            Estimated progress percentage of the project
+                        </label>
+                        </div>
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">account_circle</span>Role
+                        </label>
+                        <select name="userRole">
+                            <option>not defined</option>
+                            <option>Architect</option>
+                            <option>Engineer</option>
+                            <option>Developer</option>
+                        </select>
+                        </div>
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">not_listed_location</span>
+                            Status
+                        </label>
+                        <select name="status">
+                            <option>Pending</option>
+                            <option>Active</option>
+                            <option>Finished</option>
+                        </select>
+                        </div>
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">calendar_view_week</span>
+                            Design Phase
+                        </label>
+                        <select name="phase">
+                            <option>Design</option>
+                            <option>Construction project</option>
+                            <option>Execution</option>
+                            <option>Construction</option>
+                        </select>
+                        </div>
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">calendar_today</span>Start
+                            Date
+                        </label>
+                        <input name="startDate" type="date" />
+                        </div>
+                        <div className="formFieldContainer">
+                        <label>
+                            <span className="material-icons-round">calendar_month</span>Finish
+                            Date
+                        </label>
+                        <input name="finishDate" type="date" />
+                        </div>
                     </div>
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">subject</span>Description
-                    </label>
-                    <textarea
-                        name="description"
-                        cols={30}
-                        rows={5}
-                        placeholder="Give your project a nice description!"
-                        defaultValue={""}
-                    />
+                    <div className="cancelAccept">
+                        <button
+                            type="button"
+                            className="cancelButton"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
+                        <button type="submit" className="acceptButton">
+                        Accept
+                        </button>
                     </div>
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">pin_drop</span>Location
-                    </label>
-                    <input
-                        name="location"
-                        type="text"
-                        placeholder="Where is your project located?"
-                    />
-                    <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }} />
-                    </div>
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">paid</span>Estimated cost
-                    </label>
-                    <input
-                        name="cost"
-                        type="number"
-                        placeholder="What's the estimated cost of the project?"
-                    />
-                    <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-                        Estimated cost of the project
-                    </label>
-                    </div>
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">percent</span>Estimated
-                        Progress
-                    </label>
-                    <input
-                        name="progress"
-                        type="number"
-                        placeholder="What's the estimated completion progress of the project?"
-                    />
-                    <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-                        Estimated progress percentage of the project
-                    </label>
-                    </div>
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">account_circle</span>Role
-                    </label>
-                    <select name="userRole">
-                        <option>not defined</option>
-                        <option>Architect</option>
-                        <option>Engineer</option>
-                        <option>Developer</option>
-                    </select>
-                    </div>
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">not_listed_location</span>
-                        Status
-                    </label>
-                    <select name="status">
-                        <option>Pending</option>
-                        <option>Active</option>
-                        <option>Finished</option>
-                    </select>
-                    </div>
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">calendar_view_week</span>
-                        Design Phase
-                    </label>
-                    <select name="phase">
-                        <option>Design</option>
-                        <option>Construction project</option>
-                        <option>Execution</option>
-                        <option>Construction</option>
-                    </select>
-                    </div>
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">calendar_today</span>Start
-                        Date
-                    </label>
-                    <input name="startDate" type="date" />
-                    </div>
-                    <div className="formFieldContainer">
-                    <label>
-                        <span className="material-icons-round">calendar_month</span>Finish
-                        Date
-                    </label>
-                    <input name="finishDate" type="date" />
-                    </div>
-                </div>
-                <div className="cancelAccept">
-                    <button
-                        type="button"
-                        className="cancelButton"
-                        onClick={() => {
-                            const modal = document.getElementById("newProjectModal");
-                            if (modal && modal instanceof HTMLDialogElement) {
-                                modal.close();
-                            }
+                    </form>
+                </dialog>
+            )}
+            {isErrorModalOpen && (
+                <dialog id="newProjectErrorModal" open>
+                    <form
+                    className="userForm"
+                    id="newProjectErrorForm"
+                    method="dialog"
+                    style={{ boxSizing: "border-box"}}
+                    >
+                    <h2
+                        style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        fontSize: 20,
+                        padding: 10,
+                        margin: 0
                         }}
                     >
-                        Cancel
-                    </button>
-                    <button type="submit" className="acceptButton">
-                    Accept
-                    </button>
-                </div>
-                </form>
-            </dialog>
-            <dialog id="newProjectErrorModal">
-                <form
-                className="userForm"
-                id="newProjectErrorForm"
-                method="dialog"
-                style={{ boxSizing: "border-box" }}
-                >
-                <h2
-                    style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontSize: 20,
-                    padding: 10,
-                    margin: 0
-                    }}
-                >
-                    <span
-                    className="material-icons-round"
-                    style={{ fontSize: 20, verticalAlign: "middle" }}
+                        <span
+                        className="material-icons-round"
+                        style={{ fontSize: 20, verticalAlign: "middle" }}
+                        >
+                        warning
+                        </span>
+                        Error
+                    </h2>
+                    <div
+                        style={{
+                        borderTop: "2px solid var(--complementary200)",
+                        marginTop: 8,
+                        marginBottom: 16
+                        }}
+                    />
+                    <p
+                        id="errorMessage"
+                        style={{ display: "flex", justifyContent: "center" }}
                     >
-                    warning
-                    </span>
-                    Error
-                </h2>
-                <div
-                    style={{
-                    borderTop: "2px solid var(--complementary200)",
-                    marginTop: 8,
-                    marginBottom: 16
-                    }}
-                />
-                <p
-                    id="errorMessage"
-                    style={{ display: "flex", justifyContent: "center" }}
-                >
-                    Error message placeholder
-                </p>
-                <div
-                    style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}
-                >
-                    <button
-                    type="button"
-                    className="cancelButton"
-                    style={{ marginRight: 10, height: 30 }}
-                    onClick={() => {
-                        const modal = document.getElementById("newProjectErrorModal");
-                        if (modal && modal instanceof HTMLDialogElement) {
-                            modal.close();
-                        }
-                    }}
+                        {errorMessage}
+                    </p>
+                    <div
+                        style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}
                     >
-                        OK
-                    </button>
-                </div>
-                </form>
-            </dialog>
+                        <button
+                        type="button"
+                        className="cancelButton"
+                        style={{ marginRight: 10, height: 30 }}
+                        onClick={() => setIsErrorModalOpen(false)}
+                        >
+                            OK
+                        </button>
+                    </div>
+                    </form>
+                </dialog>
+            )}
             <header
                 style={{
-                    display: "flex", // Use flexbox for layout
-                    justifyContent: "space-between", // Space between "Projects" and buttons
-                    alignItems: "center", // Vertically align items
-                    padding: "20px 20px", // Add padding for spacing                    gap: "50px", // Add gap between items
-                    marginTop: "0px", // Add margin to the top
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    zIndex: 100,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "20px 20px 0 0px",
+                    marginTop: "70px",
+                    gap: "50px",
+                    background: "var(--secondary100)",
                 }}
             >
                 {/* Left-aligned text */}
-                <h2 style={{ margin: 0, marginRight: "auto" }}>Projects</h2>
+                <h2 style={{ marginRight: "auto",marginLeft: "250px" }}>Projects</h2>
 
                 {/* Right-aligned buttons */}
-                <div style={{ display: "flex", gap: "10px" }}>
+                <div style={{ display: "flex", gap: "10px",  }}>
                     <button id="importProjectsBtn" className="buttonTertiary" onClick={onImportClick}>
                         <span className="material-icons-round">file_download</span>
                     </button>
@@ -289,7 +298,7 @@ export function ProjectsPage({ customStyle }: { customStyle?: React.CSSPropertie
                     </button>
                 </div>
             </header>
-            <div id="projectsList" className="projectsList">{ projectCards}</div>
+            <div id="projectsList" className="projectsList" style={{marginTop: "70px", marginLeft: 0}}>{ projectCards}</div>
     </div>
 
     )

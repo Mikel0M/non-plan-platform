@@ -1,10 +1,10 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
+import * as Router from 'react-router-dom';
 import {Sidebar} from './react-components/Sidebar';
 import { ProjectsPage } from './react-components/ProjectsPage';
 import {Banner} from './react-components/Banner';
 import { IProject, status, userRole, phase, Project} from "./classes/Project"
-import { ProjectsManager } from "./classes/ProjectsManager"
 import { IUser, usersRole, access} from "./classes/User"
 import { UsersManager } from "./classes/UsersManager"
 import { ICompany} from "./classes/Companies"
@@ -13,16 +13,28 @@ import { ItoDo, toDoPriority, toDoStatus, toDoPercentage } from "./classes/toDo"
 import { toDoManager } from "./classes/toDoManager"
 import { toDoManagerInstance } from './classes/toDoManager';
 import { usersManagerInstance, users } from "./classes/UsersManager";
+import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
+import { ProjectsManager } from './classes/ProjectsManager';
+
+const projectsManager = new ProjectsManager();
+
 
 const rootElement = document.getElementById('app') as HTMLDivElement;
 const appRoot = ReactDOM.createRoot(rootElement)
 appRoot.render(
     <>  
-        <Sidebar customStyle={{ zIndex: 1, position: "relative" }} />
-        <ProjectsPage customStyle={{ zIndex: 2, position: "relative" }} />
-        <Banner customStyle={{ zIndex: 3, position: "relative" }} />
-        
-        
+        <Router.BrowserRouter>
+            <div style={{ display: "flex", width: "100vw" }}>
+                <Sidebar customStyle={{ zIndex: 1, position: "fixed" }} />
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", marginLeft: "250px" }}>
+                    <Banner customStyle={{ zIndex: 3, position: "relative" }} />
+                    <Router.Routes>
+                        <Router.Route path="/" element={<ProjectsPage projectManager={projectsManager} customStyle={{ zIndex: 2, position: "relative" }} />}></Router.Route>
+                        <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} />} />
+                    </Router.Routes>
+                </div>
+            </div>
+        </Router.BrowserRouter>
     </>
 );
 
@@ -141,7 +153,7 @@ export function closeModal(id: string) {
 (window as any).closeModal = closeModal;
 
 const projectsListUI = document.getElementById("projectsList") as HTMLElement
-const projectsManager = new ProjectsManager(projectsListUI)
+
 
 export function setCurrentProjectId(projectId: string | null) {
     if (projectsManager?.currentProject?.id != null) {
@@ -655,155 +667,6 @@ function openEditToDoModal(toDoData: ItoDo) {
 }
 
 
-// Call the function to populate the select elements when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    populateUserSelects();
-});
-
-// Update the user count and populate the select elements after adding a new user
-const userForm = document.getElementById("newUserForm");
-if (userForm && userForm instanceof HTMLFormElement) {
-    userForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const formData = new FormData(userForm);
-        const UserData: IUser = {
-            name: formData.get("name") as string,
-            surname: formData.get("surname") as string,
-            icon: formData.get("icon") as string,
-            color: formData.get("color") as string,
-            email: formData.get("email") as string,
-            phone: formData.get("phone") as string,
-            role: formData.get("usersRole") as usersRole,
-            access: formData.get("access") as access,
-            company: formData.get("company") as string
-        };
-        const user = usersManager.newUser(UserData);
-        userForm.reset();
-        if (usersManager.list.length === 0) {
-            console.log("No users found.");
-        } else {
-            console.log("List of Users:");
-            usersManager.list.forEach((user, index) => {
-                console.log(
-                    `${index + 1}. Name: ${user.name} ${user.surname}, Email: ${user.email}, Role: ${user.role}, Access: ${user.access}`
-                );
-            });
-        }
-        updateUserCount(); // Update the user count after adding a new user
-        populateUserSelects(); // Populate the select elements with the updated user list
-        closeModal("newUserModal");
-    });
-} else {
-    console.warn("The user form was not found. Check the ID!");
-}
-
-
-
-/**
- * Handles the submission of the "New Company" form:
- * - Prevents default form submission behavior.
- * - Extracts form input values using FormData.
- * - Constructs an IProject object with the provided data.
- * - Creates a new project instance using ProjectsManager.
- * - Resets the form and closes the modal dialog for a clean user experience.
- */
-const companyListUI = document.getElementById("companyList") as HTMLElement
-const companyManager = new CompanyManager(companyListUI)
-
-const companyForm = document.getElementById("newCompanyForm")
-if (companyForm && companyForm instanceof HTMLFormElement) {
-    companyForm.addEventListener("submit", (e) => {
-        e.preventDefault()
-        
-        const formData = new FormData(companyForm)
-        const CompanyData: ICompany = {
-            cName: formData.get("cName") as string,
-            cAddress: formData.get("cAddress") as string,
-            cEmail: formData.get("cEmail") as string,
-            cPhone: formData.get("cPhone") as string
-        }
-        console.log(CompanyData)
-        console.log(companyManager)
-        const company = companyManager.newCompany(CompanyData)
-        companyForm.reset()
-        if (companyManager.list.length === 0) {
-            console.log("No companies found.");
-        } else {
-            console.log("List of Companies:");
-            companyManager.list.forEach((company, index) => {
-                console.log(
-                    `${index + 1}. cName: ${company.cName}, cAddress: ${company.cAddress}, cEmail: ${company.cEmail}, cPhone: ${company.cPhone}`
-                );
-            });
-        }
-        closeModal("newCompanyModal")
-    })
-} else {
-    console.warn("The Company form was not found. Check the ID!")
-}
-
-const exportProjectsBtn = document.getElementById("exportProjectsBtn")
-if (exportProjectsBtn) {
-    exportProjectsBtn.addEventListener("click", () => {
-        projectsManager.exportToJSON()
-    })
-}
-
-const importProjectsBtn = document.getElementById("importProjectsBtn")
-if (importProjectsBtn) {
-    importProjectsBtn.addEventListener("click", () => {
-        projectsManager.importFromJSON()
-    })
-}
-
-
-// Show/Hide Menu
-document.getElementById("languageButton")!.addEventListener("click", () => {
-    const menu = document.getElementById("languageMenu")!;
-    menu.classList.toggle("hidden");
-    if (!menu.classList.contains("hidden")) {
-        updateMenuText(currentLanguage);
-    }
-});
-
-// Change Language
-document.querySelectorAll("#languageMenu li").forEach((item) => {
-    item.addEventListener("click", (event) => {
-        if (event.target instanceof HTMLElement) {
-            const lang = event.target.getAttribute("data-lang");
-            if (lang) {
-                currentLanguage = lang;
-                updateLanguage(currentLanguage);
-                const menu = document.getElementById("languageMenu");
-                if (menu) {
-                    menu.classList.add("hidden");
-                }
-            }
-        }
-    });
-});
-
-// Update Language
-function updateLanguage(language: string) {
-    document.querySelectorAll("[data-lang]").forEach((element) => {
-        const key = element.getAttribute("data-lang");
-        if (key && translations[language] && translations[language][key]) {
-            element.textContent = translations[language][key];
-        }
-    });
-}
-
-// Update Menu Text (language switcher)
-function updateMenuText(language: string) {
-    const menuItems = document.querySelectorAll("#languageMenu li");
-    menuItems.forEach((item) => {
-        const lang = item.getAttribute("data-lang");
-        if (lang && translations[language]) {
-            item.textContent = translations[language][lang];
-        }
-    });
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const showMoreButton = document.getElementById('showMoreButton');
     const showLessButton = document.getElementById('showLessButton');
@@ -823,10 +686,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (showLessButton) showLessButton.style.display = 'none';
         if (showMoreButton) showMoreButton.style.display = 'inline-block';
-    });
+    });});
 
-
-});
 
 // Function to format the date as dd.mm.yy
 function formatDate(date: Date): string {
@@ -956,8 +817,7 @@ function exportData() {
 const exportedData = exportData();
 console.log("Exported Data:", exportedData);
 
-// Open Change User Modal
-export function openChangeUserModal(userId: string) {
+function openChangeUserModal(userId: string) {
     console.log(`openChangeUserModal called for userId: ${userId}`);
 
     // Find the user in the global users array
@@ -1014,7 +874,6 @@ export function openChangeUserModal(userId: string) {
 }
 
 
-
 // Update the user's UI
 usersManagerInstance.setUserChangeButton(); // Ensure the change button is set
 
@@ -1022,10 +881,3 @@ usersManagerInstance.setUserChangeButton(); // Ensure the change button is set
 
 // Debugging: Print the updated users array
 console.log("Updated users array:", users);
-
-
-
-
-
-
-

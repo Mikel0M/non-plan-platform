@@ -382,7 +382,7 @@ buttonBlue:hover {
     height: calc(100vh - 70px);
     margin-top: 0px; /* Adjust based on header height */
     z-index: 10; /* Sidebar should be above other elements */
-    position: relative;
+    position: fixed;
     
 }
 
@@ -394,6 +394,8 @@ buttonBlue:hover {
     display: flex;
     flex-direction: column;
     row-gap: 10px;
+    color: white !important;
+    text-decoration: none;
 
 }
 
@@ -410,6 +412,8 @@ buttonBlue:hover {
     column-gap: 10px;
     height: 10px;
     border: 1px solid var(--primary);
+    color: white !important;
+    text-decoration: none;
 }
 
 /* Hover effect */
@@ -428,7 +432,8 @@ buttonBlue:hover {
     display: flex;
     align-content: center;
     height: 20px;
-
+    color: white !important;
+    text-decoration: none;
 }
 
 #nav-buttons li:hover {

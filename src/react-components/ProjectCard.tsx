@@ -22,7 +22,7 @@ export function ProjectCard(props: Props) {
                         fontSize: 20,
                         display: "flex",
                         alignItems: "center",
-                        backgroundColor: props.project.color,
+                        backgroundColor: props.project.color, // Pass as string, not object
                         padding: 10,
                         width: 40,
                         height: 40,

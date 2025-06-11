@@ -53,29 +53,6 @@ export class ProjectsManager {
             return null; // Prevent further execution
         }
 
-        /*project.ui.addEventListener("click", () => {
-            const projectsPage = document.getElementById("projectsPage");
-            const detailsPage = document.getElementById("projectDetails");
-            if (!projectsPage || !detailsPage) return;
-
-            projectsPage.style.display = "none";
-            detailsPage.style.display = "flex";
-
-            this.currentProject = project;
-            setCurrentProjectId(project.id); // Update the global constant
-            this.setDetailsPage(project);  // Set the details page with the selected project
-            this.setProjectsPage(project);  // Set the details page with the selected project
-            
-
-            // Call the method to filter and display to-dos by project ID
-            console.log(`Calling filterAndDisplayToDosByProjectId with project ID: ${project.id}`); // Debugging statement
-            this.filterAndDisplayToDosByProjectId(project.id);
-
-            // Access the toDoListUI element
-            const toDoListUI = toDoManagerInstance.getToDoListUI();
-            console.log("toDoListUI content:", toDoListUI.innerHTML); // Debugging statement
-        });
-        */
         const newtoDoModalBtn = document.getElementById("newToDoBtn");
         const modaltoDo = document.getElementById("newToDoModal") as HTMLDialogElement;
         if (newtoDoModalBtn && modaltoDo) {
@@ -185,7 +162,7 @@ export class ProjectsManager {
             }
         // THREE JS
         // ThreeJS viewer
-        const scene = new THREE.Scene()
+       /*const scene = new THREE.Scene()
 
         const viewerContainer = document.getElementById("viewerContainer") as HTMLDivElement
        
@@ -290,7 +267,7 @@ export class ProjectsManager {
 
         scene.add(directionalLight,ambientLight, spotLight)
 
-        
+        */
         
         //OBJ LOADER 
         /*const objLoader = new OBJLoader()
@@ -305,14 +282,14 @@ export class ProjectsManager {
                 scene.add(mesh)
             })
             })
-        */
+        
 
         //GLTF LOADER
         const gltfLoader = new GLTFLoader()
         gltfLoader.load("/assets/fossil/scene.gltf", (gltf) => {
             scene.add(gltf.scene)
         })
-        
+        */
 
         
     
