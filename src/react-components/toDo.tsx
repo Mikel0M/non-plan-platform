@@ -1,238 +1,29 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import { ProjectsManager } from '../classes/ProjectsManager';
+import { toDoManager } from '../classes/toDoManager';
 import * as Router from 'react-router-dom';
+
+
 
 interface Props {
     projectsManager: ProjectsManager
+    toDoManager:toDoManager
 }
 
-export function ProjectDetailsPage(props: Props) {
+export function ToDoPage(props: Props) {
     // Helper to close modals by id
     const closeModal = (id: string) => {
         const modal = document.getElementById(id) as HTMLDialogElement | null;
         if (modal) modal.close();
     };
-    const routeParams = Router.useParams<{ id: string }>();
-    console.log("ProjectDetailsPage routeParams:", routeParams.id);
     const { id } = useParams();
     // Ensure id is a string before using it
-    const [projectState, setProjectState] = React.useState(id ? props.projectsManager.getProject(id) : undefined);
-    React.useEffect(() => {
-      props.projectsManager.setChangeButton();
-      setProjectState(id ? props.projectsManager.getProject(id) : undefined);
-    }, [props.projectsManager, id]);
-    if (!projectState) {
-      return <div>Project not found.</div>;
-    }
-
-    // Edit modal state for controlled fields
-    const [editName, setEditName] = React.useState("");
-    const [editDescription, setEditDescription] = React.useState("");
-    const [editLocation, setEditLocation] = React.useState("");
-    const [editProgress, setEditProgress] = React.useState("");
-    const [editCost, setEditCost] = React.useState("");
-    const [editUserRole, setEditUserRole] = React.useState("");
-    const [editStatus, setEditStatus] = React.useState("");
-    const [editPhase, setEditPhase] = React.useState("");
-    const [editStartDate, setEditStartDate] = React.useState("");
-    const [editFinishDate, setEditFinishDate] = React.useState("");
-
-    // When opening the modal, set edit states
-    const openEditModal = () => {
-      setEditName(projectState.name || "");
-      setEditDescription(projectState.description || "");
-      setEditLocation(projectState.location || "");
-      setEditProgress(projectState.progress?.toString() || "");
-      setEditCost(projectState.cost?.toString() || "");
-      setEditUserRole(projectState.userRole || "");
-      setEditStatus(projectState.status || "");
-      setEditPhase(projectState.phase || "");
-      setEditStartDate(projectState.startDate || "");
-      setEditFinishDate(projectState.finishDate || "");
-      const modal = document.getElementById('editProjectModal') as HTMLDialogElement | null;
-      if (modal) modal.showModal();
-    };
+    const project = id ? props.projectsManager.getProject(id) : undefined;
 
     return (
-    <div className="page" id="projectDetails" style={{ display: "flex" }}>
-        <dialog id="DeleteProjectModal">
-            <form className="userForm" id="DeleteNewUserForm">
-                <h2>Are you sure you want to delete the project?</h2>
-                <div className="cancelAccept">
-                    <button
-                        type="button"
-                        className="cancelButton"
-                        onClick={() => closeModal('DeleteProjectModal')}>Cancel
-                    </button>
-                    <button type="button" className="acceptButton" id="ConfirmDeleteButton">Delete</button>
-                </div>
-            </form>
-        </dialog>
-        <dialog id="editProjectModal">
-            <form className="userForm" id="editProjectForm" onSubmit={e => {
-                e.preventDefault();
-                if (projectState) {
-                  projectState.name = editName;
-                  projectState.description = editDescription;
-                  projectState.location = editLocation;
-                  projectState.progress = parseFloat(editProgress) || 0;
-                  projectState.cost = parseFloat(editCost) || 0;
-                  projectState.userRole = editUserRole as any;
-                  projectState.status = editStatus as any;
-                  projectState.phase = editPhase as any;
-                  projectState.startDate = editStartDate;
-                  projectState.finishDate = editFinishDate;
-                  setProjectState(projectState); // trigger re-render
-                  // Create a new instance to trigger React re-render
-                  const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), projectState);
-                  setProjectState(updated);
-                  if (props.projectsManager.updateProjectCards) {
-                    props.projectsManager.updateProjectCards(projectState);
-                  }
-                }
-                closeModal('editProjectModal');
-            }}>
-                <h2>Edit Project</h2>
-                <div className="userCard">
-                    <div className="formFieldContainer">
-                        <label>
-                            <span className="material-icons-round">apartment</span>Name
-          </label>
-          <input name="name" type="text" id="projectNameInput" value={editName} onChange={e => setEditName(e.target.value)} />
-          <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-            TIP give it a short name
-          </label>
-        </div>
-        <div className="formFieldContainer">
-          <label>
-            <span className="material-icons-round">subject</span>Description
-          </label>
-          <textarea
-            name="description"
-            cols={30}
-            rows={5}
-            placeholder="Give your project a nice description!"
-            id="projectDescriptionInput"
-            value={editDescription}
-            onChange={e => setEditDescription(e.target.value)}
-          />
-        </div>
-        <div className="formFieldContainer">
-          <label>
-            <span className="material-icons-round">pin_drop</span>Location
-          </label>
-          <input
-            name="location"
-            type="text"
-            placeholder="Where is your project located?"
-            id="projectLocationInput"
-            value={editLocation}
-            onChange={e => setEditLocation(e.target.value)}
-          />
-          <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }} />
-        </div>
-        <div className="formFieldContainer">
-          <label>
-            <span className="material-icons-round">percent</span>Estimated
-            progress
-          </label>
-          <input
-            name="progress"
-            type="number"
-            placeholder="What's the estimated progress of the project?"
-            id="projectProgressInput"
-            value={editProgress}
-            onChange={e => setEditProgress(e.target.value)}
-          />
-          <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-            Estimated cost of the project
-          </label>
-        </div>
-        <div className="formFieldContainer">
-          <label>
-            <span className="material-icons-round">paid</span>Estimated cost
-          </label>
-          <input
-            name="cost"
-            type="number"
-            placeholder="What's the estimated cost of the project?"
-            id="projectCostInput"
-            value={editCost}
-            onChange={e => setEditCost(e.target.value)}
-          />
-          <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-            Estimated cost of the project
-          </label>
-        </div>
-        <div className="formFieldContainer">
-          <label>
-            <span className="material-icons-round">account_circle</span>Role
-          </label>
-          <select name="userRole" id="projectRoleInput" value={editUserRole} onChange={e => setEditUserRole(e.target.value)}>
-            <option>not defined</option>
-            <option>Architect</option>
-            <option>Engineer</option>
-            <option>Developer</option>
-          </select>
-        </div>
-        <div className="formFieldContainer">
-          <label>
-            <span className="material-icons-round">not_listed_location</span>
-            Status
-          </label>
-          <select name="status" id="projectStatusInput" value={editStatus} onChange={e => setEditStatus(e.target.value)}>
-            <option>Pending</option>
-            <option>Active</option>
-            <option>Finished</option>
-          </select>
-        </div>
-        <div className="formFieldContainer">
-          <label>
-            <span className="material-icons-round">calendar_view_week</span>
-            Design Phase
-          </label>
-          <select name="phase" id="projectPhaseInput" value={editPhase} onChange={e => setEditPhase(e.target.value)}>
-            <option>Design</option>
-            <option>Construction project</option>
-            <option>Execution</option>
-            <option>Construction</option>
-          </select>
-        </div>
-        <div className="formFieldContainer">
-          <label>
-            <span className="material-icons-round">calendar_today</span>Start
-            Date
-          </label>
-          <input name="startDate" type="date" id="projectStartPDInput" value={editStartDate} onChange={e => setEditStartDate(e.target.value)} />
-        </div>
-        <div className="formFieldContainer">
-          <label>
-            <span className="material-icons-round">calendar_month</span>Finish
-            Date
-          </label>
-          <input name="finishDate" type="date" id="projectFinishPDInput" value={editFinishDate} onChange={e => setEditFinishDate(e.target.value)} />
-        </div>
-      </div>
-      <div className="cancelAccept">
-        <button
-          type="button"
-          className="cancelButton"
-          onClick={() => closeModal('editProjectModal')}
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="acceptButton"
-          id="changeProjectButton"
-        >
-          Change
-        </button>
-      </div>
-    </form>
-  </dialog>
-  <dialog id="newToDoModal">
+    <div className="page" id="toDoPage" style={{ display: "flex" }}>
+        <dialog id="newToDoModal">
     <form className="toDoForm" id="newToDoForm">
       <input type="hidden" name="toDoProject" id="toDoProject" />
       <div className="userCard">
@@ -655,99 +446,8 @@ export function ProjectDetailsPage(props: Props) {
     <div style={{ display: "flex", flexDirection: "column", rowGap: 10 }}>
       <div className="dashboardCard">
         <div className="upperDashboard">
-          <p
-            id="iconPD"
-            style={{
-              fontSize: "var(--fontSizeBig)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: projectState.color,
-              padding: 5,
-              borderRadius: "50%",
-              aspectRatio: 1,
-              width: 40,
-              height: 40,
-              color: "white"
-            }}
-            data-project-info="iconPD"
-          >
-            {projectState.icon}
-          </p>
-          <div style={{ display: "flex", flexDirection: "row", gap: 20 }}>
-            <button
-              id="editProject"
-              className="buttonSecondary"
-              onClick={openEditModal}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 100,
-                height: 40,
-                fontSize: "var(--fontSizeStandard)"
-              }}
-            >
-              Edit
-            </button>
-            <button
-              id="deleteProjectBtn"
-              className="buttonSecondary"
-              onClick={() => {
-                const modal = document.getElementById('DeleteProjectModal') as HTMLDialogElement | null;
-                if (modal) modal.showModal();
-              }
-              }
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 100,
-                height: 40,
-                fontSize: "var(--fontSizeStandard)"
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-        <div className="middleDashboard">
-          <h5 data-project-info="nameBigPD">{projectState.name}</h5>
-          <p data-project-info="descriptionPD">
-            {projectState.description || "No description provided."}
-          </p>
-        </div>
-        <div className="bottomDashboard">
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Status
-            </p>
-            <p data-project-info="statusPD">{projectState.status || "No status provided."}</p>
-          </div>
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Cost
-            </p>
-            <p data-project-info="costPD">{projectState.cost || "No cost provided."}</p>
-          </div>
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Role
-            </p>
-            <p data-project-info="rolePD">{projectState.userRole || "No role provided."}</p>
-          </div>
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Start Date
-            </p>
-            <p data-project-info="startPD">{projectState.startDate || "No start date provided."}</p>
-          </div>
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Finish Date
-            </p>
-            <p data-project-info="finishPD">{projectState.finishDate || "No finish date provided."}</p>
-          </div>
+
+
         </div>
         <div
           style={{
@@ -760,53 +460,14 @@ export function ProjectDetailsPage(props: Props) {
             position: "relative"
           }}
         >
-          <div
-            id="percentageDiv"
-            style={{
-              width: `${projectState.progress ?? 0}%`,
-              height: "100%",
-              backgroundColor: (projectState.progress ?? 0) >= 50 ? "green" : "orange",
-              borderRadius: "10px 0 0 10px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "relative",
-              color: "white",
-              fontWeight: "bold",
-              transition: "width 0.5s"
-            }}
-          >
-            <span
-              id="progressText"
-              style={{
-                position: "absolute",
-                width: "100%",
-                textAlign: "center",
-                left: 0
-              }}
-            >
-              {projectState.progress ?? 0}%
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="dashboardCard" style={{ flexGrow: 1 }}>
-        <div
-          id="toDoList"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "stretch",
-            justifyContent: "flex-start",
-            padding: 20
-          }}
-        >
+
           {/* Header Section */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              backgroundColor: "#404040",
             }}
           >
             <h4>To-Do</h4>

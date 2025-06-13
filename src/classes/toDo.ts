@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { showModalPopulated } from '..';
+import { showModalPopulated } from '../utils/modalUtils';
 
 export type toDoStatus = "Pending" | "In Progress" | "Completed" | "On Hold";
 export type toDoPriority = "Low" | "Medium" | "High" | "Critical";
