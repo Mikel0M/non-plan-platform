@@ -668,7 +668,7 @@ export class ProjectsManager {
             const { ui, ...projectData } = project; // Destructure to exclude `ui`
             return {
                 ...projectData,
-                toDos: toDoManagerInstance.getToDos().filter(toDo => toDo.project_id === project.id).map(toDo => ({
+                toDos: (project.toDos || []).map(toDo => ({
                     id: toDo.id,
                     title: toDo.title,
                     description: toDo.description,
@@ -691,27 +691,6 @@ export class ProjectsManager {
             };
         });
 
-        const toDos = toDoManagerInstance.getToDos().map(toDo => ({
-            id: toDo.id,
-            title: toDo.title,
-            description: toDo.description,
-            status: toDo.status,
-            priority: toDo.priority,
-            project_id: toDo.project_id,
-            assigned_to: toDo.assigned_to,
-            created_by: toDo.created_by,
-            created_at: toDo.created_at,
-            updated_at: toDo.updated_at,
-            due_date: toDo.due_date,
-            start_date: toDo.start_date,
-            completion_date: toDo.completion_date,
-            estimated_hours: toDo.estimated_hours,
-            actual_hours: toDo.actual_hours,
-            dependencies: toDo.dependencies,
-            progress_percentage: toDo.progress_percentage,
-            comments: toDo.comments
-        }));
-
         const usersExports = this.exportUsers();
         const usersJSON = usersExports.map(user => ({
             id: user.id,
@@ -726,9 +705,9 @@ export class ProjectsManager {
             company: user.company
         }));
 
-        const exportableData = { projects, toDos, usersJSON };
+        const exportableData = { projects, usersJSON };
 
-        console.log("Exporting projects, to-dos and users to JSON:", exportableData);
+        console.log("Exporting projects and users to JSON:", exportableData);
 
         const json = JSON.stringify(exportableData, null, 2);
 
@@ -741,7 +720,7 @@ export class ProjectsManager {
         URL.revokeObjectURL(url); // Clean up the URL object
     }
 
-    importFromJSON() {
+    importFromJSON(onComplete?: () => void) {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'application/json';
@@ -750,6 +729,7 @@ export class ProjectsManager {
             const file = input.files?.[0];
             if (!file) {
                 console.error("No file selected");
+                if (onComplete) onComplete();
                 return;
             }
 
@@ -759,68 +739,64 @@ export class ProjectsManager {
                     const json = reader.result as string;
                     const parsedData: any = JSON.parse(json);
 
-                    // Ensure the parsed data is an object with 'projects' and 'toDos' properties
-                    if (!parsedData.projects || !parsedData.toDos) {
-                        throw new Error("Invalid JSON format. Expected an object with 'projects' and 'toDos' properties");
+                    if (!parsedData.projects) {
+                        throw new Error("Invalid JSON format. Expected an object with 'projects' property");
                     }
 
-                    const projects: IProject[] = parsedData.projects;
-                    const toDos: ItoDo[] = parsedData.toDos;
+                    const projects: any[] = parsedData.projects;
                     const importedUsers: IUser[] = parsedData.usersJSON || [];
 
-                    // Debugging: Log the parsed data
-                    console.log("Parsed projects:", projects);
-                    console.log("Parsed to-dos:", toDos);
-                    console.log("Parsed users:", importedUsers);
-
-                    // Import projects
                     for (const projectData of projects) {
                         try {
                             if (!projectData.name) {
                                 console.error("Project data is missing the 'name' property:", projectData);
                                 continue;
                             }
-                            this.newProject(projectData);
+                            const { toDos = [], ...rest } = projectData;
+                            let existingProject = this.list.find(p => p.id === rest.id || p.name === rest.name);
+                            if (existingProject) {
+                                Object.assign(existingProject, rest);
+                                existingProject.toDos = toDos;
+                                this.updateProjectCards(existingProject);
+                            } else {
+                                const project = this.newProject(rest);
+                                if (project && Array.isArray(toDos)) {
+                                    project.toDos = toDos;
+                                    this.updateProjectCards(project);
+                                }
+                            }
                         } catch (error) {
                             console.error(`Failed to import project: ${projectData.name}`, error);
                         }
                     }
 
-                    // Import users
                     for (const userData of importedUsers) {
                         try {
-                            const user = new User(userData); // Create a User instance
-                            users.push(user); // Add the user to the global users array
-                            console.log("User imported successfully:", user); // Debugging statement
+                            const user = new User(userData);
+                            users.push(user);
+                            console.log("User imported successfully:", user);
                         } catch (error) {
                             console.error("Failed to import user:", userData, error);
                         }
                     }
 
-                    console.log("Users imported successfully.");
-                    console.log(users); // Debugging statement
-                    
-
-                    // Import to-dos
-                    for (const toDoData of toDos) {
-                        try {
-                            const newToDo = new toDo(toDoData); // Instantiate the toDo object
-                            toDoManagerInstance.newToDo(newToDo, toDoData.project_id);
-                        } catch (error) {
-                            console.error(`Failed to import to-do: ${toDoData.title}`, error);
-                        }
+                    if (this.list.length > 0) {
+                        this.list.forEach(project => this.updateProjectCards(project));
                     }
 
-                    console.log("Projects and to-dos imported successfully.");
+                    if (onComplete) onComplete();
+                    console.log("Projects and users imported successfully.");
                 } catch (error) {
                     console.error("Error parsing the JSON file:", error);
+                    if (onComplete) onComplete();
                 }
             };
             reader.onerror = () => {
                 console.error("Failed to read the file:", reader.error);
+                if (onComplete) onComplete();
             };
 
-            reader.readAsText(file); // Start reading the file
+            reader.readAsText(file);
         });
 
         input.click();

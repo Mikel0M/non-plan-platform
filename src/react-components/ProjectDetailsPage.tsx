@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import * as Router from 'react-router-dom';
+import { toDoManager } from '../classes/toDoManager';
 
 interface Props {
     projectsManager: ProjectsManager
@@ -52,6 +53,128 @@ export function ProjectDetailsPage(props: Props) {
       setEditFinishDate(projectState.finishDate || "");
       const modal = document.getElementById('editProjectModal') as HTMLDialogElement | null;
       if (modal) modal.showModal();
+    };
+
+    // Add state for to-dos
+    const [toDos, setToDos] = React.useState<any[]>([]);
+
+    // Load to-dos for the current project
+    React.useEffect(() => {
+      if (projectState && projectState.id && props.projectsManager) {
+        // If your ProjectsManager or Project class has a method to get to-dos for a project, use it here
+        // Example: setToDos(props.projectsManager.getToDosForProject(projectState.id));
+        // For now, try to get from projectState.toDos if available
+        setToDos(projectState.toDos || []);
+      }
+    }, [projectState]);
+
+    // State for new to-do form fields
+    const [newToDo, setNewToDo] = React.useState({
+      title: '',
+      description: '',
+      status: 'Pending',
+      priority: 'Standard',
+      assigned_to: '',
+      created_by: '',
+      due_date: '',
+      start_date: '',
+      estimated_hours: '',
+      actual_hours: '',
+    });
+
+    // Handle new to-do form changes
+    const handleNewToDoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      setNewToDo({ ...newToDo, [e.target.name]: e.target.value });
+    };
+
+    // Refs
+    const toDoListContainerRef = React.useRef<HTMLDivElement | null>(null);
+
+    // Handle new to-do form submit
+    const handleNewToDoSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!newToDo.title) return;
+      if (!projectState) return;
+      // Build ItoDo object with correct types
+      const toDoObj = {
+        id: Date.now().toString(),
+        title: newToDo.title,
+        description: newToDo.description,
+        status: newToDo.status as any, // toDoStatus
+        priority: newToDo.priority as any, // toDoPriority
+        assigned_to: newToDo.assigned_to,
+        created_by: newToDo.created_by,
+        due_date: newToDo.due_date,
+        start_date: newToDo.start_date,
+        estimated_hours: Number(newToDo.estimated_hours) || 0,
+        actual_hours: Number(newToDo.actual_hours) || 0,
+        project_id: projectState.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        completion_date: '',
+        dependencies: [],
+        progress_percentage: '25%' as const,
+        comments: [],
+      };
+      projectState.addToDo(toDoObj);
+      setToDos([...projectState.toDos]);
+      setNewToDo({
+        title: '', description: '', status: 'Pending', priority: 'Standard', assigned_to: '', created_by: '', due_date: '', start_date: '', estimated_hours: '', actual_hours: ''
+      });
+      closeModal('newToDoModal');
+    };
+
+    // Handler for editing a to-do
+    const handleEditToDoSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const id = (form.elements.namedItem('editToDoId') as HTMLInputElement).value;
+      // Find the to-do instance
+      let updatedToDos = toDos.map(td => {
+        if (td.id === id) {
+          td.title = (form.elements.namedItem('toDoTitle') as HTMLInputElement).value;
+          td.description = (form.elements.namedItem('toDoDescription') as HTMLTextAreaElement).value;
+          td.status = (form.elements.namedItem('toDoStatus') as HTMLSelectElement).value as any; // toDoStatus
+          td.priority = (form.elements.namedItem('toDoPriority') as HTMLSelectElement).value as any; // toDoPriority
+          td.assigned_to = (form.elements.namedItem('edittoDoAssignedTo') as HTMLSelectElement).value;
+          td.created_by = (form.elements.namedItem('edittoDoCreatedBy') as HTMLSelectElement).value;
+          td.start_date = (form.elements.namedItem('editToDoStartDate') as HTMLInputElement).value;
+          td.updated_at = (form.elements.namedItem('editToDoUpdatedAt') as HTMLInputElement).value;
+          td.estimated_hours = parseFloat((form.elements.namedItem('editToDoEstimatedHours') as HTMLInputElement).value) || 0;
+          td.actual_hours = parseFloat((form.elements.namedItem('editToDoActualHours') as HTMLInputElement).value) || 0;
+          td.due_date = (form.elements.namedItem('editToDoDueDate') as HTMLInputElement).value;
+          // For dependencies and comments, if your model expects arrays, split by comma, else keep as string
+          const depVal = (form.elements.namedItem('editToDoDependencies') as HTMLSelectElement).value;
+          td.dependencies = depVal ? depVal.split(',').map(s => s.trim()) : [];
+          const commentsVal = (form.elements.namedItem('editToDoComments') as HTMLTextAreaElement).value;
+          td.comments = commentsVal ? [commentsVal] : [];
+        }
+        return td;
+      });
+      setToDos(updatedToDos);
+      // Also update in projectState.toDos if needed
+      if (projectState && projectState.toDos) {
+        projectState.toDos.forEach(td => {
+          if (td.id === id) {
+            td.title = (form.elements.namedItem('toDoTitle') as HTMLInputElement).value;
+            td.description = (form.elements.namedItem('toDoDescription') as HTMLTextAreaElement).value;
+            td.status = (form.elements.namedItem('toDoStatus') as HTMLSelectElement).value as any;
+            td.priority = (form.elements.namedItem('toDoPriority') as HTMLSelectElement).value as any;
+            td.assigned_to = (form.elements.namedItem('edittoDoAssignedTo') as HTMLSelectElement).value;
+            td.created_by = (form.elements.namedItem('edittoDoCreatedBy') as HTMLSelectElement).value;
+            td.start_date = (form.elements.namedItem('editToDoStartDate') as HTMLInputElement).value;
+            td.updated_at = (form.elements.namedItem('editToDoUpdatedAt') as HTMLInputElement).value;
+            td.estimated_hours = parseFloat((form.elements.namedItem('editToDoEstimatedHours') as HTMLInputElement).value) || 0;
+            td.actual_hours = parseFloat((form.elements.namedItem('editToDoActualHours') as HTMLInputElement).value) || 0;
+            td.due_date = (form.elements.namedItem('editToDoDueDate') as HTMLInputElement).value;
+            const depVal = (form.elements.namedItem('editToDoDependencies') as HTMLSelectElement).value;
+            td.dependencies = depVal ? depVal.split(',').map(s => s.trim()) : [];
+            const commentsVal = (form.elements.namedItem('editToDoComments') as HTMLTextAreaElement).value;
+            td.comments = commentsVal ? [commentsVal] : [];
+          }
+        });
+      }
+      closeModal('editToDoModal');
     };
 
     return (
@@ -233,7 +356,7 @@ export function ProjectDetailsPage(props: Props) {
     </form>
   </dialog>
   <dialog id="newToDoModal">
-    <form className="toDoForm" id="newToDoForm">
+    <form className="toDoForm" id="newToDoForm" onSubmit={handleNewToDoSubmit}>
       <input type="hidden" name="toDoProject" id="toDoProject" />
       <div className="userCard">
         <div className="formGrid">
@@ -243,10 +366,8 @@ export function ProjectDetailsPage(props: Props) {
               <label>
                 <span className="material-icons-round">apartment</span>Title
               </label>
-              <input name="toDoTitle" type="text" id="toDoTitle" />
-              <label
-                style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}
-              >
+              <input name="title" type="text" id="toDoTitle" value={newToDo.title} onChange={handleNewToDoChange} />
+              <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
                 TIP give it a short title
               </label>
             </div>
@@ -255,22 +376,21 @@ export function ProjectDetailsPage(props: Props) {
                 <span className="material-icons-round">subject</span>Description
               </label>
               <textarea
-                name="toDoDescription"
+                name="description"
                 cols={30}
                 rows={5}
                 placeholder="Give your project a nice description!"
                 id="toDoDescription"
-                defaultValue={""}
+                value={newToDo.description}
+                onChange={handleNewToDoChange}
               />
             </div>
             <div className="formFieldContainer">
               <label>
-                <span className="material-icons-round">
-                  not_listed_location
-                </span>
+                <span className="material-icons-round">not_listed_location</span>
                 Status
               </label>
-              <select name="toDoStatus" id="toDoStatus">
+              <select name="status" id="toDoStatus" value={newToDo.status} onChange={handleNewToDoChange}>
                 <option>Pending</option>
                 <option>In Progress</option>
                 <option>Completed</option>
@@ -279,12 +399,10 @@ export function ProjectDetailsPage(props: Props) {
             </div>
             <div className="formFieldContainer">
               <label>
-                <span className="material-icons-round">
-                  not_listed_location
-                </span>
+                <span className="material-icons-round">not_listed_location</span>
                 Priority
               </label>
-              <select name="toDoPriority" id="toDoPriority">
+              <select name="priority" id="toDoPriority" value={newToDo.priority} onChange={handleNewToDoChange}>
                 <option>High</option>
                 <option>Standard</option>
                 <option>Low</option>
@@ -441,7 +559,7 @@ export function ProjectDetailsPage(props: Props) {
     </form>
   </dialog>
   <dialog id="editToDoModal">
-    <form className="toDoForm" id="editToDoForm">
+    <form className="toDoForm" id="editToDoForm" onSubmit={handleEditToDoSubmit}>
       <input type="hidden" id="editToDoId" name="editToDoId" />
       {/* Other form fields... */}
       <div className="userCard">
@@ -636,6 +754,13 @@ export function ProjectDetailsPage(props: Props) {
       <div className="cancelAccept">
         <button
           type="button"
+          className="deleteButton"
+          onClick={() => closeModal('editToDoModal')}
+        >
+          Delete
+        </button>
+        <button
+          type="button"
           className="cancelButton"
           onClick={() => closeModal('editToDoModal')}
         >
@@ -825,13 +950,17 @@ export function ProjectDetailsPage(props: Props) {
                 placeholder="Search To-Do's by name"
               />
             </div>
-            <button id="newToDoBtn" className="buttonTertiary">
+            <button id="newToDoBtn" className="buttonTertiary" onClick={() => {
+  const modal = document.getElementById('newToDoModal') as HTMLDialogElement | null;
+  if (modal) modal.showModal();
+}}>
               <span className="material-icons-round">add</span>
             </button>
           </div>
           {/* To-Do List Container */}
           <div
             id="toDoListContainer"
+            ref={toDoListContainerRef}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -839,7 +968,50 @@ export function ProjectDetailsPage(props: Props) {
               marginTop: 20
             }}
           >
-            {/* To-Do list items will be appended here */}
+            {/* Render To-Do list items reactively */}
+            {toDos.length === 0 && <div style={{color: '#aaa'}}>No to-dos for this project.</div>}
+            {toDos.map((todo, idx) => {
+  let bgColor = '#222';
+  switch (todo.status) {
+    case 'Pending': bgColor = '#969697'; break;
+    case 'In Progress': bgColor = '#FFA500'; break;
+    case 'Completed': bgColor = '#4CAF50'; break;
+    case 'On Hold': bgColor = '#E57373'; break;
+    default: bgColor = '#222';
+  }
+  const handleEditToDo = () => {
+    // Fill the edit modal fields with the selected to-do's data
+    (document.getElementById('editToDoId') as HTMLInputElement).value = todo.id || '';
+    (document.getElementById('editToDoTitle') as HTMLInputElement).value = todo.title || '';
+    (document.getElementById('editToDoDescription') as HTMLTextAreaElement).value = todo.description || '';
+    (document.getElementById('editToDoStatus') as HTMLSelectElement).value = todo.status || 'Pending';
+    (document.getElementById('editToDoPriority') as HTMLSelectElement).value = todo.priority || 'Standard';
+    (document.getElementById('editToDoAssignedTo') as HTMLSelectElement).value = todo.assigned_to || '';
+    (document.getElementById('editToDoCreatedBy') as HTMLSelectElement).value = todo.created_by || '';
+    (document.getElementById('editToDoStartDate') as HTMLInputElement).value = todo.start_date || '';
+    (document.getElementById('editToDoUpdatedAt') as HTMLInputElement).value = todo.updated_at || '';
+    (document.getElementById('editToDoEstimatedHours') as HTMLInputElement).value = todo.estimated_hours || '';
+    (document.getElementById('editToDoActualHours') as HTMLInputElement).value = todo.actual_hours || '';
+    (document.getElementById('editToDoDueDate') as HTMLInputElement).value = todo.due_date || '';
+    (document.getElementById('editToDoDependencies') as HTMLSelectElement).value = todo.dependencies || '';
+    (document.getElementById('editToDoComments') as HTMLTextAreaElement).value = todo.comments || '';
+    // Open the modal
+    const modal = document.getElementById('editToDoModal') as HTMLDialogElement | null;
+    if (modal) modal.showModal();
+  };
+  return (
+    <div key={todo.id || idx} className="todoItem" style={{background: bgColor, color: '#fff', padding: 10, borderRadius: 8, marginBottom: 5, cursor: 'pointer'}} onClick={handleEditToDo}>
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <div style={{display: 'flex', columnGap: 15, alignItems: 'center'}}>
+          <span className="material-icons-round" style={{backgroundColor: '#969696', padding: 8, borderRadius: 8, aspectRatio: 1, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>construction</span>
+          <p style={{margin: 0}}>{todo.title}</p>
+        </div>
+        <p style={{whiteSpace: 'nowrap', marginLeft: 10}}>{todo.due_date}</p>
+      </div>
+      <div style={{fontSize: 12, color: '#bbb', marginTop: 4}}>{todo.description}</div>
+    </div>
+  );
+})}
           </div>
         </div>
       </div>

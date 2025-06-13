@@ -40,7 +40,9 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     
 
     const onImportClick = () => {
-        projectManager.importFromJSON()
+        projectManager.importFromJSON(() => {
+            setProjects([...projectManager.list]);
+        });
     }
 
 
