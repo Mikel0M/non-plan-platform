@@ -15,6 +15,7 @@ import { toDoManagerInstance } from './classes/toDoManager';
 import { usersManagerInstance, users } from "./classes/UsersManager";
 import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
 import { ProjectsManager } from './classes/ProjectsManager';
+import { ToDoPage } from "./react-components/toDoPage";
 
 const projectsManager = new ProjectsManager();
 
@@ -31,6 +32,7 @@ appRoot.render(
                     <Router.Routes>
                         <Router.Route path="/" element={<ProjectsPage projectManager={projectsManager} customStyle={{ zIndex: 2, position: "relative" }} />}></Router.Route>
                         <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} />} />
+                        <Router.Route path="/toDo" element={<ToDoPage toDoManager={toDoManagerInstance} projectsManager={projectsManager} />} />
                     </Router.Routes>
                 </div>
             </div>

@@ -13,7 +13,9 @@ export function Sidebar({ customStyle }: { customStyle?: React.CSSProperties }) 
                     <span className="material-icons-round">people</span>Users
                 </li>
                 <li><span className="material-icons-round">dashboard</span>Dashboard</li>
-                <li><span className="material-icons-round">task</span>Tasks/To-Do</li>
+                <Router.Link to="/toDo" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <li id="toDoBtn"><span className="material-icons-round">task</span>Tasks/To-Do</li>
+                </Router.Link>
                 <li><span className="material-icons-round">date_range</span>Calendar</li>
                 <li><span className="material-icons-round">folder_open</span>Documents</li>
                 <li><span className="material-icons-round">build</span>Tools</li>

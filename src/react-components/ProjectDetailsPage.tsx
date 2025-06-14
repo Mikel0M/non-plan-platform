@@ -177,10 +177,24 @@ export function ProjectDetailsPage(props: Props) {
       closeModal('editToDoModal');
     };
 
+    // Add state to track which to-do is being deleted
+    const [toDoToDelete, setToDoToDelete] = React.useState<any | null>(null);
+
+    // Handler for delete confirmation
+    const handleConfirmDeleteToDo = () => {
+      if (toDoToDelete && projectState) {
+        projectState.toDos = projectState.toDos.filter(td => td.id !== toDoToDelete.id);
+        setToDos([...projectState.toDos]);
+        setToDoToDelete(null);
+        closeModal('DeleteTaskModal');
+        closeModal('editToDoModal');
+      }
+    };
+
     return (
     <div className="page" id="projectDetails" style={{ display: "flex" }}>
         <dialog id="DeleteProjectModal">
-            <form className="userForm" id="DeleteNewUserForm">
+            <form className="userForm" id="DeleteNewProjectForm">
                 <h2>Are you sure you want to delete the project?</h2>
                 <div className="cancelAccept">
                     <button
@@ -189,6 +203,20 @@ export function ProjectDetailsPage(props: Props) {
                         onClick={() => closeModal('DeleteProjectModal')}>Cancel
                     </button>
                     <button type="button" className="acceptButton" id="ConfirmDeleteButton">Delete</button>
+                </div>
+            </form>
+        </dialog>
+        <dialog id="DeleteTaskModal">
+            <form className="userForm" id="DeleteNewTaskForm">
+                <h2>Are you sure you want to delete the task: {toDoToDelete?.title} ?</h2>
+                <div className="cancelAccept">
+                    <button
+                        type="button"
+                        className="cancelButton"
+                        onClick={() => { setToDoToDelete(null); closeModal('DeleteTaskModal'); }}>
+                        Cancel
+                    </button>
+                    <button type="button" className="acceptButton" id="ConfirmDeleteButton" onClick={handleConfirmDeleteToDo}>Delete</button>
                 </div>
             </form>
         </dialog>
@@ -755,7 +783,14 @@ export function ProjectDetailsPage(props: Props) {
         <button
           type="button"
           className="deleteButton"
-          onClick={() => closeModal('editToDoModal')}
+          onClick={() => {
+            // Find the to-do being edited
+            const id = (document.getElementById('editToDoId') as HTMLInputElement)?.value;
+            const td = toDos.find(td => td.id === id);
+            setToDoToDelete(td);
+            const modal = document.getElementById('DeleteTaskModal') as HTMLDialogElement | null;
+            if (modal) modal.showModal();
+          }}
         >
           Delete
         </button>
