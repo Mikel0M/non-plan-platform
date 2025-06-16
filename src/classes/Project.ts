@@ -22,6 +22,7 @@ export interface IProject {
     finishDate: string;
     toDos?: ItoDo[];
     PUsers?: IUser[];
+    assignedUsers?: Array<{ userId: string, role: string }>; // userId and custom role per project
 }
 
 // Function to generate random color
@@ -72,6 +73,7 @@ export class Project implements IProject {
     finishDate: string;
     toDos: toDo[]; // Add toDos property
     PUsers: User[]; // Add users property
+    assignedUsers: Array<{ userId: string, role: string }> = [];
     ui: HTMLDivElement;
 
     constructor(data: IProject) {
@@ -101,6 +103,7 @@ export class Project implements IProject {
         // Initialize toDos and users
         this.toDos = data.toDos?.map(toDoData => new toDo(toDoData)) || [];
         this.PUsers = data.PUsers?.map(userData => new User(userData)) || [];
+        this.assignedUsers = data.assignedUsers || [];
 
         // Generate icon and random color
         this.icon = sliceTwoEachWord(this.name);

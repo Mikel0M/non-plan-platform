@@ -1,34 +1,35 @@
-import { ICompany, Company } from "./Companies"
+import { ICompany, Company } from "./Company";
 
-export class CompanyManager {
-    list: Company[] = []
-    ui: HTMLElement
+export class CompaniesManager {
+  companies: Company[] = [];
 
-    constructor(container: HTMLElement) {
-        this.ui = container
-    }
+  addCompany(data: ICompany) {
+    const company = new Company(data);
+    this.companies.push(company);
+    return company;
+  }
 
-    newCompany(data: ICompany) {
-        console.log("newCompany() called!", data); // Debugging log
-    
-        const company = new Company(data);
-        console.log("Company created:", company);
-        
-        /*
-        if (!this.ui) {
-            console.error("CompanyManager UI is not set!");
-            return null; // Prevent further execution
-        }
-    
-        if (!company.ui) {
-            console.error("Company UI is null!");
-            return null;
-        }
-    
-        this.ui.append(company.ui);*/
-        this.list.push(company);
-        console.log("Company added to list. Current list:", this.list);
-    
-        return company;
-    }
+  getCompanies() {
+    return this.companies;
+  }
+
+  deleteCompany(id: string) {
+    this.companies = this.companies.filter(c => c.id !== id);
+  }
+
+  importCompanies(companies: ICompany[]) {
+    this.companies = companies.map(c => new Company(c));
+  }
+
+  exportCompanies(): ICompany[] {
+    return this.companies.map(c => ({
+      id: c.id,
+      name: c.name,
+      address: c.address,
+      email: c.email,
+      phone: c.phone,
+    }));
+  }
 }
+
+export const companiesManagerInstance = new CompaniesManager();

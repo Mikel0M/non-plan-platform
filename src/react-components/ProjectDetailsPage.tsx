@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import * as Router from 'react-router-dom';
 import { toDoManager } from '../classes/toDoManager';
+import { usersManagerInstance } from '../classes/UsersManager';
+import { User } from '../classes/User';
 
 interface Props {
     projectsManager: ProjectsManager
@@ -19,10 +21,12 @@ export function ProjectDetailsPage(props: Props) {
     const { id } = useParams();
     // Ensure id is a string before using it
     const [projectState, setProjectState] = React.useState(id ? props.projectsManager.getProject(id) : undefined);
+    // Only update projectState when the project ID changes
     React.useEffect(() => {
-      props.projectsManager.setChangeButton();
       setProjectState(id ? props.projectsManager.getProject(id) : undefined);
-    }, [props.projectsManager, id]);
+      // Optionally, call setChangeButton only once on mount
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
     if (!projectState) {
       return <div>Project not found.</div>;
     }
@@ -38,6 +42,10 @@ export function ProjectDetailsPage(props: Props) {
     const [editPhase, setEditPhase] = React.useState("");
     const [editStartDate, setEditStartDate] = React.useState("");
     const [editFinishDate, setEditFinishDate] = React.useState("");
+
+    // Add state for edit modal fields
+    const [editAssignedTo, setEditAssignedTo] = React.useState('');
+    const [editCreatedBy, setEditCreatedBy] = React.useState('');
 
     // When opening the modal, set edit states
     const openEditModal = () => {
@@ -58,15 +66,13 @@ export function ProjectDetailsPage(props: Props) {
     // Add state for to-dos
     const [toDos, setToDos] = React.useState<any[]>([]);
 
-    // Load to-dos for the current project
-    React.useEffect(() => {
-      if (projectState && projectState.id && props.projectsManager) {
-        // If your ProjectsManager or Project class has a method to get to-dos for a project, use it here
-        // Example: setToDos(props.projectsManager.getToDosForProject(projectState.id));
-        // For now, try to get from projectState.toDos if available
-        setToDos(projectState.toDos || []);
-      }
-    }, [projectState]);
+    // Load to-dos for the current project ONLY when project ID changes
+React.useEffect(() => {
+  if (projectState && projectState.id && props.projectsManager) {
+    setToDos(projectState.toDos || []);
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectState?.id]);
 
     // State for new to-do form fields
     const [newToDo, setNewToDo] = React.useState({
@@ -124,60 +130,83 @@ export function ProjectDetailsPage(props: Props) {
       closeModal('newToDoModal');
     };
 
-    // Handler for editing a to-do
+    // --- EDIT MODAL STATE ---
+const [editToDo, setEditToDo] = React.useState<any | null>(null);
+const [editToDoFields, setEditToDoFields] = React.useState({
+  id: '',
+  title: '',
+  description: '',
+  status: 'Pending',
+  priority: 'Standard',
+  assigned_to: '',
+  created_by: '',
+  due_date: '',
+  start_date: '',
+  estimated_hours: '',
+  actual_hours: '',
+  updated_at: '',
+  dependencies: '',
+  comments: '',
+});
+
+    // --- OPEN EDIT MODAL ---
+    const openEditToDoModal = (todo: any) => {
+      setEditToDo(todo);
+      setEditToDoFields({
+        id: todo.id || '',
+        title: todo.title || '',
+        description: todo.description || '',
+        status: todo.status || 'Pending',
+        priority: todo.priority || 'Standard',
+        assigned_to: todo.assigned_to || '',
+        created_by: todo.created_by || '',
+        due_date: todo.due_date || '',
+        start_date: todo.start_date || '',
+        estimated_hours: todo.estimated_hours?.toString() || '',
+        actual_hours: todo.actual_hours?.toString() || '',
+        updated_at: todo.updated_at || '',
+        dependencies: Array.isArray(todo.dependencies) ? todo.dependencies.join(', ') : (todo.dependencies || ''),
+        comments: Array.isArray(todo.comments) ? todo.comments.join('\n') : (todo.comments || ''),
+      });
+      setTimeout(() => {
+        const modal = document.getElementById('editToDoModal') as HTMLDialogElement | null;
+        if (modal) modal.showModal();
+      }, 0);
+    };
+
+    // --- HANDLE EDIT MODAL FIELD CHANGES ---
+    const handleEditToDoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setEditToDoFields(prev => ({ ...prev, [name]: value }));
+    };
+
+    // --- HANDLE EDIT SUBMIT ---
     const handleEditToDoSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      const form = e.target as HTMLFormElement;
-      const id = (form.elements.namedItem('editToDoId') as HTMLInputElement).value;
-      // Find the to-do instance
-      let updatedToDos = toDos.map(td => {
+      const id = editToDoFields.id;
+      const updatedToDos = toDos.map(td => {
         if (td.id === id) {
-          td.title = (form.elements.namedItem('toDoTitle') as HTMLInputElement).value;
-          td.description = (form.elements.namedItem('toDoDescription') as HTMLTextAreaElement).value;
-          td.status = (form.elements.namedItem('toDoStatus') as HTMLSelectElement).value as any; // toDoStatus
-          td.priority = (form.elements.namedItem('toDoPriority') as HTMLSelectElement).value as any; // toDoPriority
-          td.assigned_to = (form.elements.namedItem('edittoDoAssignedTo') as HTMLSelectElement).value;
-          td.created_by = (form.elements.namedItem('edittoDoCreatedBy') as HTMLSelectElement).value;
-          td.start_date = (form.elements.namedItem('editToDoStartDate') as HTMLInputElement).value;
-          td.updated_at = (form.elements.namedItem('editToDoUpdatedAt') as HTMLInputElement).value;
-          td.estimated_hours = parseFloat((form.elements.namedItem('editToDoEstimatedHours') as HTMLInputElement).value) || 0;
-          td.actual_hours = parseFloat((form.elements.namedItem('editToDoActualHours') as HTMLInputElement).value) || 0;
-          td.due_date = (form.elements.namedItem('editToDoDueDate') as HTMLInputElement).value;
-          // For dependencies and comments, if your model expects arrays, split by comma, else keep as string
-          const depVal = (form.elements.namedItem('editToDoDependencies') as HTMLSelectElement).value;
-          td.dependencies = depVal ? depVal.split(',').map(s => s.trim()) : [];
-          const commentsVal = (form.elements.namedItem('editToDoComments') as HTMLTextAreaElement).value;
-          td.comments = commentsVal ? [commentsVal] : [];
+          return {
+            ...td,
+            ...editToDoFields,
+            estimated_hours: parseFloat(editToDoFields.estimated_hours) || 0,
+            actual_hours: parseFloat(editToDoFields.actual_hours) || 0,
+            dependencies: editToDoFields.dependencies ? editToDoFields.dependencies.split(',').map(s => s.trim()) : [],
+            comments: editToDoFields.comments ? editToDoFields.comments.split('\n') : [],
+          };
         }
         return td;
       });
       setToDos(updatedToDos);
-      // Also update in projectState.toDos if needed
+      // Update the to-do in the projectState's toDos array
       if (projectState && projectState.toDos) {
-        projectState.toDos.forEach(td => {
-          if (td.id === id) {
-            td.title = (form.elements.namedItem('toDoTitle') as HTMLInputElement).value;
-            td.description = (form.elements.namedItem('toDoDescription') as HTMLTextAreaElement).value;
-            td.status = (form.elements.namedItem('toDoStatus') as HTMLSelectElement).value as any;
-            td.priority = (form.elements.namedItem('toDoPriority') as HTMLSelectElement).value as any;
-            td.assigned_to = (form.elements.namedItem('edittoDoAssignedTo') as HTMLSelectElement).value;
-            td.created_by = (form.elements.namedItem('edittoDoCreatedBy') as HTMLSelectElement).value;
-            td.start_date = (form.elements.namedItem('editToDoStartDate') as HTMLInputElement).value;
-            td.updated_at = (form.elements.namedItem('editToDoUpdatedAt') as HTMLInputElement).value;
-            td.estimated_hours = parseFloat((form.elements.namedItem('editToDoEstimatedHours') as HTMLInputElement).value) || 0;
-            td.actual_hours = parseFloat((form.elements.namedItem('editToDoActualHours') as HTMLInputElement).value) || 0;
-            td.due_date = (form.elements.namedItem('editToDoDueDate') as HTMLInputElement).value;
-            const depVal = (form.elements.namedItem('editToDoDependencies') as HTMLSelectElement).value;
-            td.dependencies = depVal ? depVal.split(',').map(s => s.trim()) : [];
-            const commentsVal = (form.elements.namedItem('editToDoComments') as HTMLTextAreaElement).value;
-            td.comments = commentsVal ? [commentsVal] : [];
-          }
-        });
+        projectState.toDos = updatedToDos;
       }
+      setEditToDo(null);
       closeModal('editToDoModal');
     };
 
-    // Add state to track which to-do is being deleted
+    // Add state for deleting a to-do
     const [toDoToDelete, setToDoToDelete] = React.useState<any | null>(null);
 
     // Handler for delete confirmation
@@ -191,9 +220,85 @@ export function ProjectDetailsPage(props: Props) {
       }
     };
 
+    // State for assigning users
+    const [assignUserModalOpen, setAssignUserModalOpen] = React.useState(false);
+    const [selectedUserId, setSelectedUserId] = React.useState('');
+    const [customRole, setCustomRole] = React.useState('');
+    const [assignError, setAssignError] = React.useState('');
+
+    // Handler for assigning user
+    const handleAssignUser = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!projectState) return;
+      if (!selectedUserId || !customRole) {
+        setAssignError('Please select a user and enter a role.');
+        return;
+      }
+      if (projectState.assignedUsers.some(u => u.userId === selectedUserId)) {
+        setAssignError('This user is already assigned to this project.');
+        return;
+      }
+      projectState.assignedUsers.push({ userId: selectedUserId, role: customRole });
+      // Create a new Project instance to trigger React re-render and preserve methods
+      const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
+        ...projectState,
+        assignedUsers: [...projectState.assignedUsers],
+      });
+      setProjectState(updated);
+      setAssignUserModalOpen(false);
+      setSelectedUserId('');
+      setCustomRole('');
+      setAssignError('');
+    };
+
+    // State for user to delete
+    const [userToDelete, setUserToDelete] = React.useState<{userId: string, name: string} | null>(null);
+    // Handler for confirming user removal
+    const handleConfirmDeleteUser = () => {
+      if (!userToDelete || !projectState) return;
+      const updatedAssigned = projectState.assignedUsers.filter(u => u.userId !== userToDelete.userId);
+      const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
+        ...projectState,
+        assignedUsers: updatedAssigned,
+      });
+      setProjectState(updated);
+      setUserToDelete(null);
+      closeModal('DeleteUserModal');
+    };
+
+    // Helper to get assigned users for dropdowns
+const assignedUsers = projectState.assignedUsers
+  .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+  .filter((user): user is User => Boolean(user));
+
     return (
     <div className="page" id="projectDetails" style={{ display: "flex" }}>
-        <dialog id="DeleteProjectModal">
+      {/* ...existing dialogs... */}
+      {/* Assign User Modal */}
+      <dialog open={assignUserModalOpen} style={{zIndex: 10}}>
+        <form onSubmit={handleAssignUser}>
+          <h2>Assign User to Project</h2>
+          <div className="formFieldContainer">
+            <label>User</label>
+            <select value={selectedUserId} onChange={e => setSelectedUserId(e.target.value)}>
+              <option value="">Select user</option>
+              {usersManagerInstance.getUsers().map(user => (
+                <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+              ))}
+            </select>
+          </div>
+          <div className="formFieldContainer">
+            <label>Role in this project</label>
+            <input type="text" value={customRole} onChange={e => setCustomRole(e.target.value)} placeholder="e.g. Project Lead, Consultant..." />
+          </div>
+          {assignError && <div style={{color: 'red'}}>{assignError}</div>}
+          <div className="cancelAccept">
+            <button type="button" className="cancelButton" onClick={() => { setAssignUserModalOpen(false); setAssignError(''); }}>Cancel</button>
+            <button type="submit" className="acceptButton">Assign</button>
+          </div>
+        </form>
+      </dialog>
+      <dialog id="DeleteProjectModal">
             <form className="userForm" id="DeleteNewProjectForm">
                 <h2>Are you sure you want to delete the project?</h2>
                 <div className="cancelAccept">
@@ -450,8 +555,16 @@ export function ProjectDetailsPage(props: Props) {
                 </span>
                 Responsible Person
               </label>
-              <select name="toDoAssignedTo" id="toDoAssignedTo">
-                {/* Options will be dynamically populated */}
+              <select
+                name="assigned_to"
+                id="toDoAssignedTo"
+                value={newToDo.assigned_to}
+                onChange={handleNewToDoChange}
+              >
+                <option value="">Select responsible person</option>
+                {assignedUsers.map(user => (
+                  <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                ))}
               </select>
             </div>
             <div className="formFieldContainer">
@@ -461,8 +574,16 @@ export function ProjectDetailsPage(props: Props) {
                 </span>
                 Created By
               </label>
-              <select name="toDoCreatedBy" id="toDoCreatedBy">
-                {/* Options will be dynamically populated */}
+              <select
+                name="created_by"
+                id="toDoCreatedBy"
+                value={newToDo.created_by}
+                onChange={handleNewToDoChange}
+              >
+                <option value="">Select creator</option>
+                {assignedUsers.map(user => (
+                  <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                ))}
               </select>
             </div>
             <div className="formFieldContainer">
@@ -588,8 +709,7 @@ export function ProjectDetailsPage(props: Props) {
   </dialog>
   <dialog id="editToDoModal">
     <form className="toDoForm" id="editToDoForm" onSubmit={handleEditToDoSubmit}>
-      <input type="hidden" id="editToDoId" name="editToDoId" />
-      {/* Other form fields... */}
+      <input type="hidden" id="editToDoId" name="id" value={editToDoFields.id} />
       <div className="userCard">
         <div className="formGrid">
           <div className="formColumn">
@@ -598,10 +718,8 @@ export function ProjectDetailsPage(props: Props) {
               <label>
                 <span className="material-icons-round">apartment</span>Title
               </label>
-              <input name="toDoTitle" type="text" id="editToDoTitle" />
-              <label
-                style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}
-              >
+              <input name="title" type="text" id="editToDoTitle" value={editToDoFields.title} onChange={handleEditToDoChange} />
+              <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
                 TIP give it a short title
               </label>
             </div>
@@ -610,12 +728,13 @@ export function ProjectDetailsPage(props: Props) {
                 <span className="material-icons-round">subject</span>Description
               </label>
               <textarea
-                name="toDoDescription"
+                name="description"
                 cols={30}
                 rows={5}
                 placeholder="Give your project a nice description!"
                 id="editToDoDescription"
-                defaultValue={""}
+                value={editToDoFields.description}
+                onChange={handleEditToDoChange}
               />
             </div>
             <div className="formFieldContainer">
@@ -625,7 +744,7 @@ export function ProjectDetailsPage(props: Props) {
                 </span>
                 Status
               </label>
-              <select name="toDoStatus" id="editToDoStatus">
+              <select name="status" id="editToDoStatus" value={editToDoFields.status} onChange={handleEditToDoChange}>
                 <option>Pending</option>
                 <option>In Progress</option>
                 <option>Completed</option>
@@ -639,7 +758,7 @@ export function ProjectDetailsPage(props: Props) {
                 </span>
                 Priority
               </label>
-              <select name="toDoPriority" id="editToDoPriority">
+              <select name="priority" id="editToDoPriority" value={editToDoFields.priority} onChange={handleEditToDoChange}>
                 <option>High</option>
                 <option>Standard</option>
                 <option>Low</option>
@@ -659,8 +778,19 @@ export function ProjectDetailsPage(props: Props) {
                 </span>
                 Responsible Person
               </label>
-              <select name="edittoDoAssignedTo" id="editToDoAssignedTo">
-                {/* Options will be dynamically populated */}
+              <select
+                name="assigned_to"
+                id="editToDoAssignedTo"
+                value={editToDoFields.assigned_to}
+                onChange={handleEditToDoChange}
+              >
+                <option value="">Select responsible person</option>
+                {projectState && projectState.assignedUsers && projectState.assignedUsers
+    .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+    .filter((user): user is User => Boolean(user))
+    .map(user => (
+      <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+    ))}
               </select>
             </div>
             <div className="formFieldContainer">
@@ -670,8 +800,19 @@ export function ProjectDetailsPage(props: Props) {
                 </span>
                 Created By
               </label>
-              <select name="edittoDoCreatedBy" id="editToDoCreatedBy">
-                {/* Options will be dynamically populated */}
+              <select
+                name="created_by"
+                id="editToDoCreatedBy"
+                value={editToDoFields.created_by}
+                onChange={handleEditToDoChange}
+              >
+                <option value="">Select creator</option>
+                {projectState && projectState.assignedUsers && projectState.assignedUsers
+    .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+    .filter((user): user is User => Boolean(user))
+    .map(user => (
+      <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+    ))}
               </select>
             </div>
             <div className="formFieldContainer">
@@ -680,9 +821,11 @@ export function ProjectDetailsPage(props: Props) {
                 To-Do start date
               </label>
               <input
-                name="editToDoStartDate"
+                name="start_date"
                 type="date"
                 id="editToDoStartDate"
+                value={editToDoFields.start_date}
+                onChange={handleEditToDoChange}
               />
             </div>
             <div className="formFieldContainer">
@@ -691,9 +834,11 @@ export function ProjectDetailsPage(props: Props) {
                 To-Do last update date
               </label>
               <input
-                name="editToDoUpdatedAt"
+                name="updated_at"
                 type="date"
                 id="editToDoUpdatedAt"
+                value={editToDoFields.updated_at}
+                onChange={handleEditToDoChange}
               />
             </div>
             <div className="formFieldContainer">
@@ -702,10 +847,12 @@ export function ProjectDetailsPage(props: Props) {
                 hours
               </label>
               <input
-                name="editToDoEstimatedHours"
+                name="estimated_hours"
                 type="number"
                 placeholder="Estimated hours for the project"
                 id="editToDoEstimatedHours"
+                value={editToDoFields.estimated_hours}
+                onChange={handleEditToDoChange}
               />
             </div>
             <div className="formFieldContainer">
@@ -713,10 +860,12 @@ export function ProjectDetailsPage(props: Props) {
                 <span className="material-icons-round">paid</span>Actual hours
               </label>
               <input
-                name="editToDoActualHours"
+                name="actual_hours"
                 type="number"
                 placeholder="Hours used so far"
                 id="editToDoActualHours"
+                value={editToDoFields.actual_hours}
+                onChange={handleEditToDoChange}
               />
             </div>
           </div>
@@ -729,7 +878,7 @@ export function ProjectDetailsPage(props: Props) {
                 <span className="material-icons-round">calendar_month</span>Due
                 Date
               </label>
-              <input name="editToDoDueDate" type="date" id="editToDoDueDate" />
+              <input name="due_date" type="date" id="editToDoDueDate" value={editToDoFields.due_date} onChange={handleEditToDoChange} />
             </div>
             <div className="formFieldContainer">
               <label>
@@ -737,9 +886,11 @@ export function ProjectDetailsPage(props: Props) {
                 Start Date
               </label>
               <input
-                name="editToDoStartDate"
+                name="start_date"
                 type="date"
-                id="editToDoStartDate"
+                id="editToDoStartDate2"
+                value={editToDoFields.start_date}
+                onChange={handleEditToDoChange}
               />
             </div>
           </div>
@@ -756,11 +907,7 @@ export function ProjectDetailsPage(props: Props) {
               >
                 Select the tasks this project is dependent on
               </label>
-              <select name="editToDoDependencies" id="editToDoDependencies">
-                <option>You</option>
-                <option>Standard</option>
-                <option>Low</option>
-              </select>
+              <input name="dependencies" id="editToDoDependencies" value={editToDoFields.dependencies} onChange={handleEditToDoChange} />
             </div>
           </div>
         </div>
@@ -770,12 +917,13 @@ export function ProjectDetailsPage(props: Props) {
             <span className="material-icons-round">subject</span>Comments
           </label>
           <textarea
-            name="editToDoComments"
+            name="comments"
             cols={30}
             rows={5}
             placeholder="Add any clarification comment"
             id="editToDoComments"
-            defaultValue={""}
+            value={editToDoFields.comments}
+            onChange={handleEditToDoChange}
           />
         </div>
       </div>
@@ -1014,32 +1162,21 @@ export function ProjectDetailsPage(props: Props) {
     case 'On Hold': bgColor = '#E57373'; break;
     default: bgColor = '#222';
   }
-  const handleEditToDo = () => {
-    // Fill the edit modal fields with the selected to-do's data
-    (document.getElementById('editToDoId') as HTMLInputElement).value = todo.id || '';
-    (document.getElementById('editToDoTitle') as HTMLInputElement).value = todo.title || '';
-    (document.getElementById('editToDoDescription') as HTMLTextAreaElement).value = todo.description || '';
-    (document.getElementById('editToDoStatus') as HTMLSelectElement).value = todo.status || 'Pending';
-    (document.getElementById('editToDoPriority') as HTMLSelectElement).value = todo.priority || 'Standard';
-    (document.getElementById('editToDoAssignedTo') as HTMLSelectElement).value = todo.assigned_to || '';
-    (document.getElementById('editToDoCreatedBy') as HTMLSelectElement).value = todo.created_by || '';
-    (document.getElementById('editToDoStartDate') as HTMLInputElement).value = todo.start_date || '';
-    (document.getElementById('editToDoUpdatedAt') as HTMLInputElement).value = todo.updated_at || '';
-    (document.getElementById('editToDoEstimatedHours') as HTMLInputElement).value = todo.estimated_hours || '';
-    (document.getElementById('editToDoActualHours') as HTMLInputElement).value = todo.actual_hours || '';
-    (document.getElementById('editToDoDueDate') as HTMLInputElement).value = todo.due_date || '';
-    (document.getElementById('editToDoDependencies') as HTMLSelectElement).value = todo.dependencies || '';
-    (document.getElementById('editToDoComments') as HTMLTextAreaElement).value = todo.comments || '';
-    // Open the modal
-    const modal = document.getElementById('editToDoModal') as HTMLDialogElement | null;
-    if (modal) modal.showModal();
-  };
+  // Find responsible user
+  const responsibleUser = projectState && projectState.assignedUsers
+    ? usersManagerInstance.getUsers().find(u => u.id === todo.assigned_to)
+    : null;
   return (
-    <div key={todo.id || idx} className="todoItem" style={{background: bgColor, color: '#fff', padding: 10, borderRadius: 8, marginBottom: 5, cursor: 'pointer'}} onClick={handleEditToDo}>
+    <div key={todo.id || idx} className="todoItem" style={{background: bgColor, color: '#fff', padding: 10, borderRadius: 8, marginBottom: 5, cursor: 'pointer'}} onClick={() => openEditToDoModal(todo)}>
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <div style={{display: 'flex', columnGap: 15, alignItems: 'center'}}>
           <span className="material-icons-round" style={{backgroundColor: '#969696', padding: 8, borderRadius: 8, aspectRatio: 1, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>construction</span>
-          <p style={{margin: 0}}>{todo.title}</p>
+          <div>
+            <p style={{margin: 0, fontWeight: 600}}>{todo.title}</p>
+            <div style={{fontSize: 12, color: '#bbb', marginTop: 2}}>
+              Priority: <b>{todo.priority}</b> | Due: <b>{todo.due_date || '-'}</b> | Responsible: <b>{responsibleUser ? `${responsibleUser.name} ${responsibleUser.surname}` : '-'}</b>
+            </div>
+          </div>
         </div>
         <p style={{whiteSpace: 'nowrap', marginLeft: 10}}>{todo.due_date}</p>
       </div>
@@ -1050,13 +1187,65 @@ export function ProjectDetailsPage(props: Props) {
           </div>
         </div>
       </div>
+      <div className="dashboardCard">
+        <h4>Assigned Users</h4>
+        <ul>
+          {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
+            projectState.assignedUsers.map((au, idx) => {
+              const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
+              return (
+                <li key={au.userId} style={{marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'}}
+                    onClick={() => window.openEditUserModal && window.openEditUserModal(au.userId)}>
+                  {user ? `${user.name} ${user.surname}` : 'Unknown User'} — <b>{au.role}</b>
+                  <button
+                    className="buttonTertiary"
+                    style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                    title="Remove user from project"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : 'Unknown User' });
+                      const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
+                      if (modal) modal.showModal();
+                    }}
+                  >
+                    <span className="material-icons-round" style={{fontSize: 18}}>close</span>
+                  </button>
+                </li>
+              );
+            })
+          ) : (
+            <li>No users assigned to this project.</li>
+          )}
+        </ul>
+        <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
+          <span className="material-icons-round">add</span> Assign User
+        </button>
+      </div>
+      {/* Delete User Modal */}
+      <dialog id="DeleteUserModal">
+        <form className="userForm" id="DeleteUserForm">
+          <h2>Are you sure you want to delete the user {userToDelete?.name}?</h2>
+          <div className="cancelAccept">
+            <button
+              type="button"
+              className="cancelButton"
+              onClick={() => { setUserToDelete(null); closeModal('DeleteUserModal'); }}>
+              Cancel
+            </button>
+            <button type="button" className="acceptButton" id="ConfirmDeleteUserButton" onClick={handleConfirmDeleteUser}>Delete</button>
+          </div>
+        </form>
+      </dialog>
+      <div id="viewerContainer" className="dashboardCard" style={{ minWidth: 0, minHeight: 700, maxHeight: 700 }} />
     </div>
-    <div
-      id="viewerContainer"
-      className="dashboardCard"
-      style={{ minWidth: 0, minHeight: 700, maxHeight: 700 }}
-    />
-  </div>
-</div>
-)
+  </div> {/* Close mainPageContent */}
+</div> ); {/* Close page */}
+;
+}
+
+// Declare global interface for window
+declare global {
+  interface Window {
+    openEditUserModal?: (userId: string) => void;
+  }
 }

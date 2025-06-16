@@ -8,6 +8,7 @@ import { setCurrentProjectId } from "../index"; // Import the global constant an
 import { toDo, ItoDo } from "./toDo";
 import { IUser, User } from "./User";
 import { users } from "./UsersManager";
+import { CompaniesManager, companiesManagerInstance } from "./CompaniesManager";
 
 export let currentProject: Project | null = null; // Ensure it's globally accessible
 
@@ -705,9 +706,11 @@ export class ProjectsManager {
             company: user.company
         }));
 
-        const exportableData = { projects, usersJSON };
+        // --- Add companies to export ---
+        const companies = companiesManagerInstance.exportCompanies();
+        const exportableData = { projects, usersJSON, companies };
 
-        console.log("Exporting projects and users to JSON:", exportableData);
+        console.log("Exporting projects, users, and companies to JSON:", exportableData);
 
         const json = JSON.stringify(exportableData, null, 2);
 
@@ -745,6 +748,10 @@ export class ProjectsManager {
 
                     const projects: any[] = parsedData.projects;
                     const importedUsers: IUser[] = parsedData.usersJSON || [];
+                    // --- Import companies if present ---
+                    if (parsedData.companies) {
+                        companiesManagerInstance.importCompanies(parsedData.companies);
+                    }
 
                     for (const projectData of projects) {
                         try {
@@ -785,7 +792,7 @@ export class ProjectsManager {
                     }
 
                     if (onComplete) onComplete();
-                    console.log("Projects and users imported successfully.");
+                    console.log("Projects, users, and companies imported successfully.");
                 } catch (error) {
                     console.error("Error parsing the JSON file:", error);
                     if (onComplete) onComplete();

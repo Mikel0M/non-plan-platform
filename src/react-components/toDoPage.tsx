@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import * as Router from 'react-router-dom';
 import { toDoManager } from '../classes/toDoManager';
+import { usersManagerInstance } from '../classes/UsersManager';
 
 interface Props {
 
@@ -73,7 +74,8 @@ export function ToDoPage(props: Props) {
 
     // Handle new to-do form changes
     const handleNewToDoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      setNewToDo({ ...newToDo, [e.target.name]: e.target.value });
+      const { name, value } = e.target;
+      setNewToDo(prev => ({ ...prev, [name]: value }));
     };
 
     // Refs
@@ -117,55 +119,80 @@ export function ToDoPage(props: Props) {
 
     // State for editing a to-do
     const [editToDo, setEditToDo] = React.useState<any | null>(null);
+    const [editToDoFields, setEditToDoFields] = React.useState({
+      id: '',
+      title: '',
+      description: '',
+      status: 'Pending',
+      priority: 'Standard',
+      assigned_to: '',
+      created_by: '',
+      due_date: '',
+      start_date: '',
+      estimated_hours: '',
+      actual_hours: '',
+      updated_at: '',
+      dependencies: '',
+      comments: '',
+    });
+    const [editToDoProject, setEditToDoProject] = React.useState<any | null>(null);
 
     // Function to open the edit modal for a to-do
     const openEditToDoModal = (todo: any) => {
       setEditToDo(todo);
+      // Find the project for this to-do
+      const project = props.projectsManager.list.find(p => p.id === todo.project_id);
+      setEditToDoProject(project || null);
+      setEditToDoFields({
+        id: todo.id || '',
+        title: todo.title || '',
+        description: todo.description || '',
+        status: todo.status || 'Pending',
+        priority: todo.priority || 'Standard',
+        assigned_to: todo.assigned_to || '',
+        created_by: todo.created_by || '',
+        due_date: todo.due_date || '',
+        start_date: todo.start_date || '',
+        estimated_hours: todo.estimated_hours || '',
+        actual_hours: todo.actual_hours || '',
+        updated_at: todo.updated_at || '',
+        dependencies: (todo.dependencies || []).join(', '),
+        comments: (todo.comments || []).join('\n'),
+      });
       setTimeout(() => {
-        (document.getElementById('editToDoId') as HTMLInputElement).value = todo.id || '';
-        (document.getElementById('editToDoTitle') as HTMLInputElement).value = todo.title || '';
-        (document.getElementById('editToDoDescription') as HTMLTextAreaElement).value = todo.description || '';
-        (document.getElementById('editToDoStatus') as HTMLSelectElement).value = todo.status || 'Pending';
-        (document.getElementById('editToDoPriority') as HTMLSelectElement).value = todo.priority || 'Standard';
-        (document.getElementById('editToDoAssignedTo') as HTMLSelectElement).value = todo.assigned_to || '';
-        (document.getElementById('editToDoCreatedBy') as HTMLSelectElement).value = todo.created_by || '';
-        (document.getElementById('editToDoStartDate') as HTMLInputElement).value = todo.start_date || '';
-        (document.getElementById('editToDoUpdatedAt') as HTMLInputElement).value = todo.updated_at || '';
-        (document.getElementById('editToDoEstimatedHours') as HTMLInputElement).value = todo.estimated_hours || '';
-        (document.getElementById('editToDoActualHours') as HTMLInputElement).value = todo.actual_hours || '';
-        (document.getElementById('editToDoDueDate') as HTMLInputElement).value = todo.due_date || '';
-        (document.getElementById('editToDoDependencies') as HTMLSelectElement).value = todo.dependencies || '';
-        (document.getElementById('editToDoComments') as HTMLTextAreaElement).value = todo.comments || '';
         const modal = document.getElementById('editToDoModal') as HTMLDialogElement | null;
         if (modal) modal.showModal();
       }, 0);
     };
 
+    // Handle edit to-do form changes
+    const handleEditToDoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setEditToDoFields(prev => ({ ...prev, [name]: value }));
+    };
+
     // Handler for editing a to-do
     const handleEditToDoSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      const form = e.target as HTMLFormElement;
-      const id = (form.elements.namedItem('editToDoId') as HTMLInputElement).value;
+      const id = editToDoFields.id;
       // Update the to-do in all projects
       props.projectsManager.list.forEach(project => {
         if (project.toDos) {
           project.toDos.forEach(td => {
             if (td.id === id) {
-              td.title = (form.elements.namedItem('toDoTitle') as HTMLInputElement).value;
-              td.description = (form.elements.namedItem('toDoDescription') as HTMLTextAreaElement).value;
-              td.status = (form.elements.namedItem('toDoStatus') as HTMLSelectElement).value as any;
-              td.priority = (form.elements.namedItem('toDoPriority') as HTMLSelectElement).value as any;
-              td.assigned_to = (form.elements.namedItem('edittoDoAssignedTo') as HTMLSelectElement).value;
-              td.created_by = (form.elements.namedItem('edittoDoCreatedBy') as HTMLSelectElement).value;
-              td.start_date = (form.elements.namedItem('editToDoStartDate') as HTMLInputElement).value;
-              td.updated_at = (form.elements.namedItem('editToDoUpdatedAt') as HTMLInputElement).value;
-              td.estimated_hours = parseFloat((form.elements.namedItem('editToDoEstimatedHours') as HTMLInputElement).value) || 0;
-              td.actual_hours = parseFloat((form.elements.namedItem('editToDoActualHours') as HTMLInputElement).value) || 0;
-              td.due_date = (form.elements.namedItem('editToDoDueDate') as HTMLInputElement).value;
-              const depVal = (form.elements.namedItem('editToDoDependencies') as HTMLSelectElement).value;
-              td.dependencies = depVal ? depVal.split(',').map(s => s.trim()) : [];
-              const commentsVal = (form.elements.namedItem('editToDoComments') as HTMLTextAreaElement).value;
-              td.comments = commentsVal ? [commentsVal] : [];
+              td.title = editToDoFields.title;
+              td.description = editToDoFields.description;
+              td.status = editToDoFields.status as any;
+              td.priority = editToDoFields.priority as any;
+              td.assigned_to = editToDoFields.assigned_to;
+              td.created_by = editToDoFields.created_by;
+              td.start_date = editToDoFields.start_date;
+              td.updated_at = editToDoFields.updated_at;
+              td.estimated_hours = parseFloat(editToDoFields.estimated_hours) || 0;
+              td.actual_hours = parseFloat(editToDoFields.actual_hours) || 0;
+              td.due_date = editToDoFields.due_date;
+              td.dependencies = editToDoFields.dependencies ? editToDoFields.dependencies.split(',').map(s => s.trim()) : [];
+              td.comments = editToDoFields.comments ? [editToDoFields.comments] : [];
             }
           });
         }
@@ -210,6 +237,14 @@ export function ToDoPage(props: Props) {
       }
     };
 
+    // Helper to get assigned users for a project
+    const getAssignedUsers = (project) => {
+      if (!project || !project.assignedUsers) return [];
+      return project.assignedUsers
+        .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+        .filter(Boolean);
+    };
+
     return (
       <div className="page" id="toDoPage" style={{ display: "flex", flexDirection: "column", gap: 32 }}>
         <h2 style={{margin: "20px 0"}}>All To-Dos by Project</h2>
@@ -237,6 +272,10 @@ export function ToDoPage(props: Props) {
                   case 'On Hold': bgColor = '#E57373'; break;
                   default: bgColor = '#222';
                 }
+                // Find assigned user for this project
+                const assignedUser = (project.assignedUsers || [])
+                  .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+                  .find(u => u && u.id === todo.assigned_to);
                 return (
                   <div
                     key={todo.id}
@@ -262,7 +301,12 @@ export function ToDoPage(props: Props) {
                           alignItems: 'center',
                           justifyContent: 'center'
                         }}>construction</span>
-                        <p style={{margin: 0}}>{todo.title}</p>
+                        <div>
+                          <p style={{margin: 0, fontWeight: 600}}>{todo.title}</p>
+                          <div style={{fontSize: 12, color: '#bbb', marginTop: 2}}>
+                            Priority: <b>{todo.priority}</b> | Due: <b>{todo.due_date || '-'}</b> | Responsible: <b>{assignedUser ? `${assignedUser.name} ${assignedUser.surname}` : '-'}</b>
+                          </div>
+                        </div>
                       </div>
                       <p style={{whiteSpace: 'nowrap', marginLeft: 10}}>{todo.due_date}</p>
                     </div>
@@ -276,7 +320,7 @@ export function ToDoPage(props: Props) {
         {/* Edit To-Do Modal */}
         <dialog id="editToDoModal">
           <form className="toDoForm" id="editToDoForm" onSubmit={handleEditToDoSubmit}>
-            <input type="hidden" id="editToDoId" name="editToDoId" />
+            <input type="hidden" id="editToDoId" name="id" value={editToDoFields.id} />
             <div className="userCard">
               <div className="formGrid">
                 <div className="formColumn">
@@ -292,7 +336,7 @@ export function ToDoPage(props: Props) {
                     <label>
                       <span className="material-icons-round">apartment</span>Title
                     </label>
-                    <input name="toDoTitle" type="text" id="editToDoTitle" />
+                    <input name="title" type="text" id="editToDoTitle" value={editToDoFields.title} onChange={handleEditToDoChange} />
                     <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
                       TIP give it a short title
                     </label>
@@ -302,12 +346,13 @@ export function ToDoPage(props: Props) {
                       <span className="material-icons-round">subject</span>Description
                     </label>
                     <textarea
-                      name="toDoDescription"
+                      name="description"
                       cols={30}
                       rows={5}
                       placeholder="Give your project a nice description!"
                       id="editToDoDescription"
-                      defaultValue={""}
+                      value={editToDoFields.description}
+                      onChange={handleEditToDoChange}
                     />
                   </div>
                   <div className="formFieldContainer">
@@ -315,7 +360,7 @@ export function ToDoPage(props: Props) {
                       <span className="material-icons-round">not_listed_location</span>
                       Status
                     </label>
-                    <select name="toDoStatus" id="editToDoStatus">
+                    <select name="status" id="editToDoStatus" value={editToDoFields.status} onChange={handleEditToDoChange}>
                       <option>Pending</option>
                       <option>In Progress</option>
                       <option>Completed</option>
@@ -327,7 +372,7 @@ export function ToDoPage(props: Props) {
                       <span className="material-icons-round">not_listed_location</span>
                       Priority
                     </label>
-                    <select name="toDoPriority" id="editToDoPriority">
+                    <select name="priority" id="editToDoPriority" value={editToDoFields.priority} onChange={handleEditToDoChange}>
                       <option>High</option>
                       <option>Standard</option>
                       <option>Low</option>
@@ -345,8 +390,11 @@ export function ToDoPage(props: Props) {
                       <span className="material-icons-round">not_listed_location</span>
                       Responsible Person
                     </label>
-                    <select name="edittoDoAssignedTo" id="editToDoAssignedTo">
-                      {/* Options will be dynamically populated */}
+                    <select name="assigned_to" id="editToDoAssignedTo" value={editToDoFields.assigned_to} onChange={handleEditToDoChange}>
+                      <option value="">Select user</option>
+                      {(editToDoProject ? getAssignedUsers(editToDoProject) : []).map(user => (
+                        <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="formFieldContainer">
@@ -354,8 +402,11 @@ export function ToDoPage(props: Props) {
                       <span className="material-icons-round">not_listed_location</span>
                       Created By
                     </label>
-                    <select name="edittoDoCreatedBy" id="editToDoCreatedBy">
-                      {/* Options will be dynamically populated */}
+                    <select name="created_by" id="editToDoCreatedBy" value={editToDoFields.created_by} onChange={handleEditToDoChange}>
+                      <option value="">Select user</option>
+                      {(editToDoProject ? getAssignedUsers(editToDoProject) : []).map(user => (
+                        <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="formFieldContainer">
@@ -363,26 +414,26 @@ export function ToDoPage(props: Props) {
                       <span className="material-icons-round">calendar_today</span>
                       To-Do start date
                     </label>
-                    <input name="editToDoStartDate" type="date" id="editToDoStartDate" />
+                    <input name="start_date" type="date" id="editToDoStartDate" value={editToDoFields.start_date} onChange={handleEditToDoChange} />
                   </div>
                   <div className="formFieldContainer">
                     <label>
                       <span className="material-icons-round">calendar_month</span>
                       To-Do last update date
                     </label>
-                    <input name="editToDoUpdatedAt" type="date" id="editToDoUpdatedAt" />
+                    <input name="updated_at" type="date" id="editToDoUpdatedAt" value={editToDoFields.updated_at} onChange={handleEditToDoChange} />
                   </div>
                   <div className="formFieldContainer">
                     <label>
                       <span className="material-icons-round">paid</span>Estimated hours
                     </label>
-                    <input name="editToDoEstimatedHours" type="number" placeholder="Estimated hours for the project" id="editToDoEstimatedHours" />
+                    <input name="estimated_hours" type="number" placeholder="Estimated hours for the project" id="editToDoEstimatedHours" value={editToDoFields.estimated_hours} onChange={handleEditToDoChange} />
                   </div>
                   <div className="formFieldContainer">
                     <label>
                       <span className="material-icons-round">paid</span>Actual hours
                     </label>
-                    <input name="editToDoActualHours" type="number" placeholder="Hours used so far" id="editToDoActualHours" />
+                    <input name="actual_hours" type="number" placeholder="Hours used so far" id="editToDoActualHours" value={editToDoFields.actual_hours} onChange={handleEditToDoChange} />
                   </div>
                 </div>
               </div>
@@ -393,13 +444,13 @@ export function ToDoPage(props: Props) {
                     <label>
                       <span className="material-icons-round">calendar_month</span>Due Date
                     </label>
-                    <input name="editToDoDueDate" type="date" id="editToDoDueDate" />
+                    <input name="due_date" type="date" id="editToDoDueDate" value={editToDoFields.due_date} onChange={handleEditToDoChange} />
                   </div>
                   <div className="formFieldContainer">
                     <label>
                       <span className="material-icons-round">calendar_month</span>Start Date
                     </label>
-                    <input name="editToDoStartDate" type="date" id="editToDoStartDate" />
+                    <input name="start_date" type="date" id="editToDoStartDate2" value={editToDoFields.start_date} onChange={handleEditToDoChange} />
                   </div>
                 </div>
                 <div className="formColumn">
@@ -411,11 +462,7 @@ export function ToDoPage(props: Props) {
                     <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
                       Select the tasks this project is dependent on
                     </label>
-                    <select name="editToDoDependencies" id="editToDoDependencies">
-                      <option>You</option>
-                      <option>Standard</option>
-                      <option>Low</option>
-                    </select>
+                    <input name="dependencies" id="editToDoDependencies" value={editToDoFields.dependencies} onChange={handleEditToDoChange} />
                   </div>
                 </div>
               </div>
@@ -425,12 +472,13 @@ export function ToDoPage(props: Props) {
                   <span className="material-icons-round">subject</span>Comments
                 </label>
                 <textarea
-                  name="editToDoComments"
+                  name="comments"
                   cols={30}
                   rows={5}
                   placeholder="Add any clarification comment"
                   id="editToDoComments"
-                  defaultValue={""}
+                  value={editToDoFields.comments}
+                  onChange={handleEditToDoChange}
                 />
               </div>
             </div>
@@ -525,7 +573,10 @@ export function ToDoPage(props: Props) {
                       Responsible Person
                     </label>
                     <select name="assigned_to" id="newToDoAssignedTo" value={newToDo.assigned_to} onChange={handleNewToDoChange}>
-                      {/* Options will be dynamically populated */}
+                      <option value="">Select user</option>
+                      {getAssignedUsers(newToDoProject || projectState).map(user => (
+                        <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="formFieldContainer">
@@ -534,7 +585,10 @@ export function ToDoPage(props: Props) {
                       Created By
                     </label>
                     <select name="created_by" id="newToDoCreatedBy" value={newToDo.created_by} onChange={handleNewToDoChange}>
-                      {/* Options will be dynamically populated */}
+                      <option value="">Select user</option>
+                      {getAssignedUsers(newToDoProject || projectState).map(user => (
+                        <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="formFieldContainer">

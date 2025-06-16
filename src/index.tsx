@@ -7,8 +7,8 @@ import {Banner} from './react-components/Banner';
 import { IProject, status, userRole, phase, Project} from "./classes/Project"
 import { IUser, usersRole, access} from "./classes/User"
 import { UsersManager } from "./classes/UsersManager"
-import { ICompany} from "./classes/Companies"
-import { CompanyManager } from "./classes/CompaniesManager"
+import { ICompany } from "./classes/Company"
+import { CompaniesManager, companiesManagerInstance } from "./classes/CompaniesManager"
 import { ItoDo, toDoPriority, toDoStatus, toDoPercentage } from "./classes/toDo"
 import { toDoManager } from "./classes/toDoManager"
 import { toDoManagerInstance } from './classes/toDoManager';
@@ -783,7 +783,8 @@ document.getElementById('newToDoForm')!.addEventListener('submit', (event) => {
 function exportData() {
     const toDos = toDoManagerInstance.exportToDos();
     const users = projectsManager.exportUsers();
-    return { toDos, users };
+    const companies = companiesManagerInstance.exportCompanies();
+    return { toDos, users, companies };
 }
 
 // Example usage

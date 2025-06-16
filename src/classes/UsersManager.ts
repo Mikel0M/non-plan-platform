@@ -170,6 +170,45 @@ export class UsersManager {
 
         console.log("To-Do user list refreshed");
     }
+
+    /**
+     * Update a user by id with new data (React-friendly, no DOM)
+     */
+    editUser(data: IUser) {
+        const user = users.find(u => u.id === data.id);
+        if (user) {
+            user.name = data.name;
+            user.surname = data.surname;
+            user.email = data.email;
+            user.phone = data.phone;
+            user.role = data.role;
+            user.access = data.access;
+            user.company = data.company;
+            // Optionally update icon/color if needed
+            // user.icon = data.icon;
+            // user.color = data.color;
+        }
+        const user2 = this.list.find(u => u.id === data.id);
+        if (user2) {
+            user2.name = data.name;
+            user2.surname = data.surname;
+            user2.email = data.email;
+            user2.phone = data.phone;
+            user2.role = data.role;
+            user2.access = data.access;
+            user2.company = data.company;
+        }
+    }
+
+    /**
+     * Delete a user by id from the users and list arrays
+     */
+    deleteUser(userId: string) {
+        const idx = users.findIndex(u => u.id === userId);
+        if (idx !== -1) users.splice(idx, 1);
+        const idx2 = this.list.findIndex(u => u.id === userId);
+        if (idx2 !== -1) this.list.splice(idx2, 1);
+    }
 }
 
 // Create and export an instance of UsersManager
