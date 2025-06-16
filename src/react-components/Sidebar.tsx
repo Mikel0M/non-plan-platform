@@ -17,9 +17,11 @@ export function Sidebar({ customStyle }: { customStyle?: React.CSSProperties }) 
                 <Router.Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <li id="projectsBtn" className={isActive('/') ? 'active' : ''}><span className="material-icons-round">maps_home_work</span>Projects</li>
                 </Router.Link>
-                <li id="usersBtn" style={{ cursor: 'pointer' }} className={location.hash === '#users' ? 'active' : ''} onClick={() => navigate('#users')}>
-                    <span className="material-icons-round">people</span>Users
-                </li>
+                <Router.Link to="/users" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <li id="usersBtn" className={isActive('/users') ? 'active' : ''} style={{ cursor: 'pointer' }}>
+                        <span className="material-icons-round">people</span>Users
+                    </li>
+                </Router.Link>
                 <li className={location.pathname === '/dashboard' ? 'active' : ''}><span className="material-icons-round">dashboard</span>Dashboard</li>
                 <Router.Link to="/toDo" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <li id="toDoBtn" className={isActive('/toDo') ? 'active' : ''}><span className="material-icons-round">task</span>Tasks/To-Do</li>

@@ -16,6 +16,7 @@ import { usersManagerInstance, users } from "./classes/UsersManager";
 import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
 import { ProjectsManager } from './classes/ProjectsManager';
 import { ToDoPage } from "./react-components/toDoPage";
+import { UsersPage } from './react-components/Users';
 
 const projectsManager = new ProjectsManager();
 
@@ -33,6 +34,7 @@ appRoot.render(
                         <Router.Route path="/" element={<ProjectsPage projectManager={projectsManager} customStyle={{ zIndex: 2, position: "relative" }} />}></Router.Route>
                         <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} />} />
                         <Router.Route path="/toDo" element={<ToDoPage toDoManager={toDoManagerInstance} projectsManager={projectsManager} />} />
+                        <Router.Route path="/users" element={<UsersPage usersManager={usersManagerInstance} projectsManager={projectsManager} />} />
                     </Router.Routes>
                 </div>
             </div>
@@ -396,7 +398,7 @@ usersBtn?.addEventListener("click", () => {
 
     // Refresh the users UI
     console.log("Refreshing users UI...");
-    usersManagerInstance.refreshUsersUI();
+    // usersManagerInstance.refreshUsersUI(); // No longer needed, UI is now managed by React
 });
 
 /**
@@ -454,7 +456,7 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
  * - Resets the form and closes the modal dialog for a clean user experience.
  */
 const usersListUI = document.getElementById("usersList") as HTMLElement;
-const usersManager = new UsersManager(usersListUI);
+
 
 // Function to update the user count
 function updateUserCount() {

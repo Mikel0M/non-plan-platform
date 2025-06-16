@@ -1,6 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
-import { openChangeUserModal } from "../index";
-import { UsersManager, usersManagerInstance } from "./UsersManager";
+import { v4 as uuidv4 } from 'uuid';import { UsersManager, usersManagerInstance } from "./UsersManager";
 
 const usersListUI = document.getElementById("usersList") as HTMLElement;
 
