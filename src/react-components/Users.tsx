@@ -222,7 +222,36 @@ export function UsersPage(props: Props) {
     };
 
     return (
-        <div className="page" id="usersPage" style={{ display: "flex" }}>
+        <div className="page page-flex" id="usersPage">
+            <header>
+                {/* Removed the Users/Companies title */}
+                <div className="flex-row-gap-10">
+                    <button
+                      className={activeTab === 'users' ? 'buttonTertiary active' : 'buttonTertiary'}
+                      onClick={() => setActiveTab('users')}
+                    >
+                      Users
+                    </button>
+                    <button
+                      className={activeTab === 'companies' ? 'buttonTertiary active' : 'buttonTertiary'}
+                      onClick={() => setActiveTab('companies')}
+                    >
+                      Companies
+                    </button>
+                    {activeTab === 'users' && (
+                      <button id="newUserBtn" className="buttonTertiary" onClick={() => setOpenModal('newUser')}>
+                        <span className="material-icons-round">add</span>
+                        <span className="material-icons-round">person</span>
+                      </button>
+                    )}
+                    {activeTab === 'companies' && (
+                      <button id="newCompanyBtn" className="buttonTertiary" onClick={() => setOpenModal('newCompany')}>
+                        <span className="material-icons-round">add</span>
+                        <span className="material-icons-round">business</span>
+                      </button>
+                    )}
+                </div>
+            </header>
             <dialog id="newUserModal" ref={newUserModalRef}>
                 <form className="userForm" id="newUserForm" onSubmit={handleNewUserSubmit}>
                     <h2>New User</h2>
@@ -469,41 +498,10 @@ export function UsersPage(props: Props) {
                 </div>
               </form>
             </dialog>
-            <header>
-              <h2>{activeTab === 'users' ? 'Users' : 'Companies'}</h2>
-              <div style={{ display: 'flex', flexDirection: 'row', columnGap: 10 }}>
-                <button
-                  className={activeTab === 'users' ? 'buttonTertiary active' : 'buttonTertiary'}
-                  onClick={() => setActiveTab('users')}
-                  style={{ fontWeight: activeTab === 'users' ? 'bold' : 'normal' }}
-                >
-                  Users
-                </button>
-                <button
-                  className={activeTab === 'companies' ? 'buttonTertiary active' : 'buttonTertiary'}
-                  onClick={() => setActiveTab('companies')}
-                  style={{ fontWeight: activeTab === 'companies' ? 'bold' : 'normal' }}
-                >
-                  Companies
-                </button>
-                {activeTab === 'users' && (
-                  <button id="newUserBtn" className="buttonTertiary" onClick={() => setOpenModal('newUser')}>
-                    <span className="material-icons-round">add</span>
-                    <span className="material-icons-round">person</span>
-                  </button>
-                )}
-                {activeTab === 'companies' && (
-                  <button id="newCompanyBtn" className="buttonTertiary" onClick={() => setOpenModal('newCompany')}>
-                    <span className="material-icons-round">add</span>
-                    <span className="material-icons-round">business</span>
-                  </button>
-                )}
-              </div>
-            </header>
-            <div style={{ display: 'flex', flexDirection: 'row', fontSize: 'var(--fontSizeStandard)', height: 40, columnGap: 100, paddingLeft: 30 }}>
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
-                <label style={{ paddingLeft: 10 }}>Total number of {activeTab === 'users' ? 'Users' : 'Companies'}:</label>
-                <label style={{ paddingLeft: 15 }} id="userCount">
+            <div className="flex-row-gap-100 padding-left-30" style={{ fontSize: 'var(--fontSizeStandard)', height: 40 }}>
+              <div className="flex-row">
+                <label className="label-tip">Total number of {activeTab === 'users' ? 'Users' : 'Companies'}:</label>
+                <label className="label-tip" id="userCount">
                   {activeTab === 'users' ? users.length : companies.length}
                 </label>
               </div>
@@ -520,12 +518,12 @@ export function UsersPage(props: Props) {
                       alignItems: "center"
                   }}
               >
-                  <label style={{ paddingLeft: 10 }}>User name</label>
-                  <label>Access</label>
-                  <label>Role</label>
-                  <label>Company</label>
-                  <label>Last active</label>
-                  <label style={{ justifySelf: "end" }}>Edit</label>
+                  <label className="label-tip">User name</label>
+                  <label className="label-tip">Access</label>
+                  <label className="label-tip">Role</label>
+                  <label className="label-tip">Company</label>
+                  <label className="label-tip">Last active</label>
+                  <label className="label-tip" style={{ justifySelf: "end" }}>Edit</label>
               </div>
             )}
             <div></div>

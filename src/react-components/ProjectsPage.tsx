@@ -20,14 +20,18 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     const projectCards = projects.map((project) => {
         return (
             <Router.Link to={`/project/${project.id}`} key={project.id} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div>
-                    <ProjectCard project={project} />
-                </div>
+                <ProjectCard project={project} />
             </Router.Link>
         )
     })
 
-    React.useEffect(() => {console.log("Projects state updated", projects)}, [projects])
+    React.useEffect(() => {
+        console.log("Projects state updated", projects)
+        const grid = document.querySelector('.project-cards-grid');
+        if (grid) {
+            console.log('Grid width:', grid.clientWidth);
+        }
+    }, [projects])
     
 
     const onNewProjectClick = () => {
@@ -81,10 +85,26 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     };
 
     return (
-        <div className="page" id="projectsPage" style={{ display: "flex", padding: 0, margin: 0, marginTop: "20px", marginLeft: "0px", marginRight: "0px", ...customStyle }}>
+        <div className="page" id="projectsPage">
+            <header>
+                <div style={{ display: "flex", gap: "10px", margin: "15px 0" }}>
+                    <button id="importProjectsBtn" className="buttonTertiary" onClick={onImportClick}>
+                        <span className="material-icons-round">file_download</span>
+                    </button>
+                    <button id="exportProjectsBtn" className="buttonTertiary" onClick={onExportClick}>
+                        <span className="material-icons-round">file_upload</span>
+                    </button>
+                    <button onClick={onNewProjectClick} id="newProjectBtn" className="buttonTertiary">
+                        <span className="material-icons-round">add</span>
+                    </button>
+                </div>
+            </header>
+            <div className="project-cards-grid">
+                {projectCards}
+            </div>
             {isModalOpen && (
                 <dialog id="newProjectModal" open>
-                    <form onSubmit={(e) => {onFormSubmit(e)}} className="userForm" id="newProjectForm" style={{width: 500, maxWidth: '95vw', minWidth: 350, boxSizing: 'border-box'}}>
+                    <form onSubmit={(e) => {onFormSubmit(e)}} className="userForm form-wide" id="newProjectForm">
                     <h2>New Project</h2>
                     <div className="userCard">
                         <div className="formFieldContainer">
@@ -96,7 +116,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                             type="text"
                             placeholder="What's the name of your project?"
                         />
-                        <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
+                        <label className="label-tip">
                             TIP give it a short name
                         </label>
                         </div>
@@ -121,7 +141,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                             type="text"
                             placeholder="Where is your project located?"
                         />
-                        <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }} />
+                        <label className="label-tip" />
                         </div>
                         <div className="formFieldContainer">
                         <label>
@@ -132,7 +152,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                             type="number"
                             placeholder="What's the estimated cost of the project?"
                         />
-                        <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
+                        <label className="label-tip">
                             Estimated cost of the project
                         </label>
                         </div>
@@ -146,7 +166,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                             type="number"
                             placeholder="What's the estimated completion progress of the project?"
                         />
-                        <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
+                        <label className="label-tip">
                             Estimated progress percentage of the project
                         </label>
                         </div>
@@ -268,39 +288,6 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                     </form>
                 </dialog>
             )}
-            <header
-                style={{
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    zIndex: 100,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "20px 20px 0 0px",
-                    marginTop: "70px",
-                    gap: "50px",
-                    background: "var(--secondary100)",
-                }}
-            >
-                {/* Left-aligned text */}
-                <h2 style={{ marginRight: "auto",marginLeft: "250px" }}>Projects</h2>
-
-                {/* Right-aligned buttons */}
-                <div style={{ display: "flex", gap: "10px",  }}>
-                    <button id="importProjectsBtn" className="buttonTertiary" onClick={onImportClick}>
-                        <span className="material-icons-round">file_download</span>
-                    </button>
-                    <button id="exportProjectsBtn" className="buttonTertiary" onClick={onExportClick}>
-                        <span className="material-icons-round">file_upload</span>
-                    </button>
-                    <button onClick={(onNewProjectClick)} id="newProjectBtn" className="buttonTertiary">
-                        <span className="material-icons-round">add</span>
-                    </button>
-                </div>
-            </header>
-            <div id="projectsList" className="projectsList" style={{marginTop: "70px", marginLeft: 0}}>{ projectCards}</div>
     </div>
 
     )

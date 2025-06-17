@@ -53,17 +53,18 @@
 }
 
 #banner {
-    margin-top: 70px; /* Adjust based on your header height */
-    display: grid;
-    grid-template-areas:
-        "header header"
-        "sidebar main";
-    grid-template-rows: 70px 1fr; /* Adjust the second row to take remaining space */
-    grid-template-columns: 200px auto;
-    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 200px; /* Start after sidebar */
+    right: 0;
+    height: 70px;
     background-color: var(--background);
     color: #fff;
-    vertical-align: middle;
+    display: flex;
+    align-items: center;
+    z-index: 100;
+    padding: 0 24px;
+    box-sizing: border-box;
 }
 
 * {
@@ -353,6 +354,18 @@ buttonBlue:hover {
     display: flex;
     flex-direction: column;
     height: 100%;
+}
+
+/* Main page layout helpers for content areas */
+.page-flex {
+  display: flex;
+  gap: 32px;
+}
+
+.page-column {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
 /* Header styles */
@@ -651,6 +664,10 @@ input:focus, textarea:focus, select:focus {
     flex-direction: column;
 }
 
+#projectDetails {
+  width: calc(100vw - 200px);
+}
+
 #projectDetails > .mainPageContent {
     z-index: 5; /* Ensure it doesn't overlap the sidebar */
     position: relative;
@@ -659,6 +676,45 @@ input:focus, textarea:focus, select:focus {
     gap: 30px;
     grid-template-columns: 475px 1fr;
     height: 100%;
+}
+
+.project-details-main-block {
+  width: 100%;
+  margin-bottom: 32px;
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 32px;
+  align-items: start;
+}
+.project-dashboard-card {
+  width: 100%;
+}
+.project-assigned-users-card {
+  width: 100%;
+}
+
+.project-details-below-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 32px;
+  width: 100%;
+}
+.project-details-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 350px;
+}
+
+/* Remove .project-details-right-col, viewer will be placed directly in grid */
+
+#viewerContainer {
+  width: 100%;
+  min-width: 0;
+  min-height: 700px;
+  max-height: 700px;
+  grid-column: 2;
+  grid-row: 1 / span 2;
 }
 
 /* Users */
@@ -747,8 +803,20 @@ input:focus, textarea:focus, select:focus {
     row-gap: 20px;           /* Space between children */
 }
 
+/* Wide form for modal dialogs */
+.form-wide {
+  width: 500px;
+  max-width: 95vw;
+  min-width: 350px;
+  box-sizing: border-box;
+}
 
-
+/* Tip label styling */
+.label-tip {
+  font-size: 12px;
+  font-style: italic;
+  padding-top: 5px;
+}
 
 /* Language */
 
@@ -815,4 +883,145 @@ input:focus, textarea:focus, select:focus {
     padding: 20px;
     border-radius: 8px;
     color: #fff; /* White text color */
+}
+
+#main-content {
+  width: calc(100vw - 220px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin-left: 200px;
+  margin-right: 20px;
+}
+
+/* Modal z-index helper */
+.modal-z10 {
+  z-index: 10;
+}
+
+/* Error text */
+.error-text {
+  color: red;
+}
+
+/* Headings with no margin */
+.heading-no-margin {
+  margin: 0;
+}
+.heading-margin {
+  margin: 20px 0;
+}
+
+/* Todo card and item styles */
+.todo-card {
+  margin-bottom: 32px;
+  background: #222;
+  border-radius: 8px;
+  padding: 16px;
+}
+.todo-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.todo-card-title {
+  color: #fff;
+  margin: 0;
+  margin-right: 16px;
+}
+.todo-add-btn {
+  margin-left: 8px;
+  padding: 4px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  background: #444;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.todo-empty {
+  color: #aaa;
+}
+.todo-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.todo-item-title-row {
+  display: flex;
+  column-gap: 15px;
+  align-items: center;
+}
+.todo-item-title {
+  margin: 0;
+  font-weight: 600;
+}
+.todo-item-date {
+  white-space: nowrap;
+  margin-left: 10px;
+}
+.todo-item-desc {
+  font-size: 12px;
+  color: #bbb;
+  margin-top: 4px;
+}
+.todo-item-icon {
+  background-color: #969696;
+  padding: 8px;
+  border-radius: 8px;
+  aspect-ratio: 1;
+  display: flex;
+}
+
+/* Flex and gap helpers */
+.flex-row-gap-10 {
+  display: flex;
+  flex-direction: row;
+  column-gap: 10px;
+}
+.flex-row-gap-20 {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+.row-gap-20 {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+}
+.column-gap-10 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Project cards grid: left-to-right, wrapping */
+.project-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  width: 100%;
+  margin: 0;
+}
+
+/* User/company/todo cards: full width, stacked vertically */
+.user-cards-list, .todo-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  margin: 0;
+}
+
+.project-details-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  width: 100%;
+}
+.project-details-left,
+.project-details-right {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }

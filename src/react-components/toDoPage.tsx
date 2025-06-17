@@ -246,77 +246,57 @@ export function ToDoPage(props: Props) {
     };
 
     return (
-      <div className="page" id="toDoPage" style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-        <h2 style={{margin: "20px 0"}}>All To-Dos by Project</h2>
-        {props.projectsManager.list.map(project => (
-          <div key={project.id} style={{marginBottom: 32, background: "#222", borderRadius: 8, padding: 16}}>
-            <div style={{display: 'flex', alignItems: 'center', marginBottom: 12}}>
-              <h3 style={{color: "#fff", margin: 0, marginRight: 16}}>{project.name}</h3>
-              <button
-                className="buttonTertiary"
-                style={{marginLeft: 8, padding: '4px 12px', fontSize: 16, borderRadius: 6, background: '#444', color: '#fff', border: 'none', cursor: 'pointer'}}
-                onClick={() => openNewToDoModal(project)}
-              >
-                + Add To-Do
-              </button>
-            </div>
-            {(!project.toDos || project.toDos.length === 0) ? (
-              <div style={{color: "#aaa"}}>No to-dos for this project.</div>
-            ) : (
-              project.toDos.map(todo => {
-                let bgColor = '#222';
-                switch (todo.status) {
-                  case 'Pending': bgColor = '#969697'; break;
-                  case 'In Progress': bgColor = '#FFA500'; break;
-                  case 'Completed': bgColor = '#4CAF50'; break;
-                  case 'On Hold': bgColor = '#E57373'; break;
-                  default: bgColor = '#222';
-                }
-                // Find assigned user for this project
-                const assignedUser = (project.assignedUsers || [])
-                  .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
-                  .find(u => u && u.id === todo.assigned_to);
-                return (
-                  <div
-                    key={todo.id}
-                    className="todoItem"
-                    style={{
-                      background: bgColor,
-                      color: '#fff',
-                      padding: 10,
-                      borderRadius: 8,
-                      marginBottom: 8,
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => openEditToDoModal(todo)}
-                  >
-                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                      <div style={{display: 'flex', columnGap: 15, alignItems: 'center'}}>
-                        <span className="material-icons-round" style={{
-                          backgroundColor: '#969696',
-                          padding: 8,
-                          borderRadius: 8,
-                          aspectRatio: 1,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>construction</span>
-                        <div>
-                          <p style={{margin: 0, fontWeight: 600}}>{todo.title}</p>
-                          <div style={{fontSize: 12, color: '#bbb', marginTop: 2}}>
-                            Priority: <b>{todo.priority}</b> | Due: <b>{todo.due_date || '-'}</b> | Responsible: <b>{assignedUser ? `${assignedUser.name} ${assignedUser.surname}` : '-'}</b>
-                          </div>
+      <div className="page page-column" id="toDoPage">
+        <div className="todo-cards-list">
+          {props.projectsManager.list.map(project => (
+            <div key={project.id} className="todo-card">
+              <div className="todo-card-header">
+                <h3 className="todo-card-title">{project.name}</h3>
+                <button
+                  className="buttonTertiary todo-add-btn"
+                  onClick={() => openNewToDoModal(project)}
+                >
+                  + Add To-Do
+                </button>
+              </div>
+              {(!project.toDos || project.toDos.length === 0) ? (
+                <div className="todo-empty">No to-dos for this project.</div>
+              ) : (
+                project.toDos.map(todo => {
+                  let bgColor = '#222';
+                  switch (todo.status) {
+                    case 'Pending': bgColor = '#969697'; break;
+                    case 'In Progress': bgColor = '#FFA500'; break;
+                    case 'Completed': bgColor = '#4CAF50'; break;
+                    case 'On Hold': bgColor = '#E57373'; break;
+                    default: bgColor = '#222';
+                  }
+                  // Find assigned user for this project
+                  const assignedUser = (project.assignedUsers || [])
+                    .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+                    .find(u => u && u.id === todo.assigned_to);
+                  return (
+                    <div
+                      key={todo.id}
+                      className="todoItem"
+                      style={{ background: bgColor }}
+                      onClick={() => openEditToDoModal(todo)}
+                    >
+                      <div className="todo-item-header">
+                        <div className="todo-item-title-row">
+                          <span className="material-icons-round todo-item-icon" />
+                          <p className="todo-item-title">{todo.title}</p>
+                          <div className="todo-item-date">{todo.due_date}</div>
                         </div>
+                        <div className="todo-item-desc">{todo.description}</div>
                       </div>
-                      <p style={{whiteSpace: 'nowrap', marginLeft: 10}}>{todo.due_date}</p>
                     </div>
-                    <div style={{fontSize: 12, color: '#bbb', marginTop: 4}}>{todo.description}</div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        ))}
+                  );
+                })
+              )}
+            </div>
+          ))}
+        </div>
         {/* Edit To-Do Modal */}
         <dialog id="editToDoModal">
           <form className="toDoForm" id="editToDoForm" onSubmit={handleEditToDoSubmit}>

@@ -26,17 +26,15 @@ const appRoot = ReactDOM.createRoot(rootElement)
 appRoot.render(
     <>  
         <Router.BrowserRouter>
-            <div style={{ display: "flex", width: "100vw" }}>
-                <Sidebar customStyle={{ zIndex: 1, position: "fixed" }} />
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", marginLeft: "250px" }}>
-                    <Banner customStyle={{ zIndex: 3, position: "relative" }} />
-                    <Router.Routes>
-                        <Router.Route path="/" element={<ProjectsPage projectManager={projectsManager} customStyle={{ zIndex: 2, position: "relative" }} />}></Router.Route>
-                        <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} />} />
-                        <Router.Route path="/toDo" element={<ToDoPage toDoManager={toDoManagerInstance} projectsManager={projectsManager} />} />
-                        <Router.Route path="/users" element={<UsersPage usersManager={usersManagerInstance} projectsManager={projectsManager} />} />
-                    </Router.Routes>
-                </div>
+            <Sidebar customStyle={{ zIndex: 1, position: "fixed" }} />
+            <div id="main-content">
+                <Banner customStyle={{ zIndex: 3, position: "relative" }} />
+                <Router.Routes>
+                    <Router.Route path="/" element={<ProjectsPage projectManager={projectsManager} />} />
+                    <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} />} />
+                    <Router.Route path="/toDo" element={<ToDoPage toDoManager={toDoManagerInstance} projectsManager={projectsManager} />} />
+                    <Router.Route path="/users" element={<UsersPage usersManager={usersManagerInstance} projectsManager={projectsManager} />} />
+                </Router.Routes>
             </div>
         </Router.BrowserRouter>
     </>

@@ -271,11 +271,237 @@ const assignedUsers = projectState.assignedUsers
   .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
   .filter((user): user is User => Boolean(user));
 
+    // --- RENDER ---
     return (
-    <div className="page" id="projectDetails" style={{ display: "flex" }}>
-      {/* ...existing dialogs... */}
-      {/* Assign User Modal */}
-      <dialog open={assignUserModalOpen} style={{zIndex: 10}}>
+      <div className="page" id="projectDetails">
+        {/* Main project info and assigned users block, full width at the top, two columns */}
+        <div className="project-details-main-block">
+          <div className="dashboardCard project-dashboard-card">
+            <div className="upperDashboard">
+              <p
+                id="iconPD"
+                style={{
+                  fontSize: "var(--fontSizeBig)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: projectState.color,
+                  padding: 5,
+                  borderRadius: "50%",
+                  aspectRatio: 1,
+                  width: 40,
+                  height: 40,
+                  color: "white"
+                }}
+                data-project-info="iconPD"
+              >
+                {projectState.icon}
+              </p>
+              <div className="row-gap-20">
+                <button
+                  id="editProject"
+                  className="buttonSecondary"
+                  onClick={openEditModal}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 100,
+                    height: 40,
+                    fontSize: "var(--fontSizeStandard)"
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  id="deleteProjectBtn"
+                  className="buttonSecondary"
+                  onClick={() => {
+                    const modal = document.getElementById('DeleteProjectModal') as HTMLDialogElement | null;
+                    if (modal) modal.showModal();
+                  }
+                  }
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 100,
+                    height: 40,
+                    fontSize: "var(--fontSizeStandard)"
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div className="middleDashboard">
+              <h5 data-project-info="nameBigPD">{projectState.name}</h5>
+              <p data-project-info="descriptionPD">
+                {projectState.description || "No description provided."}
+              </p>
+            </div>
+            <div className="bottomDashboard">
+              <div>
+                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                  Status
+                </p>
+                <p data-project-info="statusPD">{projectState.status || "No status provided."}</p>
+              </div>
+              <div>
+                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                  Cost
+                </p>
+                <p data-project-info="costPD">{projectState.cost || "No cost provided."}</p>
+              </div>
+              <div>
+                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                  Role
+                </p>
+                <p data-project-info="rolePD">{projectState.userRole || "No role provided."}</p>
+              </div>
+              <div>
+                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                  Start Date
+                </p>
+                <p data-project-info="startPD">{projectState.startDate || "No start date provided."}</p>
+              </div>
+              <div>
+                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                  Finish Date
+                </p>
+                <p data-project-info="finishPD">{projectState.finishDate || "No finish date provided."}</p>
+              </div>
+            </div>
+            {/* Progress bar */}
+            <div style={{ backgroundColor: "#404040", width: "calc(100% - 40px)", height: 25, borderRadius: 50, overflow: "hidden", margin: "20px auto 30px auto", position: "relative" }}>
+              <div id="percentageDiv" style={{ width: `${projectState.progress ?? 0}%`, height: "100%", backgroundColor: (projectState.progress ?? 0) >= 50 ? "green" : "orange", borderRadius: "10px 0 0 10px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative", color: "white", fontWeight: "bold", transition: "width 0.5s" }}>
+                <span id="progressText" style={{ position: "absolute", width: "100%", textAlign: "center", left: 0 }}>{projectState.progress ?? 0}%</span>
+              </div>
+            </div>
+          </div>
+          <div className="dashboardCard project-assigned-users-card">
+            <h4>Assigned Users</h4>
+            <ul>
+              {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
+                projectState.assignedUsers.map((au, idx) => {
+                  const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
+                  return (
+                    <li key={au.userId} style={{marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'}}
+                        onClick={() => window.openEditUserModal && window.openEditUserModal(au.userId)}>
+                      {user ? `${user.name} ${user.surname}` : 'Unknown User'} — <b>{au.role}</b>
+                      <button
+                        className="buttonTertiary"
+                        style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                        title="Remove user from project"
+                        onClick={e => {
+                          e.stopPropagation();
+                          setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : 'Unknown User' });
+                          const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
+                          if (modal) modal.showModal();
+                        }}
+                      >
+                        <span className="material-icons-round" style={{fontSize: 18}}>close</span>
+                      </button>
+                    </li>
+                  );
+                })
+              ) : (
+                <li>No users assigned to this project.</li>
+              )}
+            </ul>
+            <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
+              <span className="material-icons-round">add</span> Assign User
+            </button>
+          </div>
+        </div>
+        {/* Below: grid with two columns, left for to-dos, right for viewer */}
+        <div className="project-details-below-grid">
+          <div className="project-details-left-col">
+            {/* To-dos block */}
+            <div className="dashboardCard">
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between"
+                }}
+              >
+                <h4>To-Do</h4>
+                <div
+                  style={{ display: "flex", alignItems: "center", paddingLeft: 80 }}
+                >
+                  <span
+                    className="material-icons-round"
+                    style={{ paddingRight: 10 }}
+                  >
+                    search
+                  </span>
+                  <input
+                    type="text"
+                    style={{ fontSize: "var(--fontSizeSmall)" }}
+                    placeholder="Search To-Do's by name"
+                  />
+                </div>
+                <button id="newToDoBtn" className="buttonTertiary" onClick={() => {
+  const modal = document.getElementById('newToDoModal') as HTMLDialogElement | null;
+  if (modal) modal.showModal();
+}}>
+                  <span className="material-icons-round">add</span>
+                </button>
+              </div>
+              {/* To-Do List Container */}
+              <div
+                id="toDoListContainer"
+                ref={toDoListContainerRef}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  rowGap: 10,
+                  marginTop: 20
+                }}
+              >
+                {/* Render To-Do list items reactively */}
+                {toDos.length === 0 && <div style={{color: '#aaa'}}>No to-dos for this project.</div>}
+                {toDos.map((todo, idx) => {
+  let bgColor = '#222';
+  switch (todo.status) {
+    case 'Pending': bgColor = '#969697'; break;
+    case 'In Progress': bgColor = '#FFA500'; break;
+    case 'Completed': bgColor = '#4CAF50'; break;
+    case 'On Hold': bgColor = '#E57373'; break;
+    default: bgColor = '#222';
+  }
+  // Find responsible user
+  const responsibleUser = projectState && projectState.assignedUsers
+    ? usersManagerInstance.getUsers().find(u => u.id === todo.assigned_to)
+    : null;
+  return (
+    <div key={todo.id || idx} className="todoItem" style={{background: bgColor, color: '#fff', padding: 10, borderRadius: 8, marginBottom: 5, cursor: 'pointer'}} onClick={() => openEditToDoModal(todo)}>
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <div style={{display: 'flex', columnGap: 15, alignItems: 'center'}}>
+          <span className="material-icons-round" style={{backgroundColor: '#969696', padding: 8, borderRadius: 8, aspectRatio: 1, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>construction</span>
+          <div>
+            <p style={{margin: 0, fontWeight: 600}}>{todo.title}</p>
+            <div style={{fontSize: 12, color: '#bbb', marginTop: 2}}>
+              Priority: <b>{todo.priority}</b> | Due: <b>{todo.due_date || '-'}</b> | Responsible: <b>{responsibleUser ? `${responsibleUser.name} ${responsibleUser.surname}` : '-'}</b>
+            </div>
+          </div>
+        </div>
+        <p style={{whiteSpace: 'nowrap', marginLeft: 10}}>{todo.due_date}</p>
+      </div>
+      <div style={{fontSize: 12, color: '#bbb', marginTop: 4}}>{todo.description}</div>
+    </div>
+  );
+})}
+              </div>
+            </div>
+          </div>
+          {/* Viewer container in the right column, spanning the height */}
+          <div id="viewerContainer" className="dashboardCard" />
+        </div>
+        {/* All dialogs and modals remain here, outside the grid */}
+        {/* Assign User Modal */}
+      <dialog open={assignUserModalOpen} className="modal-z10">
         <form onSubmit={handleAssignUser}>
           <h2>Assign User to Project</h2>
           <div className="formFieldContainer">
@@ -291,7 +517,7 @@ const assignedUsers = projectState.assignedUsers
             <label>Role in this project</label>
             <input type="text" value={customRole} onChange={e => setCustomRole(e.target.value)} placeholder="e.g. Project Lead, Consultant..." />
           </div>
-          {assignError && <div style={{color: 'red'}}>{assignError}</div>}
+          {assignError && <div className="error-text">{assignError}</div>}
           <div className="cancelAccept">
             <button type="button" className="cancelButton" onClick={() => { setAssignUserModalOpen(false); setAssignError(''); }}>Cancel</button>
             <button type="submit" className="acceptButton">Assign</button>
@@ -356,9 +582,7 @@ const assignedUsers = projectState.assignedUsers
                             <span className="material-icons-round">apartment</span>Name
           </label>
           <input name="name" type="text" id="projectNameInput" value={editName} onChange={e => setEditName(e.target.value)} />
-          <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-            TIP give it a short name
-          </label>
+          <label className="label-tip">TIP give it a short name</label>
         </div>
         <div className="formFieldContainer">
           <label>
@@ -386,7 +610,7 @@ const assignedUsers = projectState.assignedUsers
             value={editLocation}
             onChange={e => setEditLocation(e.target.value)}
           />
-          <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }} />
+          <label className="label-tip" />
         </div>
         <div className="formFieldContainer">
           <label>
@@ -401,9 +625,7 @@ const assignedUsers = projectState.assignedUsers
             value={editProgress}
             onChange={e => setEditProgress(e.target.value)}
           />
-          <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-            Estimated cost of the project
-          </label>
+          <label className="label-tip">Estimated progress percentage of the project</label>
         </div>
         <div className="formFieldContainer">
           <label>
@@ -417,9 +639,7 @@ const assignedUsers = projectState.assignedUsers
             value={editCost}
             onChange={e => setEditCost(e.target.value)}
           />
-          <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-            Estimated cost of the project
-          </label>
+          <label className="label-tip">Estimated cost of the project</label>
         </div>
         <div className="formFieldContainer">
           <label>
@@ -431,6 +651,7 @@ const assignedUsers = projectState.assignedUsers
             <option>Engineer</option>
             <option>Developer</option>
           </select>
+          <label className="label-tip">Role in this project</label>
         </div>
         <div className="formFieldContainer">
           <label>
@@ -442,6 +663,7 @@ const assignedUsers = projectState.assignedUsers
             <option>Active</option>
             <option>Finished</option>
           </select>
+          <label className="label-tip">Project status</label>
         </div>
         <div className="formFieldContainer">
           <label>
@@ -454,6 +676,7 @@ const assignedUsers = projectState.assignedUsers
             <option>Execution</option>
             <option>Construction</option>
           </select>
+          <label className="label-tip">Project phase</label>
         </div>
         <div className="formFieldContainer">
           <label>
@@ -461,6 +684,7 @@ const assignedUsers = projectState.assignedUsers
             Date
           </label>
           <input name="startDate" type="date" id="projectStartPDInput" value={editStartDate} onChange={e => setEditStartDate(e.target.value)} />
+          <label className="label-tip">Start date</label>
         </div>
         <div className="formFieldContainer">
           <label>
@@ -468,6 +692,7 @@ const assignedUsers = projectState.assignedUsers
             Date
           </label>
           <input name="finishDate" type="date" id="projectFinishPDInput" value={editFinishDate} onChange={e => setEditFinishDate(e.target.value)} />
+          <label className="label-tip">Finish date</label>
         </div>
       </div>
       <div className="cancelAccept">
@@ -494,15 +719,13 @@ const assignedUsers = projectState.assignedUsers
       <div className="userCard">
         <div className="formGrid">
           <div className="formColumn">
-            <h2 style={{ margin: 0 }}>Add a Task</h2>
+            <h2 className="heading-no-margin">Add a Task</h2>
             <div className="formFieldContainerToDo">
               <label>
                 <span className="material-icons-round">apartment</span>Title
               </label>
               <input name="title" type="text" id="toDoTitle" value={newToDo.title} onChange={handleNewToDoChange} />
-              <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-                TIP give it a short title
-              </label>
+              <label className="label-tip">TIP give it a short title</label>
             </div>
             <div className="formFieldContainer">
               <label>
@@ -520,7 +743,9 @@ const assignedUsers = projectState.assignedUsers
             </div>
             <div className="formFieldContainer">
               <label>
-                <span className="material-icons-round">not_listed_location</span>
+                <span className="material-icons-round">
+                  not_listed_location
+                </span>
                 Status
               </label>
               <select name="status" id="toDoStatus" value={newToDo.status} onChange={handleNewToDoChange}>
@@ -532,7 +757,9 @@ const assignedUsers = projectState.assignedUsers
             </div>
             <div className="formFieldContainer">
               <label>
-                <span className="material-icons-round">not_listed_location</span>
+                <span className="material-icons-round">
+                  not_listed_location
+                </span>
                 Priority
               </label>
               <select name="priority" id="toDoPriority" value={newToDo.priority} onChange={handleNewToDoChange}>
@@ -544,7 +771,7 @@ const assignedUsers = projectState.assignedUsers
           </div>
           <div className="formColumn">
             <div className="formFieldContainerToDo">
-              <h2 data-project-info="toDoProjectName" style={{ margin: 0 }}>
+              <h2 className="heading-no-margin" data-project-info="toDoProjectName">
                 Project Name
               </h2>
             </div>
@@ -612,6 +839,7 @@ const assignedUsers = projectState.assignedUsers
                 id="projectCostInput"
               />
               <label
+                className="label-tip"
                 style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}
               >
                 Estimated hours for the project
@@ -628,6 +856,7 @@ const assignedUsers = projectState.assignedUsers
                 id="projectCostInput"
               />
               <label
+                className="label-tip"
                 style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}
               >
                 hours used so far
@@ -666,6 +895,7 @@ const assignedUsers = projectState.assignedUsers
                 Dependancies
               </label>
               <label
+                className="label-tip"
                 style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}
               >
                 select the tasks this project is dependant of
@@ -713,15 +943,13 @@ const assignedUsers = projectState.assignedUsers
       <div className="userCard">
         <div className="formGrid">
           <div className="formColumn">
-            <h2 style={{ margin: 0 }}>Edit Task</h2>
+            <h2 className="heading-no-margin">Edit Task</h2>
             <div className="formFieldContainerToDo">
               <label>
                 <span className="material-icons-round">apartment</span>Title
               </label>
               <input name="title" type="text" id="editToDoTitle" value={editToDoFields.title} onChange={handleEditToDoChange} />
-              <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-                TIP give it a short title
-              </label>
+              <label className="label-tip">TIP give it a short title</label>
             </div>
             <div className="formFieldContainer">
               <label>
@@ -767,7 +995,7 @@ const assignedUsers = projectState.assignedUsers
           </div>
           <div className="formColumn">
             <div className="formFieldContainerToDo">
-              <h2 data-project-info="toDoProjectName" style={{ margin: 0 }}>
+              <h2 className="heading-no-margin" data-project-info="toDoProjectName">
                 Project Name
               </h2>
             </div>
@@ -903,6 +1131,7 @@ const assignedUsers = projectState.assignedUsers
                 Dependencies
               </label>
               <label
+                className="label-tip"
                 style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}
               >
                 Select the tasks this project is dependent on
@@ -959,269 +1188,7 @@ const assignedUsers = projectState.assignedUsers
       </div>
     </form>
   </dialog>
-  <div className="mainPageContent">
-    <div style={{ display: "flex", flexDirection: "column", rowGap: 10 }}>
-      <div className="dashboardCard">
-        <div className="upperDashboard">
-          <p
-            id="iconPD"
-            style={{
-              fontSize: "var(--fontSizeBig)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: projectState.color,
-              padding: 5,
-              borderRadius: "50%",
-              aspectRatio: 1,
-              width: 40,
-              height: 40,
-              color: "white"
-            }}
-            data-project-info="iconPD"
-          >
-            {projectState.icon}
-          </p>
-          <div style={{ display: "flex", flexDirection: "row", gap: 20 }}>
-            <button
-              id="editProject"
-              className="buttonSecondary"
-              onClick={openEditModal}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 100,
-                height: 40,
-                fontSize: "var(--fontSizeStandard)"
-              }}
-            >
-              Edit
-            </button>
-            <button
-              id="deleteProjectBtn"
-              className="buttonSecondary"
-              onClick={() => {
-                const modal = document.getElementById('DeleteProjectModal') as HTMLDialogElement | null;
-                if (modal) modal.showModal();
-              }
-              }
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 100,
-                height: 40,
-                fontSize: "var(--fontSizeStandard)"
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-        <div className="middleDashboard">
-          <h5 data-project-info="nameBigPD">{projectState.name}</h5>
-          <p data-project-info="descriptionPD">
-            {projectState.description || "No description provided."}
-          </p>
-        </div>
-        <div className="bottomDashboard">
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Status
-            </p>
-            <p data-project-info="statusPD">{projectState.status || "No status provided."}</p>
-          </div>
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Cost
-            </p>
-            <p data-project-info="costPD">{projectState.cost || "No cost provided."}</p>
-          </div>
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Role
-            </p>
-            <p data-project-info="rolePD">{projectState.userRole || "No role provided."}</p>
-          </div>
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Start Date
-            </p>
-            <p data-project-info="startPD">{projectState.startDate || "No start date provided."}</p>
-          </div>
-          <div>
-            <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-              Finish Date
-            </p>
-            <p data-project-info="finishPD">{projectState.finishDate || "No finish date provided."}</p>
-          </div>
-        </div>
-        <div
-          style={{
-            backgroundColor: "#404040",
-            width: "calc(100% - 40px)",
-            height: 25,
-            borderRadius: 50,
-            overflow: "hidden",
-            margin: "20px auto 30px auto",
-            position: "relative"
-          }}
-        >
-          <div
-            id="percentageDiv"
-            style={{
-              width: `${projectState.progress ?? 0}%`,
-              height: "100%",
-              backgroundColor: (projectState.progress ?? 0) >= 50 ? "green" : "orange",
-              borderRadius: "10px 0 0 10px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "relative",
-              color: "white",
-              fontWeight: "bold",
-              transition: "width 0.5s"
-            }}
-          >
-            <span
-              id="progressText"
-              style={{
-                position: "absolute",
-                width: "100%",
-                textAlign: "center",
-                left: 0
-              }}
-            >
-              {projectState.progress ?? 0}%
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="dashboardCard" style={{ flexGrow: 1 }}>
-        <div
-          id="toDoList"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "stretch",
-            justifyContent: "flex-start",
-            padding: 20
-          }}
-        >
-          {/* Header Section */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between"
-            }}
-          >
-            <h4>To-Do</h4>
-            <div
-              style={{ display: "flex", alignItems: "center", paddingLeft: 80 }}
-            >
-              <span
-                className="material-icons-round"
-                style={{ paddingRight: 10 }}
-              >
-                search
-              </span>
-              <input
-                type="text"
-                style={{ fontSize: "var(--fontSizeSmall)" }}
-                placeholder="Search To-Do's by name"
-              />
-            </div>
-            <button id="newToDoBtn" className="buttonTertiary" onClick={() => {
-  const modal = document.getElementById('newToDoModal') as HTMLDialogElement | null;
-  if (modal) modal.showModal();
-}}>
-              <span className="material-icons-round">add</span>
-            </button>
-          </div>
-          {/* To-Do List Container */}
-          <div
-            id="toDoListContainer"
-            ref={toDoListContainerRef}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              rowGap: 10,
-              marginTop: 20
-            }}
-          >
-            {/* Render To-Do list items reactively */}
-            {toDos.length === 0 && <div style={{color: '#aaa'}}>No to-dos for this project.</div>}
-            {toDos.map((todo, idx) => {
-  let bgColor = '#222';
-  switch (todo.status) {
-    case 'Pending': bgColor = '#969697'; break;
-    case 'In Progress': bgColor = '#FFA500'; break;
-    case 'Completed': bgColor = '#4CAF50'; break;
-    case 'On Hold': bgColor = '#E57373'; break;
-    default: bgColor = '#222';
-  }
-  // Find responsible user
-  const responsibleUser = projectState && projectState.assignedUsers
-    ? usersManagerInstance.getUsers().find(u => u.id === todo.assigned_to)
-    : null;
-  return (
-    <div key={todo.id || idx} className="todoItem" style={{background: bgColor, color: '#fff', padding: 10, borderRadius: 8, marginBottom: 5, cursor: 'pointer'}} onClick={() => openEditToDoModal(todo)}>
-      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-        <div style={{display: 'flex', columnGap: 15, alignItems: 'center'}}>
-          <span className="material-icons-round" style={{backgroundColor: '#969696', padding: 8, borderRadius: 8, aspectRatio: 1, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>construction</span>
-          <div>
-            <p style={{margin: 0, fontWeight: 600}}>{todo.title}</p>
-            <div style={{fontSize: 12, color: '#bbb', marginTop: 2}}>
-              Priority: <b>{todo.priority}</b> | Due: <b>{todo.due_date || '-'}</b> | Responsible: <b>{responsibleUser ? `${responsibleUser.name} ${responsibleUser.surname}` : '-'}</b>
-            </div>
-          </div>
-        </div>
-        <p style={{whiteSpace: 'nowrap', marginLeft: 10}}>{todo.due_date}</p>
-      </div>
-      <div style={{fontSize: 12, color: '#bbb', marginTop: 4}}>{todo.description}</div>
-    </div>
-  );
-})}
-          </div>
-        </div>
-      </div>
-      <div className="dashboardCard">
-        <h4>Assigned Users</h4>
-        <ul>
-          {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
-            projectState.assignedUsers.map((au, idx) => {
-              const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
-              return (
-                <li key={au.userId} style={{marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'}}
-                    onClick={() => window.openEditUserModal && window.openEditUserModal(au.userId)}>
-                  {user ? `${user.name} ${user.surname}` : 'Unknown User'} — <b>{au.role}</b>
-                  <button
-                    className="buttonTertiary"
-                    style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                    title="Remove user from project"
-                    onClick={e => {
-                      e.stopPropagation();
-                      setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : 'Unknown User' });
-                      const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
-                      if (modal) modal.showModal();
-                    }}
-                  >
-                    <span className="material-icons-round" style={{fontSize: 18}}>close</span>
-                  </button>
-                </li>
-              );
-            })
-          ) : (
-            <li>No users assigned to this project.</li>
-          )}
-        </ul>
-        <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
-          <span className="material-icons-round">add</span> Assign User
-        </button>
-      </div>
-      {/* Delete User Modal */}
+  {/* Delete User Modal */}
       <dialog id="DeleteUserModal">
         <form className="userForm" id="DeleteUserForm">
           <h2>Are you sure you want to delete the user {userToDelete?.name}?</h2>
@@ -1236,16 +1203,6 @@ const assignedUsers = projectState.assignedUsers
           </div>
         </form>
       </dialog>
-      <div id="viewerContainer" className="dashboardCard" style={{ minWidth: 0, minHeight: 700, maxHeight: 700 }} />
     </div>
-  </div> {/* Close mainPageContent */}
-</div> ); {/* Close page */}
-;
-}
-
-// Declare global interface for window
-declare global {
-  interface Window {
-    openEditUserModal?: (userId: string) => void;
-  }
-}
+  );
+};
