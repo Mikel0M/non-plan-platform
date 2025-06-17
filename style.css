@@ -46,7 +46,7 @@
         "sidebar main";
     grid-template-rows: 70px 1fr; /* Adjust the second row to take remaining space */
     grid-template-columns: 200px auto;
-    height: 100vh;
+    min-height: 100vh;
     background-color: var(--background);
     color: #fff;
     vertical-align: middle;
@@ -78,8 +78,10 @@ body {
     
 }
 
-
-
+html, body {
+  min-height: 100vh;
+  background: var(--background);
+}
 
 #navigationHeader {
     position: fixed;
