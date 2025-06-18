@@ -43,7 +43,6 @@ appRoot.render(
 
 
 // Initialize toDoManagerInstance before using it
-const toDoListUI = document.getElementById("toDoListContainer") as HTMLElement;
 //const toDoManagerInstance = new toDoManager(toDoListUI);
 //Languages import
 
@@ -56,7 +55,6 @@ export let currentProjectId: string | null = null;
 
 
 
-const projectsListElement = document.getElementById('projectsList') as HTMLElement;
 //const projectsManager = new ProjectsManager(projectsListElement);
 
 document.getElementById('newToDoForm')!.addEventListener('submit', (event) => {

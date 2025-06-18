@@ -39,17 +39,21 @@
 
 
 #app {
-    margin-top: 70px; /* Adjust based on your header height */
+    /* Remove margin-top, header is fixed and overlays content */
+    /* margin-top: 70px; */
     display: grid;
     grid-template-areas:
         "header header"
         "sidebar main";
-    grid-template-rows: 70px 1fr; /* Adjust the second row to take remaining space */
+    grid-template-rows: 70px 1fr;
     grid-template-columns: 200px auto;
     min-height: 100vh;
     background-color: var(--background);
     color: #fff;
     vertical-align: middle;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: visible; /* Allow scrolling if content overflows */
 }
 
 #banner {
@@ -73,14 +77,18 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    
+body, html {
+    height: 100vh;
+    min-height: 100vh;
+    background: var(--background);
+    overflow: auto; /* Allow scrolling for overflow */
 }
 
-html, body {
-  min-height: 100vh;
-  background: var(--background);
+main {
+    margin-top: 70px; /* Push main content below fixed header */
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+    /* Allow scrolling for overflow on all pages */
 }
 
 #navigationHeader {
@@ -271,6 +279,7 @@ buttonBlue:hover {
     padding-right: 20px;
     padding-top: 20px;
     column-gap: 10px;
+    height: 75px;
 
 }
 
@@ -355,7 +364,7 @@ buttonBlue:hover {
 .page {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100%-70px; /* Full height minus header */
 }
 
 /* Main page layout helpers for content areas */
@@ -394,9 +403,9 @@ buttonBlue:hover {
     display: flex;
     flex-direction: column;
     row-gap: 20px;
-    height: calc(100vh - 70px);
-    margin-top: 0px; /* Adjust based on header height */
-    z-index: 10; /* Sidebar should be above other elements */
+    height: calc(100vh - 70px); /* Subtract header height so sidebar fits below header */
+    margin-top: 70px; /* Push sidebar below fixed header */
+    z-index: 10;
     position: fixed;
     
 }
@@ -681,15 +690,23 @@ input:focus, textarea:focus, select:focus {
 }
 
 .project-details-main-block {
-  width: 100%;
+  width: calc(100% - 32px);
+  margin-top: 20px;
+  margin-right: 0;
   margin-bottom: 32px;
+  margin-left: 2.5px;
   display: grid;
   grid-template-columns: 1fr 350px;
-  gap: 32px;
+  gap: 20px;
   align-items: start;
 }
 .project-dashboard-card {
-  width: 100%;
+  width: 600px;
+  max-width: 500px;
+  /* Reduce height by 100px for more space for users/tasks */
+  max-height: 275px;
+  height: 275px;
+  overflow: auto;
 }
 .project-assigned-users-card {
   width: 100%;
@@ -710,13 +727,76 @@ input:focus, textarea:focus, select:focus {
 
 /* Remove .project-details-right-col, viewer will be placed directly in grid */
 
+.project-details-layout {
+  display: grid;
+  grid-template-columns: 500px 1fr;
+  gap: 16px;
+  width: 100%;
+  align-items: start;
+  height: calc(100vh - 70px - 32px); /* 70px header, 32px margin (top+bottom) */
+  min-height: 0;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+.project-details-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 500px;
+  min-width: 500px;
+  height: calc(100vh - 70px); /* 70px header, 32px top, 32px bottom */
+  max-height: calc(100vh - 70px);
+}
+.project-dashboard-card {
+  max-width: 500px;
+  width: 100%;
+  flex-shrink: 0;
+  flex-grow: 0;
+  /* Reduce height by 100px for more space for users/tasks */
+  max-height: 275px;
+  height: 275px;
+  overflow: auto;
+}
+.project-assigned-users-card,
+.project-todo-card {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* Scrollable content for users and todos */
+.project-assigned-users-card ul,
+.project-todo-card > #toDoListContainer {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0 0 8px 0;
+}
+
+/* Ensure right column fills remaining height */
+.project-details-right-col {
+  width: 100%;
+  min-width: 0;
+  height: calc(100vh - 70px);
+  max-height: calc(100vh);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+}
+
 #viewerContainer {
   width: 100%;
   min-width: 0;
-  min-height: 700px;
-  max-height: 700px;
-  grid-column: 2;
-  grid-row: 1 / span 2;
+  flex: 1 1 0%;
+  min-height: 0;
+  max-height: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  margin-right: 0;
 }
 
 /* Users */
@@ -1026,4 +1106,27 @@ input:focus, textarea:focus, select:focus {
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+
+.dashboardCard,
+.project-dashboard-card,
+.project-assigned-users-card,
+.project-todo-card {
+  background-color: var(--background-100);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 24px 20px;
+  color: #fff;
+  transition: box-shadow 0.2s, outline 0.2s;
+}
+.dashboardCard:hover,
+.project-dashboard-card:hover,
+.project-assigned-users-card:hover,
+.project-todo-card:hover {
+
+}
+
+.page, #projectsPage, #projectDetails, #toDoPage, #usersPage {
+  margin-top: 70px;
+  box-sizing: border-box;
 }

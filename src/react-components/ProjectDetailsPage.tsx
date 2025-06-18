@@ -49,16 +49,16 @@ export function ProjectDetailsPage(props: Props) {
 
     // When opening the modal, set edit states
     const openEditModal = () => {
-      setEditName(projectState.name || "");
-      setEditDescription(projectState.description || "");
-      setEditLocation(projectState.location || "");
-      setEditProgress(projectState.progress?.toString() || "");
-      setEditCost(projectState.cost?.toString() || "");
-      setEditUserRole(projectState.userRole || "");
-      setEditStatus(projectState.status || "");
-      setEditPhase(projectState.phase || "");
-      setEditStartDate(projectState.startDate || "");
-      setEditFinishDate(projectState.finishDate || "");
+      setEditName(projectState.name ?? "");
+      setEditDescription(projectState.description ?? "");
+      setEditLocation(projectState.location ?? "");
+      setEditProgress((projectState.progress ?? "").toString());
+      setEditCost((projectState.cost ?? "").toString());
+      setEditUserRole(projectState.userRole ?? "");
+      setEditStatus(projectState.status ?? "");
+      setEditPhase(projectState.phase ?? "");
+      setEditStartDate(projectState.startDate ?? "");
+      setEditFinishDate(projectState.finishDate ?? "");
       const modal = document.getElementById('editProjectModal') as HTMLDialogElement | null;
       if (modal) modal.showModal();
     };
@@ -271,154 +271,160 @@ const assignedUsers = projectState.assignedUsers
   .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
   .filter((user): user is User => Boolean(user));
 
+    // Add navigation
+const navigate = Router.useNavigate();
+
+    // --- HANDLE DELETE PROJECT CONFIRMATION ---
+const handleConfirmDeleteProject = () => {
+  if (projectState && projectState.id) {
+    props.projectsManager.deleteProject(projectState.id);
+    closeModal('DeleteProjectModal');
+    navigate('/'); // or navigate('/projects') if that's your route
+  }
+};
+
     // --- RENDER ---
     return (
       <div className="page" id="projectDetails">
-        {/* Main project info and assigned users block, full width at the top, two columns */}
-        <div className="project-details-main-block">
-          <div className="dashboardCard project-dashboard-card">
-            <div className="upperDashboard">
-              <p
-                id="iconPD"
-                style={{
-                  fontSize: "var(--fontSizeBig)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: projectState.color,
-                  padding: 5,
-                  borderRadius: "50%",
-                  aspectRatio: 1,
-                  width: 40,
-                  height: 40,
-                  color: "white"
-                }}
-                data-project-info="iconPD"
-              >
-                {projectState.icon}
-              </p>
-              <div className="row-gap-20">
-                <button
-                  id="editProject"
-                  className="buttonSecondary"
-                  onClick={openEditModal}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 100,
-                    height: 40,
-                    fontSize: "var(--fontSizeStandard)"
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  id="deleteProjectBtn"
-                  className="buttonSecondary"
-                  onClick={() => {
-                    const modal = document.getElementById('DeleteProjectModal') as HTMLDialogElement | null;
-                    if (modal) modal.showModal();
-                  }
-                  }
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 100,
-                    height: 40,
-                    fontSize: "var(--fontSizeStandard)"
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-            <div className="middleDashboard">
-              <h5 data-project-info="nameBigPD">{projectState.name}</h5>
-              <p data-project-info="descriptionPD">
-                {projectState.description || "No description provided."}
-              </p>
-            </div>
-            <div className="bottomDashboard">
-              <div>
-                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                  Status
-                </p>
-                <p data-project-info="statusPD">{projectState.status || "No status provided."}</p>
-              </div>
-              <div>
-                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                  Cost
-                </p>
-                <p data-project-info="costPD">{projectState.cost || "No cost provided."}</p>
-              </div>
-              <div>
-                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                  Role
-                </p>
-                <p data-project-info="rolePD">{projectState.userRole || "No role provided."}</p>
-              </div>
-              <div>
-                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                  Start Date
-                </p>
-                <p data-project-info="startPD">{projectState.startDate || "No start date provided."}</p>
-              </div>
-              <div>
-                <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                  Finish Date
-                </p>
-                <p data-project-info="finishPD">{projectState.finishDate || "No finish date provided."}</p>
-              </div>
-            </div>
-            {/* Progress bar */}
-            <div style={{ backgroundColor: "#404040", width: "calc(100% - 40px)", height: 25, borderRadius: 50, overflow: "hidden", margin: "20px auto 30px auto", position: "relative" }}>
-              <div id="percentageDiv" style={{ width: `${projectState.progress ?? 0}%`, height: "100%", backgroundColor: (projectState.progress ?? 0) >= 50 ? "green" : "orange", borderRadius: "10px 0 0 10px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative", color: "white", fontWeight: "bold", transition: "width 0.5s" }}>
-                <span id="progressText" style={{ position: "absolute", width: "100%", textAlign: "center", left: 0 }}>{projectState.progress ?? 0}%</span>
-              </div>
-            </div>
-          </div>
-          <div className="dashboardCard project-assigned-users-card">
-            <h4>Assigned Users</h4>
-            <ul>
-              {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
-                projectState.assignedUsers.map((au, idx) => {
-                  const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
-                  return (
-                    <li key={au.userId} style={{marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'}}
-                        onClick={() => window.openEditUserModal && window.openEditUserModal(au.userId)}>
-                      {user ? `${user.name} ${user.surname}` : 'Unknown User'} — <b>{au.role}</b>
-                      <button
-                        className="buttonTertiary"
-                        style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                        title="Remove user from project"
-                        onClick={e => {
-                          e.stopPropagation();
-                          setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : 'Unknown User' });
-                          const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
-                          if (modal) modal.showModal();
-                        }}
-                      >
-                        <span className="material-icons-round" style={{fontSize: 18}}>close</span>
-                      </button>
-                    </li>
-                  );
-                })
-              ) : (
-                <li>No users assigned to this project.</li>
-              )}
-            </ul>
-            <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
-              <span className="material-icons-round">add</span> Assign User
-            </button>
-          </div>
-        </div>
-        {/* Below: grid with two columns, left for to-dos, right for viewer */}
-        <div className="project-details-below-grid">
+        <div className="project-details-layout">
           <div className="project-details-left-col">
-            {/* To-dos block */}
-            <div className="dashboardCard">
+            <div className="dashboardCard project-dashboard-card">
+              <div className="upperDashboard">
+                <p
+                  id="iconPD"
+                  style={{
+                    fontSize: "var(--fontSizeBig)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: projectState.color,
+                    padding: 5,
+                    borderRadius: "50%",
+                    aspectRatio: 1,
+                    width: 40,
+                    height: 40,
+                    color: "white"
+                  }}
+                  data-project-info="iconPD"
+                >
+                  {projectState.icon}
+                </p>
+                <div className="flex-row-gap-10">
+                  <button
+                    id="editProject"
+                    className="buttonSecondary"
+                    onClick={openEditModal}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 100,
+                      height: 40,
+                      fontSize: "var(--fontSizeStandard)"
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    id="deleteProjectBtn"
+                    className="buttonSecondary"
+                    onClick={() => {
+                      const modal = document.getElementById('DeleteProjectModal') as HTMLDialogElement | null;
+                      if (modal) modal.showModal();
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 100,
+                      height: 40,
+                      fontSize: "var(--fontSizeStandard)"
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+              <div className="middleDashboard">
+                <h5 data-project-info="nameBigPD">{projectState.name}</h5>
+                <p data-project-info="descriptionPD">
+                  {projectState.description || "No description provided."}
+                </p>
+              </div>
+              <div className="bottomDashboard">
+                <div>
+                  <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                    Status
+                  </p>
+                  <p data-project-info="statusPD">{projectState.status || "No status provided."}</p>
+                </div>
+                <div>
+                  <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                    Cost
+                  </p>
+                  <p data-project-info="costPD">{projectState.cost || "No cost provided."}</p>
+                </div>
+                <div>
+                  <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                    Role
+                  </p>
+                  <p data-project-info="rolePD">{projectState.userRole || "No role provided."}</p>
+                </div>
+                <div>
+                  <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                    Start Date
+                  </p>
+                  <p data-project-info="startPD">{projectState.startDate || "No start date provided."}</p>
+                </div>
+                <div>
+                  <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
+                    Finish Date
+                  </p>
+                  <p data-project-info="finishPD">{projectState.finishDate || "No finish date provided."}</p>
+                </div>
+              </div>
+              {/* Progress bar */}
+              <div style={{ backgroundColor: "#404040", width: "calc(100% - 40px)", height: 25, borderRadius: 50, overflow: "hidden", margin: "20px auto 30px auto", position: "relative" }}>
+                <div id="percentageDiv" style={{ width: `${projectState.progress ?? 0}%`, height: "100%", backgroundColor: (projectState.progress ?? 0) >= 50 ? "green" : "orange", borderRadius: "10px 0 0 10px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative", color: "white", fontWeight: "bold", transition: "width 0.5s" }}>
+                  <span id="progressText" style={{ position: "absolute", width: "100%", textAlign: "center", left: 0 }}>{projectState.progress ?? 0}%</span>
+                </div>
+              </div>
+            </div>
+            <div className="dashboardCard project-assigned-users-card">
+              <h4>Assigned Users</h4>
+              <ul>
+                {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
+                  projectState.assignedUsers.map((au, idx) => {
+                    const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
+                    return (
+                      <li key={au.userId} style={{marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'}}
+                          onClick={() => window.openEditUserModal && window.openEditUserModal(au.userId)}>
+                        {user ? `${user.name} ${user.surname}` : 'Unknown User'} — <b>{au.role}</b>
+                        <button
+                          className="buttonTertiary"
+                          style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                          title="Remove user from project"
+                          onClick={e => {
+                            e.stopPropagation();
+                            setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : 'Unknown User' });
+                            const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
+                            if (modal) modal.showModal();
+                          }}
+                        >
+                          <span className="material-icons-round" style={{fontSize: 18}}>close</span>
+                        </button>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li>No users assigned to this project.</li>
+                )}
+              </ul>
+              <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
+                <span className="material-icons-round">add</span> Assign User
+              </button>
+            </div>
+            <div className="dashboardCard project-todo-card">
               <div
                 style={{
                   display: "flex",
@@ -496,8 +502,9 @@ const assignedUsers = projectState.assignedUsers
               </div>
             </div>
           </div>
-          {/* Viewer container in the right column, spanning the height */}
-          <div id="viewerContainer" className="dashboardCard" />
+          <div className="project-details-right-col">
+            <div id="viewerContainer" className="dashboardCard" />
+          </div>
         </div>
         {/* All dialogs and modals remain here, outside the grid */}
         {/* Assign User Modal */}
@@ -533,7 +540,7 @@ const assignedUsers = projectState.assignedUsers
                         className="cancelButton"
                         onClick={() => closeModal('DeleteProjectModal')}>Cancel
                     </button>
-                    <button type="button" className="acceptButton" id="ConfirmDeleteButton">Delete</button>
+                    <button type="button" className="acceptButton" id="ConfirmDeleteButton" onClick={handleConfirmDeleteProject}>Delete</button>
                 </div>
             </form>
         </dialog>
