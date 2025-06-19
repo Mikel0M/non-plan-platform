@@ -457,12 +457,19 @@ buttonBlue:hover {
     display: flex;
     align-content: center;
     height: 20px;
-    color: white !important;
+    color: white;
     text-decoration: none;
 }
 
-#nav-buttons li:hover {
-    background-color: var(--primary-200);
+.tabCircle .material-icons-round {
+    color: var(--background-200, #222) !important;
+    transition: color 0.2s;
+}
+.tabCircle.active .material-icons-round {
+    color: var(--background-200, #222) !important;
+}
+.tabCircle:hover .material-icons-round {
+    color: var(--background-200, #222) !important;
 }
 
 /* Content styles */
@@ -539,6 +546,12 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: border 0.2s;
+    border: 1px solid transparent;
+}
+
+.todoItem:hover {
+  border: 2px solid var(--primary-100, #0078d4);
 }
 
 /* Form Styles */
@@ -1146,4 +1159,48 @@ input:focus, textarea:focus, select:focus {
   min-width: 320px;
   max-width: 95vw;
   color: #fff;
+}
+
+.tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.tabCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--background-200, #222);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  color: var(--text-100, #fff);
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+}
+.tabCircle .material-icons-round {
+  color: var(--background-200, #222) !important;
+  transition: color 0.2s;
+}
+.tabCircle.active {
+  background: var(--primary-100, #0078d4);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,120,212,0.15);
+}
+.tabCircle.active .material-icons-round {
+  color: var(--background-200, #222) !important;
+}
+.tabCircle:not(.active) {
+  background: var(--primary-100, #0078d4);
+  color: #fff;
+}
+.tabCircle:not(.active) .material-icons-round {
+  color: var(--background-200, #222) !important;
 }

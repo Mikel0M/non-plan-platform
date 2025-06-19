@@ -283,6 +283,9 @@ const handleConfirmDeleteProject = () => {
   }
 };
 
+    // State for active card (users or todo)
+const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('users');
+
     // --- RENDER ---
     return (
       <div className="page" id="projectDetails">
@@ -390,87 +393,95 @@ const handleConfirmDeleteProject = () => {
                 </div>
               </div>
             </div>
-            <div className="dashboardCard project-assigned-users-card">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <h4 style={{ margin: 0 }}>Assigned Users</h4>
-                <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
-                  <span className="material-icons-round">add</span>
-                </button>
-              </div>
-              <ul>
-                {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
-                  projectState.assignedUsers.map((au, idx) => {
-                    const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
-                    return (
-                      <li key={au.userId} style={{marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'}}
-                          onClick={() => window.openEditUserModal && window.openEditUserModal(au.userId)}>
-                        {user ? `${user.name} ${user.surname}` : 'Unknown User'} — <b>{au.role}</b>
-                        <button
-                          className="buttonTertiary"
-                          style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                          title="Remove user from project"
-                          onClick={e => {
-                            e.stopPropagation();
-                            setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : 'Unknown User' });
-                            const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
-                            if (modal) modal.showModal();
-                          }}
-                        >
-                          <span className="material-icons-round" style={{fontSize: 18}}>close</span>
-                        </button>
-                      </li>
-                    );
-                  })
-                ) : (
-                  <li>No users assigned to this project.</li>
-                )}
-              </ul>
-            </div>
-            <div className="dashboardCard project-todo-card">
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between"
-                }}
-              >
-                <h4>To-Do</h4>
-                <div
-                  style={{ display: "flex", alignItems: "center", paddingLeft: 80 }}
-                >
-                  <span
-                    className="material-icons-round"
-                    style={{ paddingRight: 10 }}
-                  >
-                    search
-                  </span>
-                  <input
-                    type="text"
-                    style={{ fontSize: "var(--fontSizeSmall)" }}
-                    placeholder="Search To-Do's by name"
-                  />
+            {activeLeftCard === 'users' && (
+              <div className="dashboardCard project-assigned-users-card">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div className="tabs-row">
+                    <h4 style={{ margin: 0, whiteSpace: 'nowrap' }}>Assigned Users</h4>
+                    <button
+                      className={activeLeftCard === 'users' ? 'tabCircle active' : 'tabCircle'}
+                      onClick={() => setActiveLeftCard('todo')}
+                      type="button"
+                      title="Show To-Do"
+                    >
+                      <span className="material-icons-round">checklist</span>
+                    </button>
+                  </div>
+                  <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
+                    <span className="material-icons-round">add</span>
+                  </button>
                 </div>
-                <button id="newToDoBtn" className="buttonTertiary" onClick={() => {
+                <ul>
+                  {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
+                    projectState.assignedUsers.map((au, idx) => {
+                      const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
+                      return (
+                        <li key={au.userId} style={{marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'}}
+                            onClick={() => window.openEditUserModal && window.openEditUserModal(au.userId)}>
+                          {user ? `${user.name} ${user.surname}` : 'Unknown User'} — <b>{au.role}</b>
+                          <button
+                            className="buttonTertiary"
+                            style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                            title="Remove user from project"
+                            onClick={e => {
+                              e.stopPropagation();
+                              setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : 'Unknown User' });
+                              const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
+                              if (modal) modal.showModal();
+                            }}
+                          >
+                            <span className="material-icons-round" style={{fontSize: 18}}>close</span>
+                          </button>
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <li>No users assigned to this project.</li>
+                  )}
+                </ul>
+              </div>
+            )}
+            {activeLeftCard === 'todo' && (
+              <div className="dashboardCard project-todo-card">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+                  <div className="tabs-row">
+                    <h4 style={{ margin: 0, whiteSpace: 'nowrap' }}>To-Do</h4>
+                    <button
+                      className={activeLeftCard === 'todo' ? 'tabCircle active' : 'tabCircle'}
+                      onClick={() => setActiveLeftCard('users')}
+                      type="button"
+                      title="Show Assigned Users"
+                    >
+                      <span className="material-icons-round">group</span>
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span className="material-icons-round" style={{ paddingRight: 10 }}>search</span>
+                      <input type="text" style={{ fontSize: "var(--fontSizeSmall)" }} placeholder="Search To-Do's by name" />
+                    </div>
+                    <button id="newToDoBtn" className="buttonTertiary" style={{ marginLeft: 8 }} onClick={() => {
   const modal = document.getElementById('newToDoModal') as HTMLDialogElement | null;
   if (modal) modal.showModal();
 }}>
-                  <span className="material-icons-round">add</span>
-                </button>
-              </div>
-              {/* To-Do List Container */}
-              <div
-                id="toDoListContainer"
-                ref={toDoListContainerRef}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  rowGap: 10,
-                  marginTop: 20
-                }}
-              >
-                {/* Render To-Do list items reactively */}
-                {toDos.length === 0 && <div style={{color: '#aaa'}}>No to-dos for this project.</div>}
-                {toDos.map((todo, idx) => {
+                      <span className="material-icons-round">add</span>
+                    </button>
+                  </div>
+                </div>
+                {/* To-Do List Container */}
+                <div
+                  id="toDoListContainer"
+                  ref={toDoListContainerRef}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: 10,
+                    marginTop: 20
+                  }}
+                >
+                  {/* Render To-Do list items reactively */}
+                  {toDos.length === 0 && <div style={{color: '#aaa'}}>No to-dos for this project.</div>}
+                  {toDos.map((todo, idx) => {
   let bgColor = '#222';
   switch (todo.status) {
     case 'Pending': bgColor = '#969697'; break;
@@ -501,8 +512,9 @@ const handleConfirmDeleteProject = () => {
     </div>
   );
 })}
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="project-details-right-col">
             <div id="viewerContainer" className="dashboardCard" />

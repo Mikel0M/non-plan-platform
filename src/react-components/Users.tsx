@@ -224,34 +224,41 @@ export function UsersPage(props: Props) {
     return (
         <div className="page page-flex" id="usersPage">
             <header>
-                {/* Removed the Users/Companies title */}
-                <div className="flex-row-gap-10">
-                    <button
-                      className={activeTab === 'users' ? 'buttonTertiary active' : 'buttonTertiary'}
-                      onClick={() => setActiveTab('users')}
-                    >
-                      Users
-                    </button>
-                    <button
-                      className={activeTab === 'companies' ? 'buttonTertiary active' : 'buttonTertiary'}
-                      onClick={() => setActiveTab('companies')}
-                    >
-                      Companies
-                    </button>
-                    {activeTab === 'users' && (
-                      <button id="newUserBtn" className="buttonTertiary" onClick={() => setOpenModal('newUser')}>
-                        <span className="material-icons-round">add</span>
-                        <span className="material-icons-round">person</span>
-                      </button>
-                    )}
-                    {activeTab === 'companies' && (
-                      <button id="newCompanyBtn" className="buttonTertiary" onClick={() => setOpenModal('newCompany')}>
-                        <span className="material-icons-round">add</span>
-                        <span className="material-icons-round">business</span>
-                      </button>
-                    )}
-                </div>
-            </header>
+  <div className="tabs-row">
+    {activeTab === 'users' && (
+      <button
+        className="tabCircle"
+        onClick={() => setActiveTab('companies')}
+        type="button"
+        title="Show Companies"
+      >
+        <span className="material-icons-round">business</span>
+      </button>
+    )}
+    {activeTab === 'companies' && (
+      <button
+        className="tabCircle"
+        onClick={() => setActiveTab('users')}
+        type="button"
+        title="Show Users"
+      >
+        <span className="material-icons-round">person</span>
+      </button>
+    )}
+    {activeTab === 'users' && (
+      <button id="newUserBtn" className="buttonTertiary" onClick={() => setOpenModal('newUser')}>
+        <span className="material-icons-round">add</span>
+        <span className="material-icons-round">person</span>
+      </button>
+    )}
+    {activeTab === 'companies' && (
+      <button id="newCompanyBtn" className="buttonTertiary" onClick={() => setOpenModal('newCompany')}>
+        <span className="material-icons-round">add</span>
+        <span className="material-icons-round">business</span>
+      </button>
+    )}
+  </div>
+</header>
             <dialog id="newUserModal" ref={newUserModalRef}>
                 <form className="userForm" id="newUserForm" onSubmit={handleNewUserSubmit}>
                     <h2>New User</h2>
@@ -506,29 +513,28 @@ export function UsersPage(props: Props) {
                 </label>
               </div>
             </div>
-            {activeTab === 'users' && (
-              <div
-                  style={{
-                      display: "grid",
-                      gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr 1fr",
-                      paddingLeft: 30,
-                      paddingRight: 30,
-                      paddingTop: 30,
-                      columnGap: 20,
-                      alignItems: "center"
-                  }}
-              >
-                  <label className="label-tip">User name</label>
-                  <label className="label-tip">Access</label>
-                  <label className="label-tip">Role</label>
-                  <label className="label-tip">Company</label>
-                  <label className="label-tip">Last active</label>
-                  <label className="label-tip" style={{ justifySelf: "end" }}>Edit</label>
-              </div>
-            )}
-            <div></div>
+            {/* Only one list visible at a time */}
             <div>
                 {activeTab === 'users' && (
+                  <>
+                  <div
+                      style={{
+                          display: "grid",
+                          gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr 1fr",
+                          paddingLeft: 30,
+                          paddingRight: 30,
+                          paddingTop: 30,
+                          columnGap: 20,
+                          alignItems: "center"
+                      }}
+                  >
+                      <label className="label-tip">User name</label>
+                      <label className="label-tip">Access</label>
+                      <label className="label-tip">Role</label>
+                      <label className="label-tip">Company</label>
+                      <label className="label-tip">Last active</label>
+                      <label className="label-tip" style={{ justifySelf: "end" }}>Edit</label>
+                  </div>
                   <div
                       id="usersList"
                       className="usersList"
@@ -564,8 +570,27 @@ export function UsersPage(props: Props) {
                           </div>
                       ))}
                   </div>
+                  </>
                 )}
                 {activeTab === 'companies' && (
+                  <>
+                  <div
+                      style={{
+                          display: "grid",
+                          gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
+                          paddingLeft: 30,
+                          paddingRight: 30,
+                          paddingTop: 30,
+                          columnGap: 20,
+                          alignItems: "center"
+                      }}
+                  >
+                      <label className="label-tip">Company</label>
+                      <label className="label-tip">Address</label>
+                      <label className="label-tip">Email</label>
+                      <label className="label-tip">Phone</label>
+                      <label className="label-tip" style={{ justifySelf: "end" }}>Edit</label>
+                  </div>
                   <div
                       id="companiesList"
                       className="usersList"
@@ -599,6 +624,7 @@ export function UsersPage(props: Props) {
                       </div>
                     ))}
                   </div>
+                  </>
                 )}
             </div>
         </div>
