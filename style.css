@@ -275,11 +275,11 @@ buttonBlue:hover {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 20px;
-    column-gap: 10px;
-    height: 75px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    column-gap: 5px;
+    height: 60px;
 
 }
 
@@ -289,7 +289,8 @@ buttonBlue:hover {
     justify-content: space-between;
     padding-left: 20px;
     padding-right: 20px;
-    column-gap: 10px;
+    column-gap: 5px;
+    height: 30px;
 
 }
 
@@ -300,8 +301,8 @@ buttonBlue:hover {
     padding-top: 20px;
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 20px;
-    column-gap: 10px;
+    padding-bottom: 0px;
+    column-gap: 5px;
 
 }
 
@@ -370,13 +371,13 @@ buttonBlue:hover {
 /* Main page layout helpers for content areas */
 .page-flex {
   display: flex;
-  gap: 32px;
+  gap: 16px;
 }
 
 .page-column {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 16px;
 }
 
 /* Header styles */
@@ -705,7 +706,7 @@ input:focus, textarea:focus, select:focus {
   max-width: 500px;
   /* Reduce height by 100px for more space for users/tasks */
   max-height: 275px;
-  height: 275px;
+  height: 250px;
   overflow: auto;
 }
 .project-assigned-users-card {
@@ -721,7 +722,6 @@ input:focus, textarea:focus, select:focus {
 .project-details-left-col {
   display: flex;
   flex-direction: column;
-  gap: 32px;
   max-width: 350px;
 }
 
@@ -733,10 +733,10 @@ input:focus, textarea:focus, select:focus {
   gap: 16px;
   width: 100%;
   align-items: start;
-  height: calc(100vh - 70px - 32px); /* 70px header, 32px margin (top+bottom) */
+  height: calc(100vh - 70px); /* 70px header, 32px margin (top+bottom) */
   min-height: 0;
-  margin-top: 16px;
-  margin-bottom: 16px;
+
+
   box-sizing: border-box;
 }
 .project-details-left-col {
@@ -745,8 +745,9 @@ input:focus, textarea:focus, select:focus {
   gap: 16px;
   width: 500px;
   min-width: 500px;
-  height: calc(100vh - 70px); /* 70px header, 32px top, 32px bottom */
-  max-height: calc(100vh - 70px);
+  height: calc(100vh - 70px - 32px); /* 70px header, 32px top, 32px bottom */
+  max-height: calc(100vh - 70px - 32px);
+  margin-top: 16px; /* Align with right column */
 }
 .project-dashboard-card {
   max-width: 500px;
@@ -754,9 +755,8 @@ input:focus, textarea:focus, select:focus {
   flex-shrink: 0;
   flex-grow: 0;
   /* Reduce height by 100px for more space for users/tasks */
-  max-height: 275px;
-  height: 275px;
-  overflow: auto;
+  min-height: 250px;
+  overflow: visible;
 }
 .project-assigned-users-card,
 .project-todo-card {
@@ -780,23 +780,26 @@ input:focus, textarea:focus, select:focus {
 .project-details-right-col {
   width: 100%;
   min-width: 0;
-  height: calc(100vh - 70px);
   max-height: calc(100vh);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  height: calc(100vh - 70px - 32px); /* 70px header, 32px top, 32px bottom */
+  max-height: calc(100vh - 70px - 32px);
+  margin-top: 16px; /* Align with right column */
+  margin-right: 16px;
+  
 
 }
 
 #viewerContainer {
-  width: 100%;
+  width: calc(100% - 16px);
   min-width: 0;
   flex: 1 1 0%;
   min-height: 0;
   max-height: 100%;
   height: 100%;
   box-sizing: border-box;
-  margin-right: 0;
 }
 
 /* Users */
@@ -1105,7 +1108,7 @@ input:focus, textarea:focus, select:focus {
 .project-details-right {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+
 }
 
 .dashboardCard,
@@ -1115,7 +1118,7 @@ input:focus, textarea:focus, select:focus {
   background-color: var(--background-100);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  padding: 24px 20px;
+  padding: 10px 10px;
   color: #fff;
   transition: box-shadow 0.2s, outline 0.2s;
 }
@@ -1129,4 +1132,18 @@ input:focus, textarea:focus, select:focus {
 .page, #projectsPage, #projectDetails, #toDoPage, #usersPage {
   margin-top: 70px;
   box-sizing: border-box;
+}
+
+/* Remove old assign-user-modal-form, unify with .app-modal-form */
+/* .assign-user-modal-form { ... } -- removed, use .app-modal-form for all modals */
+
+.app-modal-form {
+  border: 2px solid white;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--background-100);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  min-width: 320px;
+  max-width: 95vw;
+  color: #fff;
 }

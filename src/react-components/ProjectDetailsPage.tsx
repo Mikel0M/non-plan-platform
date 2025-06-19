@@ -288,7 +288,7 @@ const handleConfirmDeleteProject = () => {
       <div className="page" id="projectDetails">
         <div className="project-details-layout">
           <div className="project-details-left-col">
-            <div className="dashboardCard project-dashboard-card">
+            <div className="dashboardCard project-dashboard-card" >
               <div className="upperDashboard">
                 <p
                   id="iconPD"
@@ -383,7 +383,7 @@ const handleConfirmDeleteProject = () => {
                   <p data-project-info="finishPD">{projectState.finishDate || "No finish date provided."}</p>
                 </div>
               </div>
-              {/* Progress bar */}
+              {/* Progress bar - always visible, not clipped */}
               <div style={{ backgroundColor: "#404040", width: "calc(100% - 40px)", height: 25, borderRadius: 50, overflow: "hidden", margin: "20px auto 30px auto", position: "relative" }}>
                 <div id="percentageDiv" style={{ width: `${projectState.progress ?? 0}%`, height: "100%", backgroundColor: (projectState.progress ?? 0) >= 50 ? "green" : "orange", borderRadius: "10px 0 0 10px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative", color: "white", fontWeight: "bold", transition: "width 0.5s" }}>
                   <span id="progressText" style={{ position: "absolute", width: "100%", textAlign: "center", left: 0 }}>{projectState.progress ?? 0}%</span>
@@ -391,7 +391,12 @@ const handleConfirmDeleteProject = () => {
               </div>
             </div>
             <div className="dashboardCard project-assigned-users-card">
-              <h4>Assigned Users</h4>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <h4 style={{ margin: 0 }}>Assigned Users</h4>
+                <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
+                  <span className="material-icons-round">add</span>
+                </button>
+              </div>
               <ul>
                 {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
                   projectState.assignedUsers.map((au, idx) => {
@@ -420,9 +425,6 @@ const handleConfirmDeleteProject = () => {
                   <li>No users assigned to this project.</li>
                 )}
               </ul>
-              <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
-                <span className="material-icons-round">add</span> Assign User
-              </button>
             </div>
             <div className="dashboardCard project-todo-card">
               <div
@@ -508,8 +510,8 @@ const handleConfirmDeleteProject = () => {
         </div>
         {/* All dialogs and modals remain here, outside the grid */}
         {/* Assign User Modal */}
-      <dialog open={assignUserModalOpen} className="modal-z10">
-        <form onSubmit={handleAssignUser}>
+      <dialog open={assignUserModalOpen} className="modal-z10 assign-user-modal">
+        <form onSubmit={handleAssignUser} className="app-modal-form">
           <h2>Assign User to Project</h2>
           <div className="formFieldContainer">
             <label>User</label>
@@ -532,7 +534,7 @@ const handleConfirmDeleteProject = () => {
         </form>
       </dialog>
       <dialog id="DeleteProjectModal">
-            <form className="userForm" id="DeleteNewProjectForm">
+            <form className="app-modal-form" id="DeleteNewProjectForm">
                 <h2>Are you sure you want to delete the project?</h2>
                 <div className="cancelAccept">
                     <button
@@ -545,7 +547,7 @@ const handleConfirmDeleteProject = () => {
             </form>
         </dialog>
         <dialog id="DeleteTaskModal">
-            <form className="userForm" id="DeleteNewTaskForm">
+            <form className="app-modal-form" id="DeleteNewTaskForm">
                 <h2>Are you sure you want to delete the task: {toDoToDelete?.title} ?</h2>
                 <div className="cancelAccept">
                     <button
@@ -559,7 +561,7 @@ const handleConfirmDeleteProject = () => {
             </form>
         </dialog>
         <dialog id="editProjectModal">
-            <form className="userForm" id="editProjectForm" onSubmit={e => {
+            <form className="app-modal-form" id="editProjectForm" onSubmit={e => {
                 e.preventDefault();
                 if (projectState) {
                   projectState.name = editName;
@@ -721,7 +723,7 @@ const handleConfirmDeleteProject = () => {
     </form>
   </dialog>
   <dialog id="newToDoModal">
-    <form className="toDoForm" id="newToDoForm" onSubmit={handleNewToDoSubmit}>
+        <form className="toDoForm" id="newToDoForm" onSubmit={handleNewToDoSubmit}>
       <input type="hidden" name="toDoProject" id="toDoProject" />
       <div className="userCard">
         <div className="formGrid">
@@ -945,7 +947,7 @@ const handleConfirmDeleteProject = () => {
     </form>
   </dialog>
   <dialog id="editToDoModal">
-    <form className="toDoForm" id="editToDoForm" onSubmit={handleEditToDoSubmit}>
+    <form className="app-modal-form" id="editToDoForm" onSubmit={handleEditToDoSubmit}>
       <input type="hidden" id="editToDoId" name="id" value={editToDoFields.id} />
       <div className="userCard">
         <div className="formGrid">
@@ -1197,7 +1199,7 @@ const handleConfirmDeleteProject = () => {
   </dialog>
   {/* Delete User Modal */}
       <dialog id="DeleteUserModal">
-        <form className="userForm" id="DeleteUserForm">
+        <form className="app-modal-form" id="DeleteUserForm">
           <h2>Are you sure you want to delete the user {userToDelete?.name}?</h2>
           <div className="cancelAccept">
             <button
