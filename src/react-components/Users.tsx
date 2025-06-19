@@ -224,7 +224,7 @@ export function UsersPage(props: Props) {
     return (
         <div className="page page-flex" id="usersPage">
             <header>
-  <div className="tabs-row">
+  <div className="tabs-row" style={{margin: '15px 0'}}>
     {activeTab === 'users' && (
       <button
         className="tabCircle"
@@ -505,128 +505,124 @@ export function UsersPage(props: Props) {
                 </div>
               </form>
             </dialog>
-            <div className="flex-row-gap-100 padding-left-30" style={{ fontSize: 'var(--fontSizeStandard)', height: 40 }}>
-              <div className="flex-row">
-                <label className="label-tip">Total number of {activeTab === 'users' ? 'Users' : 'Companies'}:</label>
-                <label className="label-tip" id="userCount">
-                  {activeTab === 'users' ? users.length : companies.length}
-                </label>
-              </div>
+            <div className="flex-row user-count-row" style={{ marginLeft: 10, alignItems: 'center', height: 40 }}>
+              <label className="label-tip" style={{ marginRight: 8, marginBottom: 0 }}>Total number of {activeTab === 'users' ? 'Users' : 'Companies'}:</label>
+              <label className="label-tip" id="userCount" style={{ marginBottom: 0 }}>
+                {activeTab === 'users' ? users.length : companies.length}
+              </label>
             </div>
             {/* Only one list visible at a time */}
-            <div>
-                {activeTab === 'users' && (
-                  <>
-                  <div
-                      style={{
-                          display: "grid",
-                          gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr 1fr",
-                          paddingLeft: 30,
-                          paddingRight: 30,
-                          paddingTop: 30,
-                          columnGap: 20,
-                          alignItems: "center"
-                      }}
-                  >
-                      <label className="label-tip">User name</label>
-                      <label className="label-tip">Access</label>
-                      <label className="label-tip">Role</label>
-                      <label className="label-tip">Company</label>
-                      <label className="label-tip">Last active</label>
-                      <label className="label-tip" style={{ justifySelf: "end" }}>Edit</label>
-                  </div>
-                  <div
-                      id="usersList"
-                      className="usersList"
-                      style={{ display: 'flex', flexDirection: 'column', rowGap: 10, paddingLeft: 30, paddingRight: 30 }}
-                  >
-                      {users.map((user, idx) => (
-                          <div
-                              key={idx}
-                              className="userCard"
-                              style={{ display: 'flex', flexDirection: 'row', gap: 20, alignItems: 'center', background: '#222', padding: 10, borderRadius: 8, cursor: 'pointer' }}
-                              onClick={() => user.id && window.openEditUserModal && window.openEditUserModal(user.id as string)}
-                          >
-                              <span className="material-icons-round">person</span>
-                              <span>{user.name} {user.surname}</span>
-                              <span>{user.access}</span>
-                              <span>{user.role}</span>
-                              <span>{user.company}</span>
-                              <span>{user.email}</span>
-                              <span>{user.phone}</span>
-                              <button
-                                  className="buttonTertiary"
-                                  style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                                  title="Delete user"
-                                  onClick={e => {
-                                      e.stopPropagation();
-                                      setUserToDelete({ id: user.id as string, name: `${user.name} ${user.surname}` });
-                                      const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
-                                      if (modal) modal.showModal();
-                                  }}
-                              >
-                                  <span className="material-icons-round" style={{fontSize: 18}}>close</span>
-                              </button>
-                          </div>
-                      ))}
-                  </div>
-                  </>
-                )}
-                {activeTab === 'companies' && (
-                  <>
-                  <div
-                      style={{
-                          display: "grid",
-                          gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
-                          paddingLeft: 30,
-                          paddingRight: 30,
-                          paddingTop: 30,
-                          columnGap: 20,
-                          alignItems: "center"
-                      }}
-                  >
-                      <label className="label-tip">Company</label>
-                      <label className="label-tip">Address</label>
-                      <label className="label-tip">Email</label>
-                      <label className="label-tip">Phone</label>
-                      <label className="label-tip" style={{ justifySelf: "end" }}>Edit</label>
-                  </div>
-                  <div
-                      id="companiesList"
-                      className="usersList"
-                      style={{ display: 'flex', flexDirection: 'column', rowGap: 10, paddingLeft: 30, paddingRight: 30 }}
-                  >
-                    {companies.map((company, idx) => (
-                      <div
-                        key={company.id}
-                        className="userCard"
-                        style={{ display: 'flex', flexDirection: 'row', gap: 20, alignItems: 'center', background: '#222', padding: 10, borderRadius: 8, cursor: 'pointer' }}
-                        onClick={() => openEditCompanyModal(company.id)}
-                      >
-                        <span className="material-icons-round">business</span>
-                        <span>{company.name}</span>
-                        <span>{company.address}</span>
-                        <span>{company.email}</span>
-                        <span>{company.phone}</span>
-                        <button
-                          className="buttonTertiary"
-                          style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                          title="Delete company"
-                          onClick={e => {
-                              e.stopPropagation();
-                              setCompanyToDelete({ id: company.id, name: company.name });
-                              const modal = document.getElementById('DeleteCompanyModal') as HTMLDialogElement | null;
-                              if (modal) modal.showModal();
-                          }}
-                        >
-                          <span className="material-icons-round" style={{fontSize: 18}}>close</span>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  </>
-                )}
-            </div>
+            <div className="user-cards-grid">
+    {activeTab === 'users' && (
+      <div className="user-cards-header" style={{
+        display: 'grid',
+        gridTemplateColumns: '40px 2fr 1fr 2fr 40px',
+        paddingLeft: 10,
+        paddingRight: 30,
+        paddingTop: 30,
+        columnGap: 10,
+        alignItems: 'center',
+        fontWeight: 600,
+        color: 'var(--text-100, #fff)'
+      }}>
+        <label className="label-tip"></label>
+        <label className="label-tip">User name</label>
+        <label className="label-tip">Role</label>
+        <label className="label-tip">Company</label>
+        <label className="label-tip" style={{ justifySelf: "end" }}></label>
+      </div>
+    )}
+    {activeTab === 'users' && (
+      <div
+        id="usersList"
+        className="usersList"
+        style={{ display: 'flex', flexDirection: 'column', rowGap: 10, paddingLeft: 10, paddingRight: 30 }}
+      >
+        {users.map((user, idx) => (
+          <div
+            key={idx}
+            className="userCard user-card-hover"
+            onClick={() => user.id && window.openEditUserModal && window.openEditUserModal(user.id as string)}
+          >
+            <span className="material-icons-round">person</span>
+            <span>{user.name} {user.surname}</span>
+            <span>{user.role}</span>
+            <span>{user.company}</span>
+            <button
+              className="buttonTertiary"
+              style={{background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 8, justifySelf: 'end'}}
+              title="Delete user"
+              onClick={e => {
+                e.stopPropagation();
+                setUserToDelete({ id: user.id as string, name: `${user.name} ${user.surname}` });
+                const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
+                if (modal) modal.showModal();
+              }}
+            >
+              <span className="material-icons-round" style={{fontSize: 18}}>close</span>
+            </button>
+          </div>
+        ))}
+      </div>
+    )}
+    {activeTab === 'companies' && (
+      <>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "40px 2fr 2fr 2fr 1fr 40px",
+          paddingLeft: 10,
+          paddingRight: 30,
+          paddingTop: 30,
+          columnGap: 10,
+          alignItems: "center",
+          fontWeight: 600,
+          color: "var(--text-100, #fff)"
+        }}
+      >
+        <label className="label-tip"></label>
+        <label className="label-tip">Company</label>
+        <label className="label-tip">Address</label>
+        <label className="label-tip">Email</label>
+        <label className="label-tip">Phone</label>
+        <label className="label-tip" style={{ justifySelf: "end" }}></label>
+      </div>
+      <div
+        id="companiesList"
+        className="usersList"
+        style={{ display: 'flex', flexDirection: 'column', rowGap: 10, paddingLeft: 10, paddingRight: 30 }}
+      >
+        {companies.map((company, idx) => (
+          <div
+            key={company.id}
+            className="userCard user-card-hover"
+            style={{ display: 'grid', gridTemplateColumns: '40px 2fr 2fr 2fr 1fr 40px', gap: 10, alignItems: 'center', background: 'var(--background-100)', padding: 10, borderRadius: 8, cursor: 'pointer', boxSizing: 'border-box' }}
+            onClick={() => openEditCompanyModal(company.id)}
+          >
+            <span className="material-icons-round">business</span>
+            <span>{company.name}</span>
+            <span>{company.address}</span>
+            <span>{company.email}</span>
+            <span>{company.phone}</span>
+            <button
+              className="buttonTertiary"
+              style={{background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 8, justifySelf: 'end'}}
+              title="Delete company"
+              onClick={e => {
+                  e.stopPropagation();
+                  setCompanyToDelete({ id: company.id, name: company.name });
+                  const modal = document.getElementById('DeleteCompanyModal') as HTMLDialogElement | null;
+                  if (modal) modal.showModal();
+              }}
+            >
+              <span className="material-icons-round" style={{fontSize: 18}}>close</span>
+            </button>
+          </div>
+        ))}
+      </div>
+      </>
+    )}
+</div>
         </div>
     );
 }

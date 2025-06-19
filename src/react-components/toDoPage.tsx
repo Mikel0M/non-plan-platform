@@ -206,14 +206,13 @@ export function ToDoPage(props: Props) {
 
     // State for new to-do modal and project
     const [newToDoProject, setNewToDoProject] = React.useState<any | null>(null);
+    const newToDoModalRef = React.useRef<HTMLDialogElement | null>(null);
 
     // Function to open the new to-do modal for a specific project
     const openNewToDoModal = (project: any) => {
       setNewToDoProject(project);
       setTimeout(() => {
-        (document.getElementById('toDoProject') as HTMLInputElement).value = project.id || '';
-        const modal = document.getElementById('newToDoModal') as HTMLDialogElement | null;
-        if (modal) modal.showModal();
+        if (newToDoModalRef.current) newToDoModalRef.current.showModal();
       }, 0);
     };
 
@@ -247,7 +246,7 @@ export function ToDoPage(props: Props) {
 
     return (
       <div className="page page-column" id="toDoPage">
-        <div className="todo-cards-list">
+        <div className="todo-cards-list" style={{ gap: '10px' }}>
           {props.projectsManager.list.map(project => (
             <div key={project.id} className="todo-card">
               <div className="todo-card-header">
@@ -255,211 +254,149 @@ export function ToDoPage(props: Props) {
                 <button
                   className="buttonTertiary todo-add-btn"
                   onClick={() => openNewToDoModal(project)}
+                  title="Add To-Do"
                 >
-                  + Add To-Do
+                  <span className="material-icons-round">add</span>
+                  <span className="material-icons-round">check_circle</span>
                 </button>
+              </div>
+              {/* Header row for task columns */}
+              <div className="todo-items-header">
+                <span></span>
+                <span className="todo-header-label">Title</span>
+                <span className="todo-header-label">Priority</span>
+                <span className="todo-header-label">Responsible Person</span>
+                <span className="todo-header-label">Due Date</span>
+                <span></span>
               </div>
               {(!project.toDos || project.toDos.length === 0) ? (
                 <div className="todo-empty">No to-dos for this project.</div>
               ) : (
-                project.toDos.map(todo => {
-                  let bgColor = '#222';
-                  switch (todo.status) {
-                    case 'Pending': bgColor = '#969697'; break;
-                    case 'In Progress': bgColor = '#FFA500'; break;
-                    case 'Completed': bgColor = '#4CAF50'; break;
-                    case 'On Hold': bgColor = '#E57373'; break;
-                    default: bgColor = '#222';
-                  }
-                  // Find assigned user for this project
-                  const assignedUser = (project.assignedUsers || [])
-                    .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
-                    .find(u => u && u.id === todo.assigned_to);
-                  return (
-                    <div
-                      key={todo.id}
-                      className="todoItem"
-                      style={{ background: bgColor }}
-                      onClick={() => openEditToDoModal(todo)}
-                    >
-                      <div className="todo-item-header">
-                        <div className="todo-item-title-row">
-                          <span className="material-icons-round todo-item-icon" />
-                          <p className="todo-item-title">{todo.title}</p>
-                          <div className="todo-item-date">{todo.due_date}</div>
-                        </div>
-                        <div className="todo-item-desc">{todo.description}</div>
+                <div className="todo-tasks-list">
+                  {project.toDos.map(todo => {
+                    let statusClass = 'status-pending';
+                    switch (todo.status) {
+                      case 'Pending': statusClass = 'status-pending'; break;
+                      case 'In Progress': statusClass = 'status-inprogress'; break;
+                      case 'Completed': statusClass = 'status-completed'; break;
+                      case 'On Hold': statusClass = 'status-onhold'; break;
+                      default: statusClass = 'status-pending';
+                    }
+                    const assignedUser = (project.assignedUsers || [])
+                      .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+                      .find(u => u && u.id === todo.assigned_to);
+                    return (
+                      <div
+                        key={todo.id}
+                        className={`todoItem ${statusClass}`}
+                        onClick={() => openEditToDoModal(todo)}
+                      >
+                        <span className="todo-task-icon">
+                          <span className="material-icons-round">check_circle</span>
+                        </span>
+                        <span className="todo-task-value" style={{ fontWeight: 600 }}>{todo.title}</span>
+                        <span className="todo-task-value">{todo.priority}</span>
+                        <span className="todo-task-value">{assignedUser ? `${assignedUser.name} ${assignedUser.surname}` : ''}</span>
+                        <span className="todo-task-value">{todo.due_date}</span>
+                        <span className="todo-task-delete">
+                          <button
+                            className="buttonTertiary"
+                            style={{background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 8, justifySelf: 'end'}}
+                            title="Delete task"
+                            onClick={e => {
+                              e.stopPropagation();
+                              setToDoToDelete(todo);
+                              const modal = document.getElementById('DeleteTaskModal') as HTMLDialogElement | null;
+                              if (modal) modal.showModal();
+                            }}
+                          >
+                            <span className="material-icons-round" style={{fontSize: 18}}>close</span>
+                          </button>
+                        </span>
                       </div>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
             </div>
           ))}
         </div>
         {/* Edit To-Do Modal */}
         <dialog id="editToDoModal">
-          <form className="toDoForm" id="editToDoForm" onSubmit={handleEditToDoSubmit}>
+          <form className="userForm form-wide" id="editToDoForm" onSubmit={handleEditToDoSubmit}>
             <input type="hidden" id="editToDoId" name="id" value={editToDoFields.id} />
+            <h2>Edit Task</h2>
             <div className="userCard">
-              <div className="formGrid">
-                <div className="formColumn">
-                  <h2 style={{ margin: 0 }}>
-                    Edit Task
-                    {editToDo && props.projectsManager.findProjectById(editToDo.project_id) && (
-                      <span style={{ display: 'block', fontSize: 16, color: '#888', marginTop: 4 }}>
-                        for <b>{props.projectsManager.findProjectById(editToDo.project_id)?.name}</b>
-                      </span>
-                    )}
-                  </h2>
-                  <div className="formFieldContainerToDo">
-                    <label>
-                      <span className="material-icons-round">apartment</span>Title
-                    </label>
-                    <input name="title" type="text" id="editToDoTitle" value={editToDoFields.title} onChange={handleEditToDoChange} />
-                    <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-                      TIP give it a short title
-                    </label>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">subject</span>Description
-                    </label>
-                    <textarea
-                      name="description"
-                      cols={30}
-                      rows={5}
-                      placeholder="Give your project a nice description!"
-                      id="editToDoDescription"
-                      value={editToDoFields.description}
-                      onChange={handleEditToDoChange}
-                    />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Status
-                    </label>
-                    <select name="status" id="editToDoStatus" value={editToDoFields.status} onChange={handleEditToDoChange}>
-                      <option>Pending</option>
-                      <option>In Progress</option>
-                      <option>Completed</option>
-                      <option>On Hold</option>
-                    </select>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Priority
-                    </label>
-                    <select name="priority" id="editToDoPriority" value={editToDoFields.priority} onChange={handleEditToDoChange}>
-                      <option>High</option>
-                      <option>Standard</option>
-                      <option>Low</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="formColumn">
-                  <div className="formFieldContainerToDo">
-                    <h2 data-project-info="toDoProjectName" style={{ margin: 0 }}>
-                      Project Name
-                    </h2>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Responsible Person
-                    </label>
-                    <select name="assigned_to" id="editToDoAssignedTo" value={editToDoFields.assigned_to} onChange={handleEditToDoChange}>
-                      <option value="">Select user</option>
-                      {(editToDoProject ? getAssignedUsers(editToDoProject) : []).map(user => (
-                        <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Created By
-                    </label>
-                    <select name="created_by" id="editToDoCreatedBy" value={editToDoFields.created_by} onChange={handleEditToDoChange}>
-                      <option value="">Select user</option>
-                      {(editToDoProject ? getAssignedUsers(editToDoProject) : []).map(user => (
-                        <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">calendar_today</span>
-                      To-Do start date
-                    </label>
-                    <input name="start_date" type="date" id="editToDoStartDate" value={editToDoFields.start_date} onChange={handleEditToDoChange} />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">calendar_month</span>
-                      To-Do last update date
-                    </label>
-                    <input name="updated_at" type="date" id="editToDoUpdatedAt" value={editToDoFields.updated_at} onChange={handleEditToDoChange} />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">paid</span>Estimated hours
-                    </label>
-                    <input name="estimated_hours" type="number" placeholder="Estimated hours for the project" id="editToDoEstimatedHours" value={editToDoFields.estimated_hours} onChange={handleEditToDoChange} />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">paid</span>Actual hours
-                    </label>
-                    <input name="actual_hours" type="number" placeholder="Hours used so far" id="editToDoActualHours" value={editToDoFields.actual_hours} onChange={handleEditToDoChange} />
-                  </div>
-                </div>
-              </div>
-              <div className="separator-horizontal" />
-              <div className="formGrid">
-                <div className="formColumn">
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">calendar_month</span>Due Date
-                    </label>
-                    <input name="due_date" type="date" id="editToDoDueDate" value={editToDoFields.due_date} onChange={handleEditToDoChange} />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">calendar_month</span>Start Date
-                    </label>
-                    <input name="start_date" type="date" id="editToDoStartDate2" value={editToDoFields.start_date} onChange={handleEditToDoChange} />
-                  </div>
-                </div>
-                <div className="formColumn">
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Dependencies
-                    </label>
-                    <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-                      Select the tasks this project is dependent on
-                    </label>
-                    <input name="dependencies" id="editToDoDependencies" value={editToDoFields.dependencies} onChange={handleEditToDoChange} />
-                  </div>
-                </div>
-              </div>
-              <div className="separator-horizontal" />
               <div className="formFieldContainer">
-                <label>
-                  <span className="material-icons-round">subject</span>Comments
-                </label>
-                <textarea
-                  name="comments"
-                  cols={30}
-                  rows={5}
-                  placeholder="Add any clarification comment"
-                  id="editToDoComments"
-                  value={editToDoFields.comments}
-                  onChange={handleEditToDoChange}
-                />
+                <label><span className="material-icons-round">apartment</span>Title</label>
+                <input name="title" type="text" id="editToDoTitle" value={editToDoFields.title} onChange={handleEditToDoChange} />
+                <label className="label-tip">TIP give it a short title</label>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">subject</span>Description</label>
+                <textarea name="description" cols={30} rows={5} placeholder="Description" id="editToDoDescription" value={editToDoFields.description} onChange={handleEditToDoChange} />
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Status</label>
+                <select name="status" id="editToDoStatus" value={editToDoFields.status} onChange={handleEditToDoChange}>
+                  <option>Pending</option>
+                  <option>In Progress</option>
+                  <option>Completed</option>
+                  <option>On Hold</option>
+                </select>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Priority</label>
+                <select name="priority" id="editToDoPriority" value={editToDoFields.priority} onChange={handleEditToDoChange}>
+                  <option>High</option>
+                  <option>Standard</option>
+                  <option>Low</option>
+                </select>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">paid</span>Estimated hours</label>
+                <input name="estimated_hours" type="number" placeholder="Estimated hours for the task" id="editToDoEstimatedHours" value={editToDoFields.estimated_hours} onChange={handleEditToDoChange} />
+                <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Estimated hours for the task</label>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">paid</span>Actual hours</label>
+                <input name="actual_hours" type="number" placeholder="Hours used so far" id="editToDoActualHours" value={editToDoFields.actual_hours} onChange={handleEditToDoChange} />
+                <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Hours used so far</label>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Responsible Person</label>
+                <select name="assigned_to" id="editToDoAssignedTo" value={editToDoFields.assigned_to} onChange={handleEditToDoChange}>
+                  <option value="">Select responsible person</option>
+                  {(editToDoProject ? getAssignedUsers(editToDoProject) : []).map(user => (
+                    <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Created By</label>
+                <select name="created_by" id="editToDoCreatedBy" value={editToDoFields.created_by} onChange={handleEditToDoChange}>
+                  <option value="">Select creator</option>
+                  {(editToDoProject ? getAssignedUsers(editToDoProject) : []).map(user => (
+                    <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">calendar_today</span>Start Date</label>
+                <input name="start_date" type="date" id="editToDoStartDate" value={editToDoFields.start_date} onChange={handleEditToDoChange} />
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">calendar_month</span>Due Date</label>
+                <input name="due_date" type="date" id="editToDoDueDate" value={editToDoFields.due_date} onChange={handleEditToDoChange} />
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Dependencies</label>
+                <input name="dependencies" id="editToDoDependencies" value={editToDoFields.dependencies} onChange={handleEditToDoChange} />
+                <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Comma-separated task IDs</label>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">subject</span>Comments</label>
+                <textarea name="comments" cols={30} rows={5} placeholder="Add any clarification comment" id="editToDoComments" value={editToDoFields.comments} onChange={handleEditToDoChange} />
               </div>
             </div>
             <div className="cancelAccept">
@@ -485,175 +422,89 @@ export function ToDoPage(props: Props) {
           </form>
         </dialog>
 
-        
         {/* New To-Do Modal */}
-        <dialog id="newToDoModal">
-          <form className="toDoForm" id="newToDoForm" onSubmit={handleNewToDoSubmit}>
-            <input type="hidden" id="toDoProject" name="toDoProject" />
+        <dialog id="newToDoModal" ref={newToDoModalRef}>
+          <form className="userForm form-wide" id="newToDoForm" onSubmit={handleNewToDoSubmit}>
+            <h2>New Task</h2>
             <div className="userCard">
-              <div className="formGrid">
-                <div className="formColumn">
-                  <h2 style={{ margin: 0 }}>New Task</h2>
-                  <div className="formFieldContainerToDo">
-                    <label>
-                      <span className="material-icons-round">apartment</span>Title
-                    </label>
-                    <input name="title" type="text" id="newToDoTitle" value={newToDo.title} onChange={handleNewToDoChange} />
-                    <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-                      TIP give it a short title
-                    </label>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">subject</span>Description
-                    </label>
-                    <textarea
-                      name="description"
-                      cols={30}
-                      rows={5}
-                      placeholder="Give your project a nice description!"
-                      id="newToDoDescription"
-                      value={newToDo.description}
-                      onChange={handleNewToDoChange}
-                    />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Status
-                    </label>
-                    <select name="status" id="newToDoStatus" value={newToDo.status} onChange={handleNewToDoChange}>
-                      <option>Pending</option>
-                      <option>In Progress</option>
-                      <option>Completed</option>
-                      <option>On Hold</option>
-                    </select>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Priority
-                    </label>
-                    <select name="priority" id="newToDoPriority" value={newToDo.priority} onChange={handleNewToDoChange}>
-                      <option>High</option>
-                      <option>Standard</option>
-                      <option>Low</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="formColumn">
-                  <div className="formFieldContainerToDo">
-                    <h2 data-project-info="toDoProjectName" style={{ margin: 0 }}>
-                      Project Name
-                    </h2>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Responsible Person
-                    </label>
-                    <select name="assigned_to" id="newToDoAssignedTo" value={newToDo.assigned_to} onChange={handleNewToDoChange}>
-                      <option value="">Select user</option>
-                      {getAssignedUsers(newToDoProject || projectState).map(user => (
-                        <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Created By
-                    </label>
-                    <select name="created_by" id="newToDoCreatedBy" value={newToDo.created_by} onChange={handleNewToDoChange}>
-                      <option value="">Select user</option>
-                      {getAssignedUsers(newToDoProject || projectState).map(user => (
-                        <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">calendar_today</span>
-                      To-Do start date
-                    </label>
-                    <input name="start_date" type="date" id="newToDoStartDate" value={newToDo.start_date} onChange={handleNewToDoChange} />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">calendar_month</span>
-                      To-Do last update date
-                    </label>
-                    <input name="updated_at" type="date" id="newToDoUpdatedAt" value={newToDo.updated_at} onChange={handleNewToDoChange} />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">paid</span>Estimated hours
-                    </label>
-                    <input name="estimated_hours" type="number" placeholder="Estimated hours for the project" id="newToDoEstimatedHours" value={newToDo.estimated_hours} onChange={handleNewToDoChange} />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">paid</span>Actual hours
-                    </label>
-                    <input name="actual_hours" type="number" placeholder="Hours used so far" id="newToDoActualHours" value={newToDo.actual_hours} onChange={handleNewToDoChange} />
-                  </div>
-                </div>
-              </div>
-              <div className="separator-horizontal" />
-              <div className="formGrid">
-                <div className="formColumn">
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">calendar_month</span>Due Date
-                    </label>
-                    <input name="due_date" type="date" id="newToDoDueDate" value={newToDo.due_date} onChange={handleNewToDoChange} />
-                  </div>
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">calendar_month</span>Start Date
-                    </label>
-                    <input name="start_date" type="date" id="newToDoStartDate" value={newToDo.start_date} onChange={handleNewToDoChange} />
-                  </div>
-                </div>
-                <div className="formColumn">
-                  <div className="formFieldContainer">
-                    <label>
-                      <span className="material-icons-round">not_listed_location</span>
-                      Dependencies
-                    </label>
-                    <label style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
-                      Select the tasks this project is dependent on
-                    </label>
-                    <select name="dependencies" id="newToDoDependencies" value={newToDo.dependencies} onChange={handleNewToDoChange}>
-                      <option>You</option>
-                      <option>Standard</option>
-                      <option>Low</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div className="separator-horizontal" />
               <div className="formFieldContainer">
-                <label>
-                  <span className="material-icons-round">subject</span>Comments
-                </label>
-                <textarea
-                  name="comments"
-                  cols={30}
-                  rows={5}
-                  placeholder="Add any clarification comment"
-                  id="newToDoComments"
-                  value={newToDo.comments}
-                  onChange={handleNewToDoChange}
-                />
+                <label><span className="material-icons-round">apartment</span>Title</label>
+                <input name="title" type="text" id="newToDoTitle" value={newToDo.title} onChange={handleNewToDoChange} />
+                <label className="label-tip">TIP give it a short title</label>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">subject</span>Description</label>
+                <textarea name="description" cols={30} rows={5} placeholder="Description" id="newToDoDescription" value={newToDo.description} onChange={handleNewToDoChange} />
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Status</label>
+                <select name="status" id="newToDoStatus" value={newToDo.status} onChange={handleNewToDoChange}>
+                  <option>Pending</option>
+                  <option>In Progress</option>
+                  <option>Completed</option>
+                  <option>On Hold</option>
+                </select>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Priority</label>
+                <select name="priority" id="newToDoPriority" value={newToDo.priority} onChange={handleNewToDoChange}>
+                  <option>High</option>
+                  <option>Standard</option>
+                  <option>Low</option>
+                </select>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">paid</span>Estimated hours</label>
+                <input name="estimated_hours" type="number" placeholder="Estimated hours for the task" id="newToDoEstimatedHours" value={newToDo.estimated_hours} onChange={handleNewToDoChange} />
+                <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Estimated hours for the task</label>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">paid</span>Actual hours</label>
+                <input name="actual_hours" type="number" placeholder="Hours used so far" id="newToDoActualHours" value={newToDo.actual_hours} onChange={handleNewToDoChange} />
+                <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Hours used so far</label>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Responsible Person</label>
+                <select name="assigned_to" id="newToDoAssignedTo" value={newToDo.assigned_to} onChange={handleNewToDoChange}>
+                  <option value="">Select user</option>
+                  {getAssignedUsers(newToDoProject || projectState).map(user => (
+                    <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Created By</label>
+                <select name="created_by" id="newToDoCreatedBy" value={newToDo.created_by} onChange={handleNewToDoChange}>
+                  <option value="">Select user</option>
+                  {getAssignedUsers(newToDoProject || projectState).map(user => (
+                    <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">calendar_today</span>Start Date</label>
+                <input name="start_date" type="date" id="newToDoStartDate" value={newToDo.start_date} onChange={handleNewToDoChange} />
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">calendar_month</span>Due Date</label>
+                <input name="due_date" type="date" id="newToDoDueDate" value={newToDo.due_date} onChange={handleNewToDoChange} />
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">not_listed_location</span>Dependencies</label>
+                <input name="dependencies" id="newToDoDependencies" value={newToDo.dependencies} onChange={handleNewToDoChange} />
+                <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Comma-separated task IDs</label>
+              </div>
+              <div className="formFieldContainer">
+                <label><span className="material-icons-round">subject</span>Comments</label>
+                <textarea name="comments" cols={30} rows={5} placeholder="Add any clarification comment" id="newToDoComments" value={newToDo.comments} onChange={handleNewToDoChange} />
               </div>
             </div>
             <div className="cancelAccept">
               <button type="button" className="cancelButton" onClick={() => closeModal('newToDoModal')}>
                 Cancel
               </button>
-              <button type="submit" className="acceptButton" id="submitNewToDoButton">
-                Create Task
+              <button type="submit" className="acceptButton" id="submitToDoButton">
+                Accept
               </button>
             </div>
           </form>
