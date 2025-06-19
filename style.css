@@ -28,6 +28,7 @@
     --fontSizeGiantXL: 40px;
     --fontSizeGiantXXL: 50px;
     --fontSizeGiantXXXL: 100px;
+    --green: #4CAF50;
 
 }
 
@@ -546,12 +547,27 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: border 0.2s;
-    border: 1px solid transparent;
+    transition: border-color 0.2s;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+    cursor: pointer; /* Hand cursor on hover */
 }
 
 .todoItem:hover {
-  border: 2px solid var(--primary-100, #0078d4);
+  border-color: var(--primary-100, #0078d4);
+}
+
+.todoItem.status-pending {
+  background: var(--gray);
+}
+.todoItem.status-inprogress {
+  background: var(--primary-100);
+}
+.todoItem.status-completed {
+  background: var(--green);
+}
+.todoItem.status-onhold {
+  background: var(--red);
 }
 
 /* Form Styles */
@@ -828,13 +844,15 @@ input:focus, textarea:focus, select:focus {
 }
 
 .cardUser {
-    display: flex;
-    flex-direction: row;
-    column-gap: 100px;
+    display: grid;
+    grid-template-columns: 40px 2fr 1fr 2fr 40px;
+    gap: 10px;
     align-items: center;
-    justify-content: start;
-    border: 2px solid white;
-    height: 8px;
+    background: var(--background-100);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-sizing: border-box;
 }
 
 .userCardProperty {
@@ -845,12 +863,29 @@ input:focus, textarea:focus, select:focus {
 }
 
 .userCard {
-    background-color: var(--background-100);
+    display: grid;
+    grid-template-columns: 40px 2fr 1fr 2fr 40px;
+    gap: 10px;
+    align-items: center;
+    background: var(--background-100);
+    padding: 10px;
     border-radius: 8px;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
+.userCard.company {
+  grid-template-columns: 40px 2fr 2fr 2fr 1fr 40px;
+}
 
+.user-card-hover {
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.user-card-hover:hover {
+  border-color: var(--primary-100, #0078d4);
+}
 
 
 #loginModal {
@@ -1012,8 +1047,8 @@ input:focus, textarea:focus, select:focus {
 
 /* Todo card and item styles */
 .todo-card {
-  margin-bottom: 32px;
-  background: #222;
+  margin-bottom: 10px;
+  background: var(--background-100) !important;
   border-radius: 8px;
   padding: 16px;
 }
@@ -1029,13 +1064,8 @@ input:focus, textarea:focus, select:focus {
 }
 .todo-add-btn {
   margin-left: 8px;
-  padding: 4px 12px;
-  font-size: 16px;
-  border-radius: 6px;
-  background: #444;
-  color: #fff;
-  border: none;
-  cursor: pointer;
+  /* Remove all custom padding, font-size, border-radius, background, color, border, etc. */
+  /* Only margin-left is kept for spacing */
 }
 .todo-empty {
   color: #aaa;
@@ -1111,6 +1141,45 @@ input:focus, textarea:focus, select:focus {
   margin: 0;
 }
 
+.todo-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  width: 100%;
+  margin: 20px 0 0 0; /* Add 10px margin-top to push first card down */
+}
+
+.todo-items-header {
+  display: grid;
+  grid-template-columns: 40px 2fr 1fr 2fr 1fr 40px;
+  gap: 10px;
+  padding-bottom: 8px;
+  color: var(--text-100, #fff);
+  font-weight: 600;
+  font-size: var(--fontSizeStandard);
+  align-items: center;
+}
+.todoItem {
+  display: grid !important;
+  grid-template-columns: 40px 2fr 1fr 2fr 1fr 40px;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer; /* Hand cursor on hover */
+}
+.todo-task-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 22px;
+}
+.todo-task-delete {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Project details grid adjustments for better alignment */
 .project-details-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -1203,4 +1272,48 @@ input:focus, textarea:focus, select:focus {
 }
 .tabCircle:not(.active) .material-icons-round {
   color: var(--background-200, #222) !important;
+}
+
+.todo-header-label {
+  color: var(--gray);
+  font-size: var(--fontSizeStandard);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  padding-left: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.todo-task-value {
+  color: var(--text-100, #fff);
+  font-size: var(--fontSizeStandard);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding-left: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.todo-task-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 22px;
+}
+.todo-task-delete {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.user-count-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: 10px;
+  gap: 8px;
 }
