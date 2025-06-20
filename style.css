@@ -1204,12 +1204,7 @@ input:focus, textarea:focus, select:focus {
   color: #fff;
   transition: box-shadow 0.2s, outline 0.2s;
 }
-.dashboardCard:hover,
-.project-dashboard-card:hover,
-.project-assigned-users-card:hover,
-.project-todo-card:hover {
 
-}
 
 .page, #projectsPage, #projectDetails, #toDoPage, #usersPage {
   margin-top: 70px;
@@ -1324,4 +1319,16 @@ input:focus, textarea:focus, select:focus {
     border: 1px solid #ccc;
     width: 100%;
     font-size: 1rem;
+}
+
+.projects-content {
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.projects-content-header {
+  margin-left: -40px;
+
 }

@@ -295,6 +295,7 @@ export function ToDoPage(props: Props) {
                   <SearchBox
                     value={taskSearch}
                     onValueChange={q => setProjectTaskSearch(prev => ({ ...prev, [project.id]: q }))}
+                    placeholder={t("search_tasks") || "Search for tasks"}
                   />
                   <button
                     className="buttonTertiary todo-add-btn"
@@ -315,7 +316,7 @@ export function ToDoPage(props: Props) {
                   <span></span>
                 </div>
                 {filteredToDos.length === 0 ? (
-                  <div className="todo-empty">{t("projects_no_todos") || "No to-dos for this project."}
+                  <div className="todo-empty">
                     <p style={{ textAlign: 'center', marginTop: 16, fontSize: 16, color: '#888' }}>
                       There are no tasks to display!
                     </p>

@@ -92,28 +92,30 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
 
     return (
         <div className="page" id="projectsPage">
-            <header>
-                <SearchBox onValueChange={setSearchQuery} />
-                <div style={{ display: "flex", gap: "10px", margin: "15px 0" }}>
-                    <button id="importProjectsBtn" className="buttonTertiary" onClick={onImportClick} title={t("projects_import") || "Import projects"}>
-                        <span className="material-icons-round">file_download</span>
-                    </button>
-                    <button id="exportProjectsBtn" className="buttonTertiary" onClick={onExportClick} title={t("projects_export") || "Export projects"}>
-                        <span className="material-icons-round">file_upload</span>
-                    </button>
-                    <button onClick={onNewProjectClick} id="newProjectBtn" className="buttonTertiary" title={t("projects_new") || "New project"}>
-                        <span className="material-icons-round">add</span>
-                    </button>
+            <div className="projects-content">
+                <header className="projects-content-header">
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "15px 0" }}>
+                        <SearchBox onValueChange={setSearchQuery} placeholder={t("search_projects") || "Search for projects"} style={{ width: '100%', maxWidth: 350 }} />
+                        <button id="importProjectsBtn" className="buttonTertiary" onClick={onImportClick} title={t("projects_import") || "Import projects"}>
+                            <span className="material-icons-round">file_download</span>
+                        </button>
+                        <button id="exportProjectsBtn" className="buttonTertiary" onClick={onExportClick} title={t("projects_export") || "Export projects"}>
+                            <span className="material-icons-round">file_upload</span>
+                        </button>
+                        <button onClick={onNewProjectClick} id="newProjectBtn" className="buttonTertiary" title={t("projects_new") || "New project"}>
+                            <span className="material-icons-round">add</span>
+                        </button>
+                    </div>
+                </header>
+                <div className="project-cards-grid">
+                    {projectCards}
                 </div>
-            </header>
-            <div className="project-cards-grid">
-                {projectCards}
+                {filteredProjects.length === 0 && (
+                    <p style={{ textAlign: 'center', marginTop: 32, fontSize: 18, color: '#888' }}>
+                        There are no projects to display!
+                    </p>
+                )}
             </div>
-            {filteredProjects.length === 0 && (
-                <p style={{ textAlign: 'center', marginTop: 32, fontSize: 18, color: '#888' }}>
-                    There are no projects to display!
-                </p>
-            )}
             {isModalOpen && (
                 <dialog id="newProjectModal" open>
                     <form onSubmit={(e) => {onFormSubmit(e)}} className="userForm form-wide" id="newProjectForm">

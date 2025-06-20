@@ -7,6 +7,7 @@ import { companiesManagerInstance } from '../classes/CompaniesManager';
 import { useTranslation } from "./LanguageContext";
 import UserCard from "./UserCard";
 import CompanyCard from "./CompanyCard";
+import { SearchBox } from './SearchBox';
 
 interface Props {
 
@@ -65,6 +66,8 @@ export function UsersPage(props: Props) {
         phone: '',
     });
     const [companyToDelete, setCompanyToDelete] = React.useState<{id: string, name: string} | null>(null);
+    // Add state for search query
+    const [searchQuery, setSearchQuery] = React.useState("");
 
     // Sync users state with UsersManager
     React.useEffect(() => {
@@ -210,10 +213,19 @@ export function UsersPage(props: Props) {
         if (modal) modal.close();
     };
 
+    // Filter users and companies by search query
+    const filteredUsers = users.filter(user =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.surname.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    const filteredCompanies = companies.filter(company =>
+      company.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div className="page page-flex" id="usersPage">
             <header>
-  <div className="tabs-row" style={{margin: '15px 0'}}>
+  <div className="tabs-row" style={{margin: '15px 0', display: 'flex', alignItems: 'center', gap: 8}}>
     {activeTab === 'users' && (
       <button
         className="tabCircle"
@@ -234,6 +246,10 @@ export function UsersPage(props: Props) {
         <span className="material-icons-round">person</span>
       </button>
     )}
+    {/* Search bar right of the icon */}
+    <div style={{ minWidth: 180, flex: 1 }}>
+      <SearchBox value={searchQuery} onValueChange={setSearchQuery} placeholder={activeTab === 'users' ? t("search_users") || "Search for users" : t("search_companies") || "Search for companies"} />
+    </div>
     {activeTab === 'users' && (
       <button id="newUserBtn" className="buttonTertiary" onClick={() => setOpenModal('newUser')}>
         <span className="material-icons-round">add</span>
@@ -527,18 +543,26 @@ export function UsersPage(props: Props) {
         className="usersList"
         style={{ display: 'flex', flexDirection: 'column', rowGap: 10, paddingLeft: 10, paddingRight: 30 }}
       >
-        {users.map((user, idx) => (
-          <UserCard
-            key={user.id || idx}
-            user={user}
-            onEdit={id => window.openEditUserModal && window.openEditUserModal(id)}
-            onDelete={id => {
-              setUserToDelete({ id, name: `${user.name} ${user.surname}` });
-              const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
-              if (modal) modal.showModal();
-            }}
-          />
-        ))}
+        {filteredUsers.length > 0 ? (
+          filteredUsers.map(user => (
+            <UserCard
+              key={user.id}
+              user={user}
+              onEdit={id => window.openEditUserModal && window.openEditUserModal(id)}
+              onDelete={id => {
+                setUserToDelete({ id, name: `${user.name} ${user.surname}` });
+                const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
+                if (modal) modal.showModal();
+              }}
+            />
+          ))
+        ) : (
+          <div style={{color: '#aaa'}}>
+            <p style={{ textAlign: 'center', marginTop: 16, fontSize: 16, color: '#888' }}>
+              There are no users to display!
+            </p>
+          </div>
+        )}
       </div>
     )}
     {activeTab === 'companies' && (
@@ -568,18 +592,22 @@ export function UsersPage(props: Props) {
         className="usersList"
         style={{ display: 'flex', flexDirection: 'column', rowGap: 10, paddingLeft: 10, paddingRight: 30 }}
       >
-        {companies.map((company, idx) => (
-          <CompanyCard
-            key={company.id}
-            company={company}
-            onEdit={id => openEditCompanyModal(id)}
-            onDelete={id => {
-              setCompanyToDelete({ id, name: company.name });
-              const modal = document.getElementById('DeleteCompanyModal') as HTMLDialogElement | null;
-              if (modal) modal.showModal();
-            }}
-          />
-        ))}
+        {filteredCompanies.length > 0 ? (
+          filteredCompanies.map(company => (
+            <CompanyCard
+              key={company.id}
+              company={company}
+              onEdit={id => setOpenModal('changeCompany')}
+              onDelete={id => setCompanyToDelete(company)}
+            />
+          ))
+        ) : (
+          <div style={{color: '#aaa'}}>
+            <p style={{ textAlign: 'center', marginTop: 16, fontSize: 16, color: '#888' }}>
+              There are no companies to display!
+            </p>
+          </div>
+        )}
       </div>
       </>
     )}

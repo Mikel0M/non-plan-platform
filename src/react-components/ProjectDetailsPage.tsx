@@ -315,6 +315,17 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
       todo.title.toLowerCase().includes(toDoSearchQuery.toLowerCase())
     );
 
+    // Add state for assigned user search
+    const [assignedUserSearchQuery, setAssignedUserSearchQuery] = React.useState("");
+    // Filter assigned users by name or surname
+    const filteredAssignedUsers = projectState.assignedUsers
+      .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+      .filter((user): user is User => Boolean(user))
+      .filter(user =>
+        user.name.toLowerCase().includes(assignedUserSearchQuery.toLowerCase()) ||
+        user.surname.toLowerCase().includes(assignedUserSearchQuery.toLowerCase())
+      );
+
     // --- RENDER ---
     return (
       <div className="page" id="projectDetails">
@@ -413,7 +424,7 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
             {activeLeftCard === 'users' && (
               <div className="dashboardCard project-assigned-users-card">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <div className="tabs-row">
+                  <div className="tabs-row" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <h4 style={{ margin: 0, whiteSpace: 'nowrap' }}>{t("projects_assigned_users") || "Assigned Users"}</h4>
                     <button
                       className={activeLeftCard === 'users' ? 'tabCircle active' : 'tabCircle'}
@@ -423,16 +434,23 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                     >
                       <span className="material-icons-round">checklist</span>
                     </button>
+                    {/* Assigned user search bar, right of title and icon */}
+                    <SearchBox
+                      value={assignedUserSearchQuery}
+                      onValueChange={setAssignedUserSearchQuery}
+                      style={{ minWidth: 180 }}
+                      placeholder={t("search_users") || "Search for users"}
+                    />
                   </div>
                   <button className="buttonTertiary" onClick={() => setAssignUserModalOpen(true)}>
                     <span className="material-icons-round">add</span>
                   </button>
                 </div>
                 <div>
-      {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
-        projectState.assignedUsers.map((au, idx) => {
-          const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
-          if (!user) return null;
+      {filteredAssignedUsers.length > 0 ? (
+        filteredAssignedUsers.map((user, idx) => {
+          const au = projectState.assignedUsers.find(au => au.userId === user.id);
+          if (!user || !au) return null;
           return (
             <UserCard
               key={au.userId}
@@ -448,7 +466,9 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           );
         })
       ) : (
-        <div>{t("projects_no_users_assigned") || "No users assigned to this project."}</div>
+        <div style={{color: '#aaa'}}>
+          {t("projects_no_users_assigned")}
+        </div>
       )}
     </div>
               </div>
@@ -469,7 +489,7 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <SearchBox onValueChange={setToDoSearchQuery} style={{ minWidth: 180 }} />
+                      <SearchBox onValueChange={setToDoSearchQuery} style={{ minWidth: 180 }} placeholder={t("search_tasks") || "Search for tasks"} />
                     </div>
                     <button id="newToDoBtn" className="buttonTertiary" style={{ marginLeft: 8 }} onClick={() => {
   const modal = document.getElementById('newToDoModal') as HTMLDialogElement | null;
@@ -493,10 +513,7 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                   {/* Render filtered To-Do list items reactively */}
                   {filteredToDos.length === 0 && (
                     <div style={{color: '#aaa'}}>
-                      {t("projects_no_todos") || "No to-dos for this project."}
-                      <p style={{ textAlign: 'center', marginTop: 16, fontSize: 16, color: '#888' }}>
-                        There are no tasks to display!
-                      </p>
+                      {t("projects_no_todos")}
                     </div>
                   )}
                   {filteredToDos.map((todo, idx) => {
