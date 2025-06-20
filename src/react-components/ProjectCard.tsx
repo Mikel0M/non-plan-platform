@@ -1,11 +1,16 @@
 import * as React from "react"
 import { Project } from "../classes/Project"
+import { useTranslation } from "../context/LanguageContext";
 
 interface Props {
     project: Project
 }
 
 export function ProjectCard(props: Props) {
+    const { t } = useTranslation();
+    // Helper to translate status and role
+    const translateStatus = (status: string) => t(`projects_status_${status.toLowerCase()}`) || status;
+    const translateRole = (role: string) => t(`projects_role_${role.toLowerCase()}`) || role;
     return (
         <div className="projectCard">
             <div
@@ -41,19 +46,19 @@ export function ProjectCard(props: Props) {
             </div>
             <div className="cardContent">
                 <div className="cardProperty">
-                    <p style={{ color: "#969696" }}>Status</p>
-                    <p>{ props.project.status }</p>
+                    <p style={{ color: "#969696" }}>{t("projects_status") || "Status"}</p>
+                    <p>{ translateStatus(props.project.status) }</p>
                 </div>
                 <div className="cardProperty">
-                    <p style={{ color: "#969696" }}>Role</p>
-                    <p>{ props.project.userRole}</p>
+                    <p style={{ color: "#969696" }}>{t("projects_role") || "Role"}</p>
+                    <p>{ translateRole(props.project.userRole) }</p>
                 </div>
                 <div className="cardProperty">
-                    <p style={{ color: "#969696" }}>Cost</p>
+                    <p style={{ color: "#969696" }}>{t("projects_cost") || "Cost"}</p>
                     <p>{ props.project.cost }</p>
                 </div>
                 <div className="cardProperty">
-                    <p style={{ color: "#969696" }}>Progress</p>
+                    <p style={{ color: "#969696" }}>{t("projects_progress") || "Progress"}</p>
                     <p>{ props.project.progress }%</p>
                 </div>
             </div>

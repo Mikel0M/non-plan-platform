@@ -3,6 +3,7 @@ import * as Router from 'react-router-dom';
 import { IProject, userRole, status, phase, Project } from '../classes/Project';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { ProjectCard } from './ProjectCard';
+import { useTranslation } from "../context/LanguageContext";
 
 interface Props {
     projectManager: ProjectsManager;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function ProjectsPage({ projectManager, customStyle }: Props) {
+    const { t } = useTranslation();
     const [projects, setProjects] = React.useState<Project[]>(projectManager.list)
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = React.useState(false);
@@ -88,13 +90,13 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
         <div className="page" id="projectsPage">
             <header>
                 <div style={{ display: "flex", gap: "10px", margin: "15px 0" }}>
-                    <button id="importProjectsBtn" className="buttonTertiary" onClick={onImportClick}>
+                    <button id="importProjectsBtn" className="buttonTertiary" onClick={onImportClick} title={t("projects_import") || "Import projects"}>
                         <span className="material-icons-round">file_download</span>
                     </button>
-                    <button id="exportProjectsBtn" className="buttonTertiary" onClick={onExportClick}>
+                    <button id="exportProjectsBtn" className="buttonTertiary" onClick={onExportClick} title={t("projects_export") || "Export projects"}>
                         <span className="material-icons-round">file_upload</span>
                     </button>
-                    <button onClick={onNewProjectClick} id="newProjectBtn" className="buttonTertiary">
+                    <button onClick={onNewProjectClick} id="newProjectBtn" className="buttonTertiary" title={t("projects_new") || "New project"}>
                         <span className="material-icons-round">add</span>
                     </button>
                 </div>
@@ -105,116 +107,113 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
             {isModalOpen && (
                 <dialog id="newProjectModal" open>
                     <form onSubmit={(e) => {onFormSubmit(e)}} className="userForm form-wide" id="newProjectForm">
-                    <h2>New Project</h2>
+                    <h2>{t("projects_new") || "New Project"}</h2>
                     <div className="userCard">
                         <div className="formFieldContainer">
                         <label>
-                            <span className="material-icons-round">apartment</span>Name
+                            <span className="material-icons-round">apartment</span>{t("projects_name") || "Name"}
                         </label>
                         <input
                             name="name"
                             type="text"
-                            placeholder="What's the name of your project?"
+                            placeholder={t("projects_name_placeholder") || "What's the name of your project?"}
                         />
                         <label className="label-tip">
-                            TIP give it a short name
+                            {t("projects_name_tip") || "TIP give it a short name"}
                         </label>
                         </div>
                         <div className="formFieldContainer">
                         <label>
-                            <span className="material-icons-round">subject</span>Description
+                            <span className="material-icons-round">subject</span>{t("projects_description") || "Description"}
                         </label>
                         <textarea
                             name="description"
                             cols={30}
                             rows={5}
-                            placeholder="Give your project a nice description!"
+                            placeholder={t("projects_description_placeholder") || "Give your project a nice description!"}
                             defaultValue={""}
                         />
                         </div>
                         <div className="formFieldContainer">
                         <label>
-                            <span className="material-icons-round">pin_drop</span>Location
+                            <span className="material-icons-round">pin_drop</span>{t("projects_location") || "Location"}
                         </label>
                         <input
                             name="location"
                             type="text"
-                            placeholder="Where is your project located?"
+                            placeholder={t("projects_location_placeholder") || "Where is your project located?"}
                         />
                         <label className="label-tip" />
                         </div>
                         <div className="formFieldContainer">
                         <label>
-                            <span className="material-icons-round">paid</span>Estimated cost
+                            <span className="material-icons-round">paid</span>{t("projects_cost") || "Estimated cost"}
                         </label>
                         <input
                             name="cost"
                             type="number"
-                            placeholder="What's the estimated cost of the project?"
+                            placeholder={t("projects_cost_placeholder") || "What's the estimated cost of the project?"}
                         />
                         <label className="label-tip">
-                            Estimated cost of the project
+                            {t("projects_cost_tip") || "Estimated cost of the project"}
                         </label>
                         </div>
                         <div className="formFieldContainer">
                         <label>
-                            <span className="material-icons-round">percent</span>Estimated
-                            Progress
+                            <span className="material-icons-round">percent</span>{t("projects_progress") || "Estimated Progress"}
                         </label>
                         <input
                             name="progress"
                             type="number"
-                            placeholder="What's the estimated completion progress of the project?"
+                            placeholder={t("projects_progress_placeholder") || "What's the estimated completion progress of the project?"}
                         />
                         <label className="label-tip">
-                            Estimated progress percentage of the project
+                            {t("projects_progress_tip") || "Estimated progress percentage of the project"}
                         </label>
                         </div>
                         <div className="formFieldContainer">
                         <label>
-                            <span className="material-icons-round">account_circle</span>Role
+                            <span className="material-icons-round">account_circle</span>{t("projects_role") || "Role"}
                         </label>
                         <select name="userRole">
-                            <option>not defined</option>
-                            <option>Architect</option>
-                            <option>Engineer</option>
-                            <option>Developer</option>
+                            <option>{t("projects_role_not_defined") || "not defined"}</option>
+                            <option>{t("projects_role_architect") || "Architect"}</option>
+                            <option>{t("projects_role_engineer") || "Engineer"}</option>
+                            <option>{t("projects_role_developer") || "Developer"}</option>
                         </select>
                         </div>
                         <div className="formFieldContainer">
                         <label>
                             <span className="material-icons-round">not_listed_location</span>
-                            Status
+                            {t("projects_status") || "Status"}
                         </label>
                         <select name="status">
-                            <option>Pending</option>
-                            <option>Active</option>
-                            <option>Finished</option>
+                            <option>{t("projects_status_pending") || "Pending"}</option>
+                            <option>{t("projects_status_active") || "Active"}</option>
+                            <option>{t("projects_status_finished") || "Finished"}</option>
                         </select>
                         </div>
                         <div className="formFieldContainer">
                         <label>
                             <span className="material-icons-round">calendar_view_week</span>
-                            Design Phase
+                            {t("projects_phase") || "Design Phase"}
                         </label>
                         <select name="phase">
-                            <option>Design</option>
-                            <option>Construction project</option>
-                            <option>Execution</option>
-                            <option>Construction</option>
+                            <option>{t("projects_phase_design") || "Design"}</option>
+                            <option>{t("projects_phase_construction_project") || "Construction project"}</option>
+                            <option>{t("projects_phase_execution") || "Execution"}</option>
+                            <option>{t("projects_phase_construction") || "Construction"}</option>
                         </select>
                         </div>
                         <div className="formFieldContainer">
                         <label>
-                            <span className="material-icons-round">calendar_today</span>Start
-                            Date
+                            <span className="material-icons-round">calendar_today</span>{t("projects_start_date") || "Start Date"}
                         </label>
                         <input name="startDate" type="date" />
                         </div>
                         <div className="formFieldContainer">
                         <label>
-                            <span className="material-icons-round">calendar_month</span>Finish
-                            Date
+                            <span className="material-icons-round">calendar_month</span>{t("projects_finish_date") || "Finish Date"}
                         </label>
                         <input name="finishDate" type="date" />
                         </div>
@@ -225,10 +224,10 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                             className="cancelButton"
                             onClick={() => setIsModalOpen(false)}
                         >
-                            Cancel
+                            {t("projects_cancel") || "Cancel"}
                         </button>
                         <button type="submit" className="acceptButton">
-                        Accept
+                        {t("projects_accept") || "Accept"}
                         </button>
                     </div>
                     </form>
@@ -258,7 +257,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                         >
                         warning
                         </span>
-                        Error
+                        {t("projects_error") || "Error"}
                     </h2>
                     <div
                         style={{

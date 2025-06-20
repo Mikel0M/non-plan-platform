@@ -1,48 +1,10 @@
 import * as React from "react";
 import { translations } from "../text/Language"// Assuming translations are imported
+import { useLanguage, useTranslation } from "../context/LanguageContext";
 
 export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
-    const [currentLanguage, setCurrentLanguage] = React.useState("en");
-
-    const updateLanguage = (language: string) => {
-        document.querySelectorAll("[data-lang]").forEach((element) => {
-            const key = element.getAttribute("data-lang");
-            if (key && translations[language] && translations[language][key]) {
-                element.textContent = translations[language][key];
-            }
-        });
-    };
-
-    const updateMenuText = (language: string) => {
-        const menuItems = document.querySelectorAll("#languageMenu li");
-        menuItems.forEach((item) => {
-            const lang = item.getAttribute("data-lang");
-            if (lang && translations[language]) {
-                item.textContent = translations[language][lang];
-            }
-        });
-    };
-
-    const selectLanguage = (lang: string) => {
-        setCurrentLanguage(lang); // Update the state
-        updateLanguage(lang); // Update the language in the DOM
-        updateMenuText(lang); // Update the menu text
-        const menu = document.getElementById("languageMenu");
-        if (menu) {
-            menu.classList.add("hidden"); // Hide the menu
-        }
-    };
-
-    const toggleLanguageMenu = () => {
-        const menu = document.getElementById("languageMenu");
-        if (!menu) {
-            return;
-        }
-        menu.classList.toggle("hidden");
-        if (!menu.classList.contains("hidden")) {
-            updateMenuText(currentLanguage); // Update menu text when menu is shown
-        }
-    };
+    const { language, setLanguage } = useLanguage();
+    const { t } = useTranslation();
 
     const onLoginClick = () => {
         const modal = document.getElementById("loginModal");
@@ -58,6 +20,22 @@ export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
             return;
         }
         modal.close(); // Hides the modal dialog
+    };
+
+    const toggleLanguageMenu = () => {
+        const menu = document.getElementById("languageMenu");
+        if (!menu) {
+            return;
+        }
+        menu.classList.toggle("hidden");
+    };
+
+    const selectLanguage = (lang: string) => {
+        setLanguage(lang);
+        const menu = document.getElementById("languageMenu");
+        if (menu) {
+            menu.classList.add("hidden"); // Hide the menu
+        }
     };
 
     return (
@@ -113,6 +91,16 @@ export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
                             >
                                 DE
                             </li>
+                            <li
+                                onClick={() => selectLanguage("es")}
+                                data-lang="es"
+                                style={{
+                                    padding: "5px 10px",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                ES
+                            </li>
                         </ul>
                     </div>
                     <dialog id="newAccountModal">
@@ -127,9 +115,7 @@ export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
                                     }}
                                 >
                                     <h2 style={{ paddingLeft: 30 }}>non-plan Platform</h2>
-                                    <h2 data-lang="start_npInfoSoon" style={{ paddingLeft: 30 }}>
-                                        more information coming soon...
-                                    </h2>
+                                    <h2 style={{ paddingLeft: 30 }}>{t("start_npInfoSoon")}</h2>
                                     <div className="cancelAccept">
                                         <button
                                             type="button"
@@ -191,25 +177,21 @@ export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
                                 alt="non-plan"
                                 style={{ paddingTop: 20, transform: "scale(0.8)" }}
                             />
-                            <h1 style={{ padding: 20 }} data-lang="start_loginWelcome1">
-                                Welcome
-                            </h1>
-                            <h4 data-lang="start_loginWelcome2">Login to the non-plan Platform</h4>
+                            <h1 style={{ padding: 20 }}>{t("start_loginWelcome1")}</h1>
+                            <h4>{t("start_loginWelcome2")}</h4>
                             <div className="loginCard">
                                 <div className="formFieldContainer">
                                     <input
                                         name="UserName"
                                         type="string"
-                                        placeholder="Username or email address*"
-                                        data-lang="start_UsernameEmail"
+                                        placeholder={t("start_UsernameEmail") + "*"}
                                     />
                                 </div>
                                 <div className="formFieldContainer">
                                     <input
                                         name="UserPassword"
                                         type="string"
-                                        placeholder="Password*"
-                                        data-lang="start_Password"
+                                        placeholder={t("start_Password") + "*"}
                                     />
                                 </div>
                                 <button
@@ -226,9 +208,8 @@ export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
                                         height: 45,
                                         justifyContent: "left",
                                     }}
-                                    data-lang="start_forgotPassword"
                                 >
-                                    Forgot your password?
+                                    {t("start_forgotPassword")}
                                 </button>
                                 <button
                                     type="button"
@@ -245,17 +226,15 @@ export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
                                         height: 45,
                                         justifyContent: "center",
                                     }}
-                                    data-lang="start_continue"
                                 >
-                                    Continue
+                                    {t("start_continue")}
                                 </button>
                             </div>
                             <div style={{ display: "flex", flexDirection: "row", paddingLeft: 20 }}>
                                 <h5
                                     style={{ display: "flex", width: 300 }}
-                                    data-lang="start_newAccount"
                                 >
-                                    Don't have an account?{" "}
+                                    {t("start_newAccount")}
                                 </h5>
                                 <button
                                     id="newAccountBtn"

@@ -4,6 +4,7 @@ import { IUser, User, usersRole, access } from "../classes/User";
 import { UsersManager } from '../classes/UsersManager';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { companiesManagerInstance } from '../classes/CompaniesManager';
+import { useTranslation } from "../context/LanguageContext";
 
 interface Props {
 
@@ -18,6 +19,7 @@ declare global {
 }
 
 export function UsersPage(props: Props) {
+    const { t } = useTranslation();
     // State to control which modal is open
     const [openModal, setOpenModal] = React.useState<null | 'newUser' | 'changeUser' | 'newCompany' | 'changeCompany'>(null);
     const [users, setUsers] = React.useState<IUser[]>(props.usersManager.getUsers());
@@ -46,10 +48,6 @@ export function UsersPage(props: Props) {
         color: '#1CFFCA',
     });
     const [userToDelete, setUserToDelete] = React.useState<{id: string, name: string} | null>(null);
-    const newUserModalRef = React.useRef<HTMLDialogElement>(null);
-    const changeUserModalRef = React.useRef<HTMLDialogElement>(null);
-    const newCompanyModalRef = React.useRef<HTMLDialogElement>(null);
-    const changeCompanyModalRef = React.useRef<HTMLDialogElement>(null);
     const [activeTab, setActiveTab] = React.useState<'users' | 'companies'>('users');
     const [newCompanyForm, setNewCompanyForm] = React.useState({
         name: '',
@@ -65,17 +63,6 @@ export function UsersPage(props: Props) {
         phone: '',
     });
     const [companyToDelete, setCompanyToDelete] = React.useState<{id: string, name: string} | null>(null);
-
-    React.useEffect(() => {
-        if (openModal === 'newUser') newUserModalRef.current?.showModal();
-        else newUserModalRef.current?.close();
-        if (openModal === 'changeUser') changeUserModalRef.current?.showModal();
-        else changeUserModalRef.current?.close();
-        if (openModal === 'newCompany') newCompanyModalRef.current?.showModal();
-        else newCompanyModalRef.current?.close();
-        if (openModal === 'changeCompany') changeCompanyModalRef.current?.showModal();
-        else changeCompanyModalRef.current?.close();
-    }, [openModal]);
 
     // Sync users state with UsersManager
     React.useEffect(() => {
@@ -230,7 +217,7 @@ export function UsersPage(props: Props) {
         className="tabCircle"
         onClick={() => setActiveTab('companies')}
         type="button"
-        title="Show Companies"
+        title={t("users_show_companies") || "Show Companies"}
       >
         <span className="material-icons-round">business</span>
       </button>
@@ -240,7 +227,7 @@ export function UsersPage(props: Props) {
         className="tabCircle"
         onClick={() => setActiveTab('users')}
         type="button"
-        title="Show Users"
+        title={t("users_show_users") || "Show Users"}
       >
         <span className="material-icons-round">person</span>
       </button>
@@ -259,60 +246,60 @@ export function UsersPage(props: Props) {
     )}
   </div>
 </header>
-            <dialog id="newUserModal" ref={newUserModalRef}>
+            <dialog id="newUserModal" open={openModal === 'newUser'}>
                 <form className="userForm" id="newUserForm" onSubmit={handleNewUserSubmit}>
-                    <h2>New User</h2>
+                    <h2>{t("users_new_user") || "New User"}</h2>
                     <div className="userCard">
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">subject</span>Name
+                                <span className="material-icons-round">subject</span>{t("users_name") || "Name"}
                             </label>
                             <input name="name" type="text" value={newUserForm.name} onChange={handleInputChange} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">subject</span>Surname
+                                <span className="material-icons-round">subject</span>{t("users_surname") || "Surname"}
                             </label>
                             <input name="surname" type="text" value={newUserForm.surname} onChange={handleInputChange} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">email</span>Email Address
+                                <span className="material-icons-round">email</span>{t("users_email") || "Email Address"}
                             </label>
                             <input name="email" type="text" value={newUserForm.email} onChange={handleInputChange} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">call</span>Telephone Number
+                                <span className="material-icons-round">call</span>{t("users_phone") || "Telephone Number"}
                             </label>
                             <input name="phone" type="text" value={newUserForm.phone} onChange={handleInputChange} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">account_circle</span>Role
+                                <span className="material-icons-round">account_circle</span>{t("users_role") || "Role"}
                             </label>
                             <select name="usersRole" value={newUserForm.usersRole} onChange={handleInputChange}>
-                                <option>Architect</option>
-                                <option>Engineer</option>
-                                <option>Developer</option>
+                                <option>{t("projects_role_architect") || "Architect"}</option>
+                                <option>{t("projects_role_engineer") || "Engineer"}</option>
+                                <option>{t("projects_role_developer") || "Developer"}</option>
                             </select>
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">vpn_key</span>Access rights
+                                <span className="material-icons-round">vpn_key</span>{t("users_access") || "Access rights"}
                             </label>
                             <select name="access" value={newUserForm.access} onChange={handleInputChange}>
-                                <option>Administrator</option>
-                                <option>Editor</option>
-                                <option>Guest</option>
+                                <option>{t("users_access_admin") || "Administrator"}</option>
+                                <option>{t("users_access_editor") || "Editor"}</option>
+                                <option>{t("users_access_guest") || "Guest"}</option>
                             </select>
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">business</span>Company
+                                <span className="material-icons-round">business</span>{t("users_company") || "Company"}
                             </label>
                             <select name="company" value={newUserForm.company} onChange={handleInputChange}>
-                                <option value="">Select company</option>
+                                <option value="">{t("users_select_company") || "Select company"}</option>
                                 {companies.map(company => (
                                     <option key={company.id} value={company.name}>{company.name}</option>
                                 ))}
@@ -325,68 +312,68 @@ export function UsersPage(props: Props) {
                             className="cancelButton"
                             onClick={() => setOpenModal(null)}
                         >
-                            Cancel
+                            {t("projects_cancel") || "Cancel"}
                         </button>
                         <button type="submit" className="acceptButton" id="UserCreateButton">
-                            Accept
+                            {t("projects_accept") || "Accept"}
                         </button>
                     </div>
                 </form>
             </dialog>
-            <dialog id="ChangeUserModal" ref={changeUserModalRef}>
+            <dialog id="ChangeUserModal" open={openModal === 'changeUser'}>
                 <form className="userForm" id="newUserForm" onSubmit={handleEditUserSubmit}>
-                    <h2>Change User</h2>
+                    <h2>{t("users_change_user") || "Change User"}</h2>
                     <div className="userCard">
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">subject</span>Name
+                                <span className="material-icons-round">subject</span>{t("users_name") || "Name"}
                             </label>
                             <input name="CH_name" type="text" value={editUserForm.name} onChange={e => setEditUserForm(f => ({...f, name: e.target.value}))} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">subject</span>Surname
+                                <span className="material-icons-round">subject</span>{t("users_surname") || "Surname"}
                             </label>
                             <input name="CH_surname" type="text" value={editUserForm.surname} onChange={e => setEditUserForm(f => ({...f, surname: e.target.value}))} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">email</span>Email Address
+                                <span className="material-icons-round">email</span>{t("users_email") || "Email Address"}
                             </label>
                             <input name="CH_email" type="text" value={editUserForm.email} onChange={e => setEditUserForm(f => ({...f, email: e.target.value}))} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">call</span>Telephone Number
+                                <span className="material-icons-round">call</span>{t("users_phone") || "Telephone Number"}
                             </label>
                             <input name="CH_phone" type="text" value={editUserForm.phone} onChange={e => setEditUserForm(f => ({...f, phone: e.target.value}))} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">account_circle</span>Role
+                                <span className="material-icons-round">account_circle</span>{t("users_role") || "Role"}
                             </label>
                             <select name="CH_usersRole" value={editUserForm.usersRole} onChange={e => setEditUserForm(f => ({...f, usersRole: e.target.value}))}>
-                                <option>Architect</option>
-                                <option>Engineer</option>
-                                <option>Developer</option>
+                                <option>{t("projects_role_architect") || "Architect"}</option>
+                                <option>{t("projects_role_engineer") || "Engineer"}</option>
+                                <option>{t("projects_role_developer") || "Developer"}</option>
                             </select>
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">vpn_key</span>Access rights
+                                <span className="material-icons-round">vpn_key</span>{t("users_access") || "Access rights"}
                             </label>
                             <select name="CH_access" value={editUserForm.access} onChange={e => setEditUserForm(f => ({...f, access: e.target.value}))}>
-                                <option>Administrator</option>
-                                <option>Editor</option>
-                                <option>Guest</option>
+                                <option>{t("users_access_admin") || "Administrator"}</option>
+                                <option>{t("users_access_editor") || "Editor"}</option>
+                                <option>{t("users_access_guest") || "Guest"}</option>
                             </select>
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">business</span>Company
+                                <span className="material-icons-round">business</span>{t("users_company") || "Company"}
                             </label>
                             <select name="CH_company" value={editUserForm.company} onChange={e => setEditUserForm(f => ({...f, company: e.target.value}))}>
-                                <option value="">Select company</option>
+                                <option value="">{t("users_select_company") || "Select company"}</option>
                                 {companies.map(company => (
                                     <option key={company.id} value={company.name}>{company.name}</option>
                                 ))}
@@ -394,36 +381,36 @@ export function UsersPage(props: Props) {
                         </div>
                     </div>
                     <div className="cancelAccept">
-                        <button type="button" className="cancelButton" onClick={() => setOpenModal(null)}>Cancel</button>
-                        <button type="submit" className="acceptButton" id="UserChangeAcceptButton">Accept</button>
+                        <button type="button" className="cancelButton" onClick={() => setOpenModal(null)}>{t("projects_cancel") || "Cancel"}</button>
+                        <button type="submit" className="acceptButton" id="UserChangeAcceptButton">{t("projects_accept") || "Accept"}</button>
                     </div>
                 </form>
             </dialog>
-            <dialog id="newCompanyModal" ref={newCompanyModalRef}>
+            <dialog id="newCompanyModal" open={openModal === 'newCompany'}>
                 <form className="userForm" id="newCompanyForm" onSubmit={handleNewCompanySubmit}>
-                    <h2>New Company</h2>
+                    <h2>{t("users_new_company") || "New Company"}</h2>
                     <div className="userCard">
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">subject</span>Company Name
+                                <span className="material-icons-round">subject</span>{t("users_company_name") || "Company Name"}
                             </label>
                             <input type="text" name="name" value={newCompanyForm.name} onChange={handleCompanyInputChange} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">subject</span>Company Address
+                                <span className="material-icons-round">subject</span>{t("users_company_address") || "Company Address"}
                             </label>
                             <input type="text" name="address" value={newCompanyForm.address} onChange={handleCompanyInputChange} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">email</span>Contact Email
+                                <span className="material-icons-round">email</span>{t("users_company_email") || "Contact Email"}
                             </label>
                             <input type="text" name="email" value={newCompanyForm.email} onChange={handleCompanyInputChange} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">call</span>Telephone Number
+                                <span className="material-icons-round">call</span>{t("users_company_phone") || "Telephone Number"}
                             </label>
                             <input type="tel" name="phone" value={newCompanyForm.phone} onChange={handleCompanyInputChange} />
                         </div>
@@ -434,79 +421,79 @@ export function UsersPage(props: Props) {
                             className="cancelButton"
                             onClick={() => setOpenModal(null)}
                         >
-                            Cancel
+                            {t("projects_cancel") || "Cancel"}
                         </button>
                         <button type="submit" className="acceptButton">
-                            Accept
+                            {t("projects_accept") || "Accept"}
                         </button>
                     </div>
                 </form>
             </dialog>
-            <dialog id="ChangeCompanyModal" ref={changeCompanyModalRef}>
+            <dialog id="ChangeCompanyModal" open={openModal === 'changeCompany'}>
                 <form className="userForm" id="editCompanyForm" onSubmit={handleEditCompanySubmit}>
-                    <h2>Edit Company</h2>
+                    <h2>{t("users_edit_company") || "Edit Company"}</h2>
                     <div className="userCard">
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">subject</span>Company Name
+                                <span className="material-icons-round">subject</span>{t("users_company_name") || "Company Name"}
                             </label>
                             <input type="text" name="name" value={editCompanyForm.name} onChange={e => setEditCompanyForm(f => ({...f, name: e.target.value}))} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">subject</span>Company Address
+                                <span className="material-icons-round">subject</span>{t("users_company_address") || "Company Address"}
                             </label>
                             <input type="text" name="address" value={editCompanyForm.address} onChange={e => setEditCompanyForm(f => ({...f, address: e.target.value}))} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">email</span>Contact Email
+                                <span className="material-icons-round">email</span>{t("users_company_email") || "Contact Email"}
                             </label>
                             <input type="text" name="email" value={editCompanyForm.email} onChange={e => setEditCompanyForm(f => ({...f, email: e.target.value}))} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
-                                <span className="material-icons-round">call</span>Telephone Number
+                                <span className="material-icons-round">call</span>{t("users_company_phone") || "Telephone Number"}
                             </label>
                             <input type="tel" name="phone" value={editCompanyForm.phone} onChange={e => setEditCompanyForm(f => ({...f, phone: e.target.value}))} />
                         </div>
                     </div>
                     <div className="cancelAccept">
-                        <button type="button" className="cancelButton" onClick={() => setOpenModal(null)}>Cancel</button>
-                        <button type="submit" className="acceptButton">Accept</button>
+                        <button type="button" className="cancelButton" onClick={() => setOpenModal(null)}>{t("projects_cancel") || "Cancel"}</button>
+                        <button type="submit" className="acceptButton">{t("projects_accept") || "Accept"}</button>
                     </div>
                 </form>
             </dialog>
             <dialog id="DeleteUserModal">
               <form className="userForm" id="DeleteUserForm">
-                <h2>Are you sure you want to delete the user {userToDelete?.name}?</h2>
+                <h2>{t("users_confirm_delete_user") || "Are you sure you want to delete the user"} {userToDelete?.name ? `"${userToDelete.name}"?` : "?"}</h2>
                 <div className="cancelAccept">
                   <button
                     type="button"
                     className="cancelButton"
                     onClick={() => { setUserToDelete(null); const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null; if (modal) modal.close(); }}>
-                    Cancel
+                    {t("projects_cancel") || "Cancel"}
                   </button>
-                  <button type="button" className="acceptButton" id="ConfirmDeleteUserButton" onClick={handleConfirmDeleteUser}>Delete</button>
+                  <button type="button" className="acceptButton" id="ConfirmDeleteUserButton" onClick={handleConfirmDeleteUser}>{t("users_delete") || "Delete"}</button>
                 </div>
               </form>
             </dialog>
             <dialog id="DeleteCompanyModal">
               <form className="userForm" id="DeleteCompanyForm">
-                <h2>Are you sure you want to delete the company {companyToDelete?.name}?</h2>
+                <h2>{t("users_confirm_delete_company") || "Are you sure you want to delete the company"} {companyToDelete?.name ? `"${companyToDelete.name}"?` : "?"}</h2>
                 <div className="cancelAccept">
                   <button
                     type="button"
                     className="cancelButton"
                     onClick={() => { setCompanyToDelete(null); const modal = document.getElementById('DeleteCompanyModal') as HTMLDialogElement | null; if (modal) modal.close(); }}>
-                    Cancel
+                    {t("projects_cancel") || "Cancel"}
                   </button>
-                  <button type="button" className="acceptButton" id="ConfirmDeleteCompanyButton" onClick={handleConfirmDeleteCompany}>Delete</button>
+                  <button type="button" className="acceptButton" id="ConfirmDeleteCompanyButton" onClick={handleConfirmDeleteCompany}>{t("users_delete") || "Delete"}</button>
                 </div>
               </form>
             </dialog>
             <div className="flex-row user-count-row" style={{ marginLeft: 10, alignItems: 'center', height: 40 }}>
-              <label className="label-tip" style={{ marginRight: 8, marginBottom: 0 }}>Total number of {activeTab === 'users' ? 'Users' : 'Companies'}:</label>
+              <label className="label-tip" style={{ marginRight: 8, marginBottom: 0 }}>{t("users_total_number") || "Total number of"} {activeTab === 'users' ? t("sidebar_users") || 'Users' : t("users_companies") || 'Companies'}:</label>
               <label className="label-tip" id="userCount" style={{ marginBottom: 0 }}>
                 {activeTab === 'users' ? users.length : companies.length}
               </label>
@@ -526,9 +513,9 @@ export function UsersPage(props: Props) {
         color: 'var(--text-100, #fff)'
       }}>
         <label className="label-tip"></label>
-        <label className="label-tip">User name</label>
-        <label className="label-tip">Role</label>
-        <label className="label-tip">Company</label>
+        <label className="label-tip">{t("users_user_name") || "User name"}</label>
+        <label className="label-tip">{t("users_role") || "Role"}</label>
+        <label className="label-tip">{t("users_company") || "Company"}</label>
         <label className="label-tip" style={{ justifySelf: "end" }}></label>
       </div>
     )}
@@ -546,12 +533,12 @@ export function UsersPage(props: Props) {
           >
             <span className="material-icons-round">person</span>
             <span>{user.name} {user.surname}</span>
-            <span>{user.role}</span>
+            <span>{t(`projects_role_${user.role?.toLowerCase()}`) || user.role}</span>
             <span>{user.company}</span>
             <button
               className="buttonTertiary"
               style={{background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 8, justifySelf: 'end'}}
-              title="Delete user"
+              title={t("users_delete_user") || "Delete user"}
               onClick={e => {
                 e.stopPropagation();
                 setUserToDelete({ id: user.id as string, name: `${user.name} ${user.surname}` });
@@ -581,10 +568,10 @@ export function UsersPage(props: Props) {
         }}
       >
         <label className="label-tip"></label>
-        <label className="label-tip">Company</label>
-        <label className="label-tip">Address</label>
-        <label className="label-tip">Email</label>
-        <label className="label-tip">Phone</label>
+        <label className="label-tip">{t("users_company") || "Company"}</label>
+        <label className="label-tip">{t("users_company_address") || "Address"}</label>
+        <label className="label-tip">{t("users_company_email") || "Email"}</label>
+        <label className="label-tip">{t("users_company_phone") || "Phone"}</label>
         <label className="label-tip" style={{ justifySelf: "end" }}></label>
       </div>
       <div
@@ -607,7 +594,7 @@ export function UsersPage(props: Props) {
             <button
               className="buttonTertiary"
               style={{background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 8, justifySelf: 'end'}}
-              title="Delete company"
+              title={t("users_delete_company") || "Delete company"}
               onClick={e => {
                   e.stopPropagation();
                   setCompanyToDelete({ id: company.id, name: company.name });

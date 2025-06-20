@@ -5,12 +5,18 @@ import * as Router from 'react-router-dom';
 import { toDoManager } from '../classes/toDoManager';
 import { usersManagerInstance } from '../classes/UsersManager';
 import { User } from '../classes/User';
+import { useTranslation } from "../context/LanguageContext";
 
 interface Props {
     projectsManager: ProjectsManager
 }
 
 export function ProjectDetailsPage(props: Props) {
+    const { t } = useTranslation();
+    // Helper to translate status and role
+    const translateStatus = (status: string) => t(`projects_status_${status?.toLowerCase()}`) || status;
+    const translateRole = (role: string) => t(`projects_role_${role?.toLowerCase()}`) || role;
+
     // Helper to close modals by id
     const closeModal = (id: string) => {
         const modal = document.getElementById(id) as HTMLDialogElement | null;
@@ -328,75 +334,63 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                 <div className="flex-row-gap-10">
                   <button
                     id="editProject"
-                    className="buttonSecondary"
+                    className="buttonTertiary"
                     onClick={openEditModal}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: 100,
-                      height: 40,
-                      fontSize: "var(--fontSizeStandard)"
-                    }}
+                    style={{ width: 40, height: 40, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, padding: 0, minWidth: 0, border: "none", background: "var(--primary)", color: "white" }}
+                    title={t("projects_edit") || "Edit"}
                   >
-                    Edit
+                    <span className="material-icons-round">add</span>
                   </button>
                   <button
                     id="deleteProjectBtn"
-                    className="buttonSecondary"
+                    className="roundButton"
                     onClick={() => {
                       const modal = document.getElementById('DeleteProjectModal') as HTMLDialogElement | null;
                       if (modal) modal.showModal();
                     }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: 100,
-                      height: 40,
-                      fontSize: "var(--fontSizeStandard)"
-                    }}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 40, height: 40, borderRadius: "50%", backgroundColor: "#ff3b3b", color: "white", fontSize: 24, border: "none", boxShadow: "0 2px 6px rgba(0,0,0,0.08)", cursor: "pointer" }}
+                    title={t("projects_delete") || "Delete"}
                   >
-                    Delete
+                    <span className="material-icons-round">close</span>
                   </button>
                 </div>
               </div>
               <div className="middleDashboard">
                 <h5 data-project-info="nameBigPD">{projectState.name}</h5>
                 <p data-project-info="descriptionPD">
-                  {projectState.description || "No description provided."}
+                  {projectState.description || t("projects_no_description") || "No description provided."}
                 </p>
               </div>
               <div className="bottomDashboard">
                 <div>
                   <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                    Status
+                    {t("projects_status") || "Status"}
                   </p>
-                  <p data-project-info="statusPD">{projectState.status || "No status provided."}</p>
+                  <p data-project-info="statusPD">{translateStatus(projectState.status) || t("projects_no_status") || "No status provided."}</p>
                 </div>
                 <div>
                   <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                    Cost
+                    {t("projects_cost") || "Cost"}
                   </p>
-                  <p data-project-info="costPD">{projectState.cost || "No cost provided."}</p>
+                  <p data-project-info="costPD">{projectState.cost || t("projects_no_cost") || "No cost provided."}</p>
                 </div>
                 <div>
                   <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                    Role
+                    {t("projects_role") || "Role"}
                   </p>
-                  <p data-project-info="rolePD">{projectState.userRole || "No role provided."}</p>
+                  <p data-project-info="rolePD">{translateRole(projectState.userRole) || t("projects_no_role") || "No role provided."}</p>
                 </div>
                 <div>
                   <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                    Start Date
+                    {t("projects_start_date") || "Start Date"}
                   </p>
-                  <p data-project-info="startPD">{projectState.startDate || "No start date provided."}</p>
+                  <p data-project-info="startPD">{projectState.startDate || t("projects_no_start_date") || "No start date provided."}</p>
                 </div>
                 <div>
                   <p style={{ color: "#969696", fontSize: "var(--fontSizeSmall)" }}>
-                    Finish Date
+                    {t("projects_finish_date") || "Finish Date"}
                   </p>
-                  <p data-project-info="finishPD">{projectState.finishDate || "No finish date provided."}</p>
+                  <p data-project-info="finishPD">{projectState.finishDate || t("projects_no_finish_date") || "No finish date provided."}</p>
                 </div>
               </div>
               {/* Progress bar - always visible, not clipped */}
@@ -410,12 +404,12 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
               <div className="dashboardCard project-assigned-users-card">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                   <div className="tabs-row">
-                    <h4 style={{ margin: 0, whiteSpace: 'nowrap' }}>Assigned Users</h4>
+                    <h4 style={{ margin: 0, whiteSpace: 'nowrap' }}>{t("projects_assigned_users") || "Assigned Users"}</h4>
                     <button
                       className={activeLeftCard === 'users' ? 'tabCircle active' : 'tabCircle'}
                       onClick={() => setActiveLeftCard('todo')}
                       type="button"
-                      title="Show To-Do"
+                      title={t("projects_show_todo") || "Show To-Do"}
                     >
                       <span className="material-icons-round">checklist</span>
                     </button>
@@ -431,14 +425,14 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                       return (
                         <li key={au.userId} style={{marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'}}
                             onClick={() => window.openEditUserModal && window.openEditUserModal(au.userId)}>
-                          {user ? `${user.name} ${user.surname}` : 'Unknown User'} — <b>{au.role}</b>
+                          {user ? `${user.name} ${user.surname}` : t("projects_unknown_user") || 'Unknown User'} — <b>{au.role}</b>
                           <button
                             className="buttonTertiary"
                             style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                            title="Remove user from project"
+                            title={t("projects_remove_user") || "Remove user from project"}
                             onClick={e => {
                               e.stopPropagation();
-                              setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : 'Unknown User' });
+                              setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : t("projects_unknown_user") || 'Unknown User' });
                               const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
                               if (modal) modal.showModal();
                             }}
@@ -449,7 +443,7 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                       );
                     })
                   ) : (
-                    <li>No users assigned to this project.</li>
+                    <li>{t("projects_no_users_assigned") || "No users assigned to this project."}</li>
                   )}
                 </ul>
               </div>
@@ -458,12 +452,12 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
               <div className="dashboardCard project-todo-card">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'nowrap' }}>
                   <div className="tabs-row">
-                    <h4 style={{ margin: 0, whiteSpace: 'nowrap' }}>To-Do</h4>
+                    <h4 style={{ margin: 0, whiteSpace: 'nowrap' }}>{t("projects_todo") || "To-Do"}</h4>
                     <button
                       className={activeLeftCard === 'todo' ? 'tabCircle active' : 'tabCircle'}
                       onClick={() => setActiveLeftCard('users')}
                       type="button"
-                      title="Show Assigned Users"
+                      title={t("projects_show_assigned_users") || "Show Assigned Users"}
                     >
                       <span className="material-icons-round">group</span>
                     </button>
@@ -471,7 +465,7 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <span className="material-icons-round" style={{ paddingRight: 10 }}>search</span>
-                      <input type="text" style={{ fontSize: "var(--fontSizeSmall)" }} placeholder="Search To-Do's by name" />
+                      <input type="text" style={{ fontSize: "var(--fontSizeSmall)" }} placeholder={t("projects_search_todos") || "Search To-Do's by name"} />
                     </div>
                     <button id="newToDoBtn" className="buttonTertiary" style={{ marginLeft: 8 }} onClick={() => {
   const modal = document.getElementById('newToDoModal') as HTMLDialogElement | null;
@@ -493,7 +487,7 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                   }}
                 >
                   {/* Render To-Do list items reactively */}
-                  {toDos.length === 0 && <div style={{color: '#aaa'}}>No to-dos for this project.</div>}
+                  {toDos.length === 0 && <div style={{color: '#aaa'}}>{t("projects_no_todos") || "No to-dos for this project."}</div>}
                   {toDos.map((todo, idx) => {
   let statusClass = 'status-pending';
   switch (todo.status) {
@@ -537,56 +531,56 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
         {/* Assign User Modal */}
       <dialog open={assignUserModalOpen} className="modal-z10 assign-user-modal">
         <form onSubmit={handleAssignUser} className="app-modal-form">
-          <h2>Assign User to Project</h2>
+          <h2>{t("projects_assign_user") || "Assign User to Project"}</h2>
           <div className="formFieldContainer">
-            <label>User</label>
+            <label>{t("projects_user") || "User"}</label>
             <select value={selectedUserId} onChange={e => setSelectedUserId(e.target.value)}>
-              <option value="">Select user</option>
+              <option value="">{t("projects_select_user") || "Select user"}</option>
               {usersManagerInstance.getUsers().map(user => (
                 <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
               ))}
             </select>
           </div>
           <div className="formFieldContainer">
-            <label>Role in this project</label>
-            <input type="text" value={customRole} onChange={e => setCustomRole(e.target.value)} placeholder="e.g. Project Lead, Consultant..." />
+            <label>{t("projects_role_in_project") || "Role in this project"}</label>
+            <input type="text" value={customRole} onChange={e => setCustomRole(e.target.value)} placeholder={t("projects_role_placeholder") || "e.g. Project Lead, Consultant..."} />
           </div>
           {assignError && <div className="error-text">{assignError}</div>}
           <div className="cancelAccept">
-            <button type="button" className="cancelButton" onClick={() => { setAssignUserModalOpen(false); setAssignError(''); }}>Cancel</button>
-            <button type="submit" className="acceptButton">Assign</button>
+            <button type="button" className="cancelButton" onClick={() => { setAssignUserModalOpen(false); setAssignError(''); }}>{t("projects_cancel") || "Cancel"}</button>
+            <button type="submit" className="acceptButton">{t("projects_assign") || "Assign"}</button>
           </div>
         </form>
       </dialog>
       <dialog id="DeleteProjectModal">
             <form className="app-modal-form" id="DeleteNewProjectForm">
-                <h2>Are you sure you want to delete the project?</h2>
+                <h2>{t("projects_confirm_delete_project") || "Are you sure you want to delete the project?"}</h2>
                 <div className="cancelAccept">
                     <button
                         type="button"
                         className="cancelButton"
-                        onClick={() => closeModal('DeleteProjectModal')}>Cancel
+                        onClick={() => closeModal('DeleteProjectModal')}>{t("projects_cancel") || "Cancel"}
                     </button>
-                    <button type="button" className="acceptButton" id="ConfirmDeleteButton" onClick={handleConfirmDeleteProject}>Delete</button>
+                    <button type="button" className="acceptButton" id="ConfirmDeleteButton" onClick={handleConfirmDeleteProject}>{t("projects_delete") || "Delete"}</button>
                 </div>
             </form>
         </dialog>
         <dialog id="DeleteTaskModal">
             <form className="app-modal-form" id="DeleteNewTaskForm">
-                <h2>Are you sure you want to delete the task: {toDoToDelete?.title} ?</h2>
+                <h2>{t("projects_confirm_delete_task") || "Are you sure you want to delete the task:"} {toDoToDelete?.title ? `"${toDoToDelete.title}"?` : "?"}</h2>
                 <div className="cancelAccept">
                     <button
                         type="button"
                         className="cancelButton"
                         onClick={() => { setToDoToDelete(null); closeModal('DeleteTaskModal'); }}>
-                        Cancel
+                        {t("projects_cancel") || "Cancel"}
                     </button>
-                    <button type="button" className="acceptButton" id="ConfirmDeleteButton" onClick={handleConfirmDeleteToDo}>Delete</button>
+                    <button type="button" className="acceptButton" id="ConfirmDeleteButton" onClick={handleConfirmDeleteToDo}>{t("projects_delete") || "Delete"}</button>
                 </div>
             </form>
         </dialog>
         <dialog id="editProjectModal">
-            <form className="app-modal-form" id="editProjectForm" onSubmit={e => {
+            <form className="userForm form-wide" id="editProjectForm" onSubmit={e => {
                 e.preventDefault();
                 if (projectState) {
                   projectState.name = editName;
@@ -609,89 +603,94 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                 }
                 closeModal('editProjectModal');
             }}>
-                <h2>Edit Project</h2>
+                <h2>{t("projects_edit_project") || "Edit Project"}</h2>
+                <div className="userCard">
                 <div className="formFieldContainer">
-                    <label>Name</label>
+                    <label><span className="material-icons-round">apartment</span>{t("projects_name") || "Name"}</label>
                     <input name="name" type="text" id="projectNameInput" value={editName} onChange={e => setEditName(e.target.value)} />
+                    <label className="label-tip">{t("projects_name_tip") || "TIP give it a short name"}</label>
                 </div>
                 <div className="formFieldContainer">
-                    <label>Description</label>
+                    <label><span className="material-icons-round">subject</span>{t("projects_description") || "Description"}</label>
                     <textarea
                         name="description"
                         cols={30}
                         rows={5}
-                        placeholder="Give your project a nice description!"
+                        placeholder={t("projects_description_placeholder") || "Give your project a nice description!"}
                         id="projectDescriptionInput"
                         value={editDescription}
                         onChange={e => setEditDescription(e.target.value)}
                     />
                 </div>
                 <div className="formFieldContainer">
-                    <label>Location</label>
+                    <label><span className="material-icons-round">pin_drop</span>{t("projects_location") || "Location"}</label>
                     <input
                         name="location"
                         type="text"
-                        placeholder="Where is your project located?"
+                        placeholder={t("projects_location_placeholder") || "Where is your project located?"}
                         id="projectLocationInput"
                         value={editLocation}
                         onChange={e => setEditLocation(e.target.value)}
                     />
                 </div>
                 <div className="formFieldContainer">
-                    <label>Estimated progress</label>
+                    <label><span className="material-icons-round">percent</span>{t("projects_progress") || "Estimated Progress"}</label>
                     <input
                         name="progress"
                         type="number"
-                        placeholder="What's the estimated progress of the project?"
+                        placeholder={t("projects_progress_placeholder") || "What's the estimated completion progress of the project?"}
                         id="projectProgressInput"
                         value={editProgress}
                         onChange={e => setEditProgress(e.target.value)}
                     />
+                    <label className="label-tip">{t("projects_progress_tip") || "Estimated progress percentage of the project"}</label>
                 </div>
                 <div className="formFieldContainer">
-                    <label>Estimated cost</label>
+                    <label><span className="material-icons-round">paid</span>{t("projects_cost") || "Estimated cost"}</label>
                     <input
                         name="cost"
                         type="number"
-                        placeholder="What's the estimated cost of the project?"
+                        placeholder={t("projects_cost_placeholder") || "What's the estimated cost of the project?"}
                         id="projectCostInput"
                         value={editCost}
                         onChange={e => setEditCost(e.target.value)}
                     />
+                    <label className="label-tip">{t("projects_cost_tip") || "Estimated cost of the project"}</label>
                 </div>
                 <div className="formFieldContainer">
-                    <label>Role</label>
+                    <label><span className="material-icons-round">account_circle</span>{t("projects_role") || "Role"}</label>
                     <select name="userRole" id="projectRoleInput" value={editUserRole} onChange={e => setEditUserRole(e.target.value)}>
-                        <option>not defined</option>
-                        <option>Architect</option>
-                        <option>Engineer</option>
-                        <option>Developer</option>
+                        <option>{t("projects_role_not_defined") || "not defined"}</option>
+                        <option>{t("projects_role_architect") || "Architect"}</option>
+                        <option>{t("projects_role_engineer") || "Engineer"}</option>
+                        <option>{t("projects_role_developer") || "Developer"}</option>
                     </select>
                 </div>
                 <div className="formFieldContainer">
-                    <label>Status</label>
+                    <label><span className="material-icons-round">not_listed_location</span>{t("projects_status") || "Status"}</label>
                     <select name="status" id="projectStatusInput" value={editStatus} onChange={e => setEditStatus(e.target.value)}>
-                        <option>Pending</option>
-                        <option>Active</option>
-                        <option>Finished</option>
+                        <option>{t("projects_status_pending") || "Pending"}</option>
+                        <option>{t("projects_status_active") || "Active"}</option>
+                        <option>{t("projects_status_finished") || "Finished"}</option>
                     </select>
                 </div>
                 <div className="formFieldContainer">
-                    <label>Design Phase</label>
+                    <label><span className="material-icons-round">calendar_view_week</span>{t("projects_phase") || "Design Phase"}</label>
                     <select name="phase" id="projectPhaseInput" value={editPhase} onChange={e => setEditPhase(e.target.value)}>
-                        <option>Design</option>
-                        <option>Construction project</option>
-                        <option>Execution</option>
-                        <option>Construction</option>
+                        <option>{t("projects_phase_design") || "Design"}</option>
+                        <option>{t("projects_phase_construction_project") || "Construction project"}</option>
+                        <option>{t("projects_phase_execution") || "Execution"}</option>
+                        <option>{t("projects_phase_construction") || "Construction"}</option>
                     </select>
                 </div>
                 <div className="formFieldContainer">
-                    <label>Start Date</label>
+                    <label><span className="material-icons-round">calendar_today</span>{t("projects_start_date") || "Start Date"}</label>
                     <input name="startDate" type="date" id="projectStartPDInput" value={editStartDate} onChange={e => setEditStartDate(e.target.value)} />
                 </div>
                 <div className="formFieldContainer">
-                    <label>Finish Date</label>
+                    <label><span className="material-icons-round">calendar_month</span>{t("projects_finish_date") || "Finish Date"}</label>
                     <input name="finishDate" type="date" id="projectFinishPDInput" value={editFinishDate} onChange={e => setEditFinishDate(e.target.value)} />
+                </div>
                 </div>
                 <div className="cancelAccept">
                     <button
@@ -699,33 +698,32 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                         className="cancelButton"
                         onClick={() => closeModal('editProjectModal')}
                     >
-                        Cancel
+                        {t("projects_cancel") || "Cancel"}
                     </button>
                     <button
                         type="submit"
                         className="acceptButton"
-                        id="changeProjectButton"
                     >
-                        Change
+                        {t("projects_accept") || "Accept"}
                     </button>
                 </div>
             </form>
         </dialog>
         <dialog id="newToDoModal">
     <form className="userForm form-wide" id="newToDoForm" onSubmit={handleNewToDoSubmit}>
-      <h2>Add Task</h2>
+      <h2>{t("projects_add_task") || "Add Task"}</h2>
       <div className="userCard">
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">apartment</span>Title</label>
+          <label><span className="material-icons-round">apartment</span>{t("projects_title") || "Title"}</label>
           <input name="title" type="text" id="toDoTitle" value={newToDo.title} onChange={handleNewToDoChange} />
-          <label className="label-tip">TIP give it a short title</label>
+          <label className="label-tip">{t("projects_tip_short_title") || "TIP give it a short title"}</label>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">subject</span>Description</label>
-          <textarea name="description" cols={30} rows={5} placeholder="Description" id="toDoDescription" value={newToDo.description} onChange={handleNewToDoChange} />
+          <label><span className="material-icons-round">subject</span>{t("projects_description") || "Description"}</label>
+          <textarea name="description" cols={30} rows={5} placeholder={t("projects_description_placeholder") || "Description"} id="toDoDescription" value={newToDo.description} onChange={handleNewToDoChange} />
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Status</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_status") || "Status"}</label>
           <select name="status" id="toDoStatus" value={newToDo.status} onChange={handleNewToDoChange}>
             <option>Pending</option>
             <option>In Progress</option>
@@ -734,7 +732,7 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           </select>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Priority</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_priority") || "Priority"}</label>
           <select name="priority" id="toDoPriority" value={newToDo.priority} onChange={handleNewToDoChange}>
             <option>High</option>
             <option>Standard</option>
@@ -742,73 +740,73 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           </select>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">paid</span>Estimated hours</label>
-          <input name="estimated_hours" type="number" placeholder="Estimated hours for the task" id="toDoEstimatedHours" value={newToDo.estimated_hours} onChange={handleNewToDoChange} />
-          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Estimated hours for the task</label>
+          <label><span className="material-icons-round">paid</span>{t("projects_estimated_hours") || "Estimated hours"}</label>
+          <input name="estimated_hours" type="number" placeholder={t("projects_estimated_hours_placeholder") || "Estimated hours for the task"} id="toDoEstimatedHours" value={newToDo.estimated_hours} onChange={handleNewToDoChange} />
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_estimated_hours_tip") || "Estimated hours for the task"}</label>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">paid</span>Actual hours</label>
-          <input name="actual_hours" type="number" placeholder="Hours used so far" id="toDoActualHours" value={newToDo.actual_hours} onChange={handleNewToDoChange} />
-          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Hours used so far</label>
+          <label><span className="material-icons-round">paid</span>{t("projects_actual_hours") || "Actual hours"}</label>
+          <input name="actual_hours" type="number" placeholder={t("projects_actual_hours_placeholder") || "Hours used so far"} id="toDoActualHours" value={newToDo.actual_hours} onChange={handleNewToDoChange} />
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_actual_hours_tip") || "Hours used so far"}</label>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Responsible Person</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_responsible_person") || "Responsible Person"}</label>
           <select name="assigned_to" id="toDoAssignedTo" value={newToDo.assigned_to} onChange={handleNewToDoChange}>
-            <option value="">Select responsible person</option>
+            <option value="">{t("projects_select_responsible") || "Select responsible person"}</option>
             {assignedUsers.map(user => (
               <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
             ))}
           </select>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Created By</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_created_by") || "Created By"}</label>
           <select name="created_by" id="toDoCreatedBy" value={newToDo.created_by} onChange={handleNewToDoChange}>
-            <option value="">Select creator</option>
+            <option value="">{t("projects_select_creator") || "Select creator"}</option>
             {assignedUsers.map(user => (
               <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
             ))}
           </select>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">calendar_today</span>Start Date</label>
+          <label><span className="material-icons-round">calendar_today</span>{t("projects_start_date") || "Start Date"}</label>
           <input name="start_date" type="date" id="toDoStartDate" value={newToDo.start_date} onChange={handleNewToDoChange} />
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">calendar_month</span>Due Date</label>
+          <label><span className="material-icons-round">calendar_month</span>{t("projects_due_date") || "Due Date"}</label>
           <input name="due_date" type="date" id="toDoDueDate" value={newToDo.due_date} onChange={handleNewToDoChange} />
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Dependencies</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_dependencies") || "Dependencies"}</label>
           <input name="dependencies" id="toDoDependencies" value={newToDo.dependencies || ''} onChange={e => setNewToDo({ ...newToDo, dependencies: e.target.value })} />
-          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Comma-separated task IDs</label>
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_dependencies_tip") || "Comma-separated task IDs"}</label>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">subject</span>Comments</label>
-          <textarea name="comments" cols={30} rows={5} placeholder="Add any clarification comment" id="toDoComments" value={newToDo.comments || ''} onChange={e => setNewToDo({ ...newToDo, comments: e.target.value })} />
+          <label><span className="material-icons-round">subject</span>{t("projects_comments") || "Comments"}</label>
+          <textarea name="comments" cols={30} rows={5} placeholder={t("projects_comments_placeholder") || "Add any clarification comment"} id="toDoComments" value={newToDo.comments || ''} onChange={e => setNewToDo({ ...newToDo, comments: e.target.value })} />
         </div>
       </div>
       <div className="cancelAccept">
-        <button type="button" className="cancelButton" onClick={() => closeModal('newToDoModal')}>Cancel</button>
-        <button type="submit" className="acceptButton" id="submitToDoButton">Accept</button>
+        <button type="button" className="cancelButton" onClick={() => closeModal('newToDoModal')}>{t("projects_cancel") || "Cancel"}</button>
+        <button type="submit" className="acceptButton" id="submitToDoButton">{t("projects_accept") || "Accept"}</button>
       </div>
     </form>
   </dialog>
   <dialog id="editToDoModal">
     <form className="userForm form-wide" id="editToDoForm" onSubmit={handleEditToDoSubmit}>
       <input type="hidden" id="editToDoId" name="id" value={editToDoFields.id} />
-      <h2>Edit Task</h2>
+      <h2>{t("projects_edit_task") || "Edit Task"}</h2>
       <div className="userCard">
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">apartment</span>Title</label>
+          <label><span className="material-icons-round">apartment</span>{t("projects_title") || "Title"}</label>
           <input name="title" type="text" id="editToDoTitle" value={editToDoFields.title} onChange={handleEditToDoChange} />
-          <label className="label-tip">TIP give it a short title</label>
+          <label className="label-tip">{t("projects_tip_short_title") || "TIP give it a short title"}</label>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">subject</span>Description</label>
-          <textarea name="description" cols={30} rows={5} placeholder="Description" id="editToDoDescription" value={editToDoFields.description} onChange={handleEditToDoChange} />
+          <label><span className="material-icons-round">subject</span>{t("projects_description") || "Description"}</label>
+          <textarea name="description" cols={30} rows={5} placeholder={t("projects_description_placeholder") || "Description"} id="editToDoDescription" value={editToDoFields.description} onChange={handleEditToDoChange} />
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Status</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_status") || "Status"}</label>
           <select name="status" id="editToDoStatus" value={editToDoFields.status} onChange={handleEditToDoChange}>
             <option>Pending</option>
             <option>In Progress</option>
@@ -817,7 +815,7 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           </select>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Priority</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_priority") || "Priority"}</label>
           <select name="priority" id="editToDoPriority" value={editToDoFields.priority} onChange={handleEditToDoChange}>
             <option>High</option>
             <option>Standard</option>
@@ -825,19 +823,19 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           </select>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">paid</span>Estimated hours</label>
-          <input name="estimated_hours" type="number" placeholder="Estimated hours for the task" id="editToDoEstimatedHours" value={editToDoFields.estimated_hours} onChange={handleEditToDoChange} />
-          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Estimated hours for the task</label>
+          <label><span className="material-icons-round">paid</span>{t("projects_estimated_hours") || "Estimated hours"}</label>
+          <input name="estimated_hours" type="number" placeholder={t("projects_estimated_hours_placeholder") || "Estimated hours for the task"} id="editToDoEstimatedHours" value={editToDoFields.estimated_hours} onChange={handleEditToDoChange} />
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_estimated_hours_tip") || "Estimated hours for the task"}</label>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">paid</span>Actual hours</label>
-          <input name="actual_hours" type="number" placeholder="Hours used so far" id="editToDoActualHours" value={editToDoFields.actual_hours} onChange={handleEditToDoChange} />
-          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Hours used so far</label>
+          <label><span className="material-icons-round">paid</span>{t("projects_actual_hours") || "Actual hours"}</label>
+          <input name="actual_hours" type="number" placeholder={t("projects_actual_hours_placeholder") || "Hours used so far"} id="editToDoActualHours" value={editToDoFields.actual_hours} onChange={handleEditToDoChange} />
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_actual_hours_tip") || "Hours used so far"}</label>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Responsible Person</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_responsible_person") || "Responsible Person"}</label>
           <select name="assigned_to" id="editToDoAssignedTo" value={editToDoFields.assigned_to} onChange={handleEditToDoChange}>
-            <option value="">Select responsible person</option>
+            <option value="">{t("projects_select_responsible") || "Select responsible person"}</option>
             {projectState && projectState.assignedUsers && projectState.assignedUsers
               .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
               .filter((user): user is User => Boolean(user))
@@ -847,9 +845,9 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           </select>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Created By</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_created_by") || "Created By"}</label>
           <select name="created_by" id="editToDoCreatedBy" value={editToDoFields.created_by} onChange={handleEditToDoChange}>
-            <option value="">Select creator</option>
+            <option value="">{t("projects_select_creator") || "Select creator"}</option>
             {projectState && projectState.assignedUsers && projectState.assignedUsers
               .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
               .filter((user): user is User => Boolean(user))
@@ -859,21 +857,21 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           </select>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">calendar_today</span>Start Date</label>
+          <label><span className="material-icons-round">calendar_today</span>{t("projects_start_date") || "Start Date"}</label>
           <input name="start_date" type="date" id="editToDoStartDate" value={editToDoFields.start_date} onChange={handleEditToDoChange} />
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">calendar_month</span>Due Date</label>
+          <label><span className="material-icons-round">calendar_month</span>{t("projects_due_date") || "Due Date"}</label>
           <input name="due_date" type="date" id="editToDoDueDate" value={editToDoFields.due_date} onChange={handleEditToDoChange} />
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>Dependencies</label>
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_dependencies") || "Dependencies"}</label>
           <input name="dependencies" id="editToDoDependencies" value={editToDoFields.dependencies} onChange={handleEditToDoChange} />
-          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>Comma-separated task IDs</label>
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_dependencies_tip") || "Comma-separated task IDs"}</label>
         </div>
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">subject</span>Comments</label>
-          <textarea name="comments" cols={30} rows={5} placeholder="Add any clarification comment" id="editToDoComments" value={editToDoFields.comments} onChange={handleEditToDoChange} />
+          <label><span className="material-icons-round">subject</span>{t("projects_comments") || "Comments"}</label>
+          <textarea name="comments" cols={30} rows={5} placeholder={t("projects_comments_placeholder") || "Add any clarification comment"} id="editToDoComments" value={editToDoFields.comments} onChange={handleEditToDoChange} />
         </div>
       </div>
       <div className="cancelAccept">
@@ -883,24 +881,24 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           setToDoToDelete(td);
           const modal = document.getElementById('DeleteTaskModal') as HTMLDialogElement | null;
           if (modal) modal.showModal();
-        }}>Delete</button>
-        <button type="button" className="cancelButton" onClick={() => closeModal('editToDoModal')}>Cancel</button>
-        <button type="submit" className="acceptButton" id="submitEditToDoButton">Accept</button>
+        }}>{t("projects_delete") || "Delete"}</button>
+        <button type="button" className="cancelButton" onClick={() => closeModal('editToDoModal')}>{t("projects_cancel") || "Cancel"}</button>
+        <button type="submit" className="acceptButton" id="submitEditToDoButton">{t("projects_accept") || "Accept"}</button>
       </div>
     </form>
   </dialog>
   {/* Delete User Modal */}
       <dialog id="DeleteUserModal">
         <form className="app-modal-form" id="DeleteUserForm">
-          <h2>Are you sure you want to delete the user {userToDelete?.name}?</h2>
+          <h2>{t("projects_confirm_delete_user") || "Are you sure you want to delete the user"} {userToDelete?.name ? `"${userToDelete.name}"?` : "?"}</h2>
           <div className="cancelAccept">
             <button
               type="button"
               className="cancelButton"
               onClick={() => { setUserToDelete(null); closeModal('DeleteUserModal'); }}>
-              Cancel
+              {t("projects_cancel") || "Cancel"}
             </button>
-            <button type="button" className="acceptButton" id="ConfirmDeleteUserButton" onClick={handleConfirmDeleteUser}>Delete</button>
+            <button type="button" className="acceptButton" id="ConfirmDeleteUserButton" onClick={handleConfirmDeleteUser}>{t("projects_delete") || "Delete"}</button>
           </div>
         </form>
       </dialog>

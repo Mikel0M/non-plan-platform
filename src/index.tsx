@@ -17,6 +17,7 @@ import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
 import { ProjectsManager } from './classes/ProjectsManager';
 import { ToDoPage } from "./react-components/toDoPage";
 import { UsersPage } from './react-components/Users';
+import { LanguageProvider } from "./context/LanguageContext";
 
 const projectsManager = new ProjectsManager();
 
@@ -24,7 +25,7 @@ const projectsManager = new ProjectsManager();
 const rootElement = document.getElementById('app') as HTMLDivElement;
 const appRoot = ReactDOM.createRoot(rootElement)
 appRoot.render(
-    <>  
+    <LanguageProvider>
         <Router.BrowserRouter>
             <Sidebar customStyle={{ zIndex: 1, position: "fixed" }} />
             <div id="main-content">
@@ -37,7 +38,7 @@ appRoot.render(
                 </Router.Routes>
             </div>
         </Router.BrowserRouter>
-    </>
+    </LanguageProvider>
 );
 
 
