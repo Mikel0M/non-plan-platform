@@ -6,6 +6,7 @@ import { toDoManager } from '../classes/toDoManager';
 import { usersManagerInstance } from '../classes/UsersManager';
 import { User } from '../classes/User';
 import { useTranslation } from "../context/LanguageContext";
+import UserCard from "./UserCard";
 
 interface Props {
     projectsManager: ProjectsManager
@@ -418,34 +419,29 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                     <span className="material-icons-round">add</span>
                   </button>
                 </div>
-                <ul>
-                  {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
-                    projectState.assignedUsers.map((au, idx) => {
-                      const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
-                      return (
-                        <li key={au.userId} style={{marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'}}
-                            onClick={() => window.openEditUserModal && window.openEditUserModal(au.userId)}>
-                          {user ? `${user.name} ${user.surname}` : t("projects_unknown_user") || 'Unknown User'} — <b>{au.role}</b>
-                          <button
-                            className="buttonTertiary"
-                            style={{marginLeft: 8, background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                            title={t("projects_remove_user") || "Remove user from project"}
-                            onClick={e => {
-                              e.stopPropagation();
-                              setUserToDelete({ userId: au.userId, name: user ? `${user.name} ${user.surname}` : t("projects_unknown_user") || 'Unknown User' });
-                              const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
-                              if (modal) modal.showModal();
-                            }}
-                          >
-                            <span className="material-icons-round" style={{fontSize: 18}}>close</span>
-                          </button>
-                        </li>
-                      );
-                    })
-                  ) : (
-                    <li>{t("projects_no_users_assigned") || "No users assigned to this project."}</li>
-                  )}
-                </ul>
+                <div>
+      {projectState.assignedUsers && projectState.assignedUsers.length > 0 ? (
+        projectState.assignedUsers.map((au, idx) => {
+          const user = usersManagerInstance.getUsers().find(u => u.id === au.userId);
+          if (!user) return null;
+          return (
+            <UserCard
+              key={au.userId}
+              user={user}
+              projectRole={au.role} // Pass the project-specific role
+              onEdit={id => window.openEditUserModal && window.openEditUserModal(id)}
+              onDelete={id => {
+                setUserToDelete({ userId: id, name: `${user.name} ${user.surname}` });
+                const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
+                if (modal) modal.showModal();
+              }}
+            />
+          );
+        })
+      ) : (
+        <div>{t("projects_no_users_assigned") || "No users assigned to this project."}</div>
+      )}
+    </div>
               </div>
             )}
             {activeLeftCard === 'todo' && (

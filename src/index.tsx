@@ -16,7 +16,7 @@ import { usersManagerInstance, users } from "./classes/UsersManager";
 import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
 import { ProjectsManager } from './classes/ProjectsManager';
 import { ToDoPage } from "./react-components/toDoPage";
-import { UsersPage } from './react-components/Users';
+import { UsersPage } from './react-components/UsersPage';
 import { LanguageProvider } from "./context/LanguageContext";
 
 const projectsManager = new ProjectsManager();

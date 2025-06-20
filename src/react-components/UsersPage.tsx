@@ -5,6 +5,8 @@ import { UsersManager } from '../classes/UsersManager';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { companiesManagerInstance } from '../classes/CompaniesManager';
 import { useTranslation } from "../context/LanguageContext";
+import UserCard from "./UserCard";
+import CompanyCard from "./CompanyCard";
 
 interface Props {
 
@@ -526,29 +528,16 @@ export function UsersPage(props: Props) {
         style={{ display: 'flex', flexDirection: 'column', rowGap: 10, paddingLeft: 10, paddingRight: 30 }}
       >
         {users.map((user, idx) => (
-          <div
-            key={idx}
-            className="userCard user-card-hover"
-            onClick={() => user.id && window.openEditUserModal && window.openEditUserModal(user.id as string)}
-          >
-            <span className="material-icons-round">person</span>
-            <span>{user.name} {user.surname}</span>
-            <span>{t(`projects_role_${user.role?.toLowerCase()}`) || user.role}</span>
-            <span>{user.company}</span>
-            <button
-              className="buttonTertiary"
-              style={{background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 8, justifySelf: 'end'}}
-              title={t("users_delete_user") || "Delete user"}
-              onClick={e => {
-                e.stopPropagation();
-                setUserToDelete({ id: user.id as string, name: `${user.name} ${user.surname}` });
-                const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
-                if (modal) modal.showModal();
-              }}
-            >
-              <span className="material-icons-round" style={{fontSize: 18}}>close</span>
-            </button>
-          </div>
+          <UserCard
+            key={user.id || idx}
+            user={user}
+            onEdit={id => window.openEditUserModal && window.openEditUserModal(id)}
+            onDelete={id => {
+              setUserToDelete({ id, name: `${user.name} ${user.surname}` });
+              const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
+              if (modal) modal.showModal();
+            }}
+          />
         ))}
       </div>
     )}
@@ -580,31 +569,16 @@ export function UsersPage(props: Props) {
         style={{ display: 'flex', flexDirection: 'column', rowGap: 10, paddingLeft: 10, paddingRight: 30 }}
       >
         {companies.map((company, idx) => (
-          <div
+          <CompanyCard
             key={company.id}
-            className="userCard user-card-hover"
-            style={{ display: 'grid', gridTemplateColumns: '40px 2fr 2fr 2fr 1fr 40px', gap: 10, alignItems: 'center', background: 'var(--background-100)', padding: 10, borderRadius: 8, cursor: 'pointer', boxSizing: 'border-box' }}
-            onClick={() => openEditCompanyModal(company.id)}
-          >
-            <span className="material-icons-round">business</span>
-            <span>{company.name}</span>
-            <span>{company.address}</span>
-            <span>{company.email}</span>
-            <span>{company.phone}</span>
-            <button
-              className="buttonTertiary"
-              style={{background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 8, justifySelf: 'end'}}
-              title={t("users_delete_company") || "Delete company"}
-              onClick={e => {
-                  e.stopPropagation();
-                  setCompanyToDelete({ id: company.id, name: company.name });
-                  const modal = document.getElementById('DeleteCompanyModal') as HTMLDialogElement | null;
-                  if (modal) modal.showModal();
-              }}
-            >
-              <span className="material-icons-round" style={{fontSize: 18}}>close</span>
-            </button>
-          </div>
+            company={company}
+            onEdit={id => openEditCompanyModal(id)}
+            onDelete={id => {
+              setCompanyToDelete({ id, name: company.name });
+              const modal = document.getElementById('DeleteCompanyModal') as HTMLDialogElement | null;
+              if (modal) modal.showModal();
+            }}
+          />
         ))}
       </div>
       </>
