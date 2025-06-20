@@ -144,6 +144,7 @@ export const translations = {
         projects_select_user: "Select user",
         projects_assign: "Assign",
         projects_change: "Change",
+        projects_delete: "Delete",
         users_new_user: "New User",
         users_change_user: "Change User",
         users_name: "Name",
@@ -318,6 +319,7 @@ export const translations = {
         projects_select_user: "Benutzer auswählen",
         projects_assign: "Zuweisen",
         projects_change: "Ändern",
+        projects_delete: "Löschen",
         users_new_user: "Neuer Benutzer",
         users_change_user: "Benutzer ändern",
         users_name: "Vorname",
@@ -484,6 +486,7 @@ export const translations = {
         projects_select_user: "Seleccione usuario",
         projects_assign: "Asignar",
         projects_change: "Cambiar",
+        projects_delete: "Eliminar",
         // Sidebar and user/company management (added missing Spanish translations)
         sidebar_projects: "Proyectos",
         sidebar_users: "Usuarios",
