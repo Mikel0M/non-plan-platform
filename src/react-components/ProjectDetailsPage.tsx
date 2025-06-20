@@ -489,36 +489,35 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                   {/* Render To-Do list items reactively */}
                   {toDos.length === 0 && <div style={{color: '#aaa'}}>{t("projects_no_todos") || "No to-dos for this project."}</div>}
                   {toDos.map((todo, idx) => {
-  let statusClass = 'status-pending';
-  switch (todo.status) {
-    case 'Pending': statusClass = 'status-pending'; break;
-    case 'In Progress': statusClass = 'status-inprogress'; break;
-    case 'Completed': statusClass = 'status-completed'; break;
-    case 'On Hold': statusClass = 'status-onhold'; break;
-    default: statusClass = 'status-pending';
-  }
-  // Find responsible user
-  const responsibleUser = projectState && projectState.assignedUsers
-    ? usersManagerInstance.getUsers().find(u => u.id === todo.assigned_to)
-    : null;
-  return (
-    <div
-      key={todo.id || idx}
-      className={`todoItem ${statusClass}`}
-      style={{ marginBottom: 0 }}
-      onClick={() => openEditToDoModal(todo)}
-    >
-      <span className="todo-task-icon">
-        <span className="material-icons-round">check_circle</span>
-      </span>
-      <span className="todo-task-value" style={{ fontWeight: 600 }}>{todo.title}</span>
-      <span className="todo-task-value">{todo.priority}</span>
-      <span className="todo-task-value">{responsibleUser ? `${responsibleUser.name} ${responsibleUser.surname}` : ''}</span>
-      <span className="todo-task-value">{todo.due_date}</span>
-      <span className="todo-task-delete" />
-    </div>
-  );
-})}
+                    let statusClass = 'status-pending';
+                    switch (todo.status) {
+                      case 'Pending': statusClass = 'status-pending'; break;
+                      case 'In Progress': statusClass = 'status-inprogress'; break;
+                      case 'Completed': statusClass = 'status-completed'; break;
+                      case 'On Hold': statusClass = 'status-onhold'; break;
+                      default: statusClass = 'status-pending';
+                    }
+                    const responsibleUser = projectState && projectState.assignedUsers
+                      ? usersManagerInstance.getUsers().find(u => u.id === todo.assigned_to)
+                      : null;
+                    return (
+                      <div
+                        key={todo.id || idx}
+                        className={`todoItem ${statusClass}`}
+                        style={{ marginBottom: 0 }}
+                        onClick={() => openEditToDoModal(todo)}
+                      >
+                        <span className="todo-task-icon">
+                          <span className="material-icons-round">check_circle</span>
+                        </span>
+                        <span className="todo-task-value" style={{ fontWeight: 600 }}>{todo.title}</span>
+                        <span className="todo-task-value">{todo.priority}</span>
+                        <span className="todo-task-value">{responsibleUser ? `${responsibleUser.name} ${responsibleUser.surname}` : ''}</span>
+                        <span className="todo-task-value">{todo.due_date}</span>
+                        <span className="todo-task-delete" />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
