@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Project } from "../classes/Project"
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation } from "./LanguageContext";
 
 interface Props {
     project: Project

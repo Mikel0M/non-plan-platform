@@ -1,6 +1,6 @@
 import * as React from "react";
 import { translations } from "../text/Language"// Assuming translations are imported
-import { useLanguage, useTranslation } from "../context/LanguageContext";
+import { useLanguage, useTranslation } from "./LanguageContext";
 
 export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
     const { language, setLanguage } = useLanguage();

@@ -1,6 +1,6 @@
 import React from "react";
 import { IUser } from "../classes/User";
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation } from "./LanguageContext";
 
 interface UserCardProps {
   user: IUser;

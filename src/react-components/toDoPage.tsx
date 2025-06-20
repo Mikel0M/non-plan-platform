@@ -4,7 +4,8 @@ import { ProjectsManager } from '../classes/ProjectsManager';
 import * as Router from 'react-router-dom';
 import { toDoManager } from '../classes/toDoManager';
 import { usersManagerInstance } from '../classes/UsersManager';
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation } from "./LanguageContext";
+import { SearchBox } from './SearchBox';
 
 interface Props {
 
@@ -14,6 +15,8 @@ interface Props {
 
 export function ToDoPage(props: Props) {
     const { t } = useTranslation();
+    // Remove searchQuery state and all project filtering by name
+    // const [searchQuery, setSearchQuery] = React.useState("");
     // Helper to close modals by id
     const closeModal = (id: string) => {
         const modal = document.getElementById(id) as HTMLDialogElement | null;
@@ -246,82 +249,127 @@ export function ToDoPage(props: Props) {
         .filter(Boolean);
     };
 
+    // State for selected project in dropdown
+    const [selectedProjectId, setSelectedProjectId] = React.useState<string>("all");
+
+    // Remove filteredProjects, just use all projects from manager
+    const allProjects = props.projectsManager.list;
+    // Determine which projects to show based on selector
+    const projectsToShow = selectedProjectId === "all"
+      ? allProjects
+      : allProjects.filter(p => p.id === selectedProjectId);
+
+    // State for per-project task search queries
+    const [projectTaskSearch, setProjectTaskSearch] = React.useState<{ [projectId: string]: string }>({});
+
     return (
       <div className="page page-column" id="toDoPage">
         <div className="todo-cards-list" style={{ gap: '10px' }}>
-          {props.projectsManager.list.map(project => (
-            <div key={project.id} className="todo-card">
-              <div className="todo-card-header">
-                <h3 className="todo-card-title">{project.name}</h3>
-                <button
-                  className="buttonTertiary todo-add-btn"
-                  onClick={() => openNewToDoModal(project)}
-                  title={t("projects_add_task") || "Add To-Do"}
-                >
-                  <span className="material-icons-round">add</span>
-                  <span className="material-icons-round">check_circle</span>
-                </button>
-              </div>
-              {/* Header row for task columns */}
-              <div className="todo-items-header">
-                <span></span>
-                <span className="todo-header-label">{t("projects_title")}</span>
-                <span className="todo-header-label">{t("projects_priority") || "Priority"}</span>
-                <span className="todo-header-label">{t("projects_responsible_person") || "Responsible Person"}</span>
-                <span className="todo-header-label">{t("projects_due_date") || "Due Date"}</span>
-                <span></span>
-              </div>
-              {(!project.toDos || project.toDos.length === 0) ? (
-                <div className="todo-empty">{t("projects_no_todos") || "No to-dos for this project."}</div>
-              ) : (
-                <div className="todo-tasks-list">
-                  {project.toDos.map(todo => {
-                    let statusClass = 'status-pending';
-                    switch (todo.status) {
-                      case 'Pending': statusClass = 'status-pending'; break;
-                      case 'In Progress': statusClass = 'status-inprogress'; break;
-                      case 'Completed': statusClass = 'status-completed'; break;
-                      case 'On Hold': statusClass = 'status-onhold'; break;
-                      default: statusClass = 'status-pending';
-                    }
-                    const assignedUser = (project.assignedUsers || [])
-                      .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
-                      .find(u => u && u.id === todo.assigned_to);
-                    return (
-                      <div
-                        key={todo.id}
-                        className={`todoItem ${statusClass}`}
-                        onClick={() => openEditToDoModal(todo)}
-                      >
-                        <span className="todo-task-icon">
-                          <span className="material-icons-round">check_circle</span>
-                        </span>
-                        <span className="todo-task-value" style={{ fontWeight: 600 }}>{todo.title}</span>
-                        <span className="todo-task-value">{t(`projects_priority_${todo.priority?.toLowerCase()}`) || todo.priority}</span>
-                        <span className="todo-task-value">{assignedUser ? `${assignedUser.name} ${assignedUser.surname}` : ''}</span>
-                        <span className="todo-task-value">{todo.due_date}</span>
-                        <span className="todo-task-delete">
-                          <button
-                            className="buttonTertiary"
-                            style={{background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 8, justifySelf: 'end'}}
-                            title={t("projects_delete") || "Delete task"}
-                            onClick={e => {
-                              e.stopPropagation();
-                              setToDoToDelete(todo);
-                              const modal = document.getElementById('DeleteTaskModal') as HTMLDialogElement | null;
-                              if (modal) modal.showModal();
-                            }}
-                          >
-                            <span className="material-icons-round" style={{fontSize: 18}}>close</span>
-                          </button>
-                        </span>
-                      </div>
-                    );
-                  })}
+          {/* Project selector dropdown */}
+          <div style={{ margin: '16px 0' }}>
+            <label htmlFor="projectSelector" style={{ marginRight: 8 }}>{t("projects_select_project") || "Select Project:"}</label>
+            <select
+              id="projectSelector"
+              value={selectedProjectId}
+              onChange={e => setSelectedProjectId(e.target.value)}
+              style={{ padding: '6px 12px', borderRadius: 4 }}
+            >
+              <option value="all">{t("projects_all_projects") || "All Projects"}</option>
+              {allProjects.map(project => (
+                <option key={project.id} value={project.id}>{project.name}</option>
+              ))}
+            </select>
+          </div>
+          {projectsToShow.map(project => {
+            // Get the search query for this project (for its tasks)
+            const taskSearch = projectTaskSearch[project.id] || "";
+            // Filter this project's toDos by title (case-insensitive)
+            const filteredToDos = (project.toDos || []).filter(td =>
+              td.title && td.title.toLowerCase().includes(taskSearch.toLowerCase())
+            );
+            return (
+              <div key={project.id} className="todo-card">
+                <div className="todo-card-header">
+                  <h3 className="todo-card-title">{project.name}</h3>
+                  {/* Per-project task search */}
+                  <SearchBox
+                    value={taskSearch}
+                    onValueChange={q => setProjectTaskSearch(prev => ({ ...prev, [project.id]: q }))}
+                  />
+                  <button
+                    className="buttonTertiary todo-add-btn"
+                    onClick={() => openNewToDoModal(project)}
+                    title={t("projects_add_task") || "Add To-Do"}
+                  >
+                    <span className="material-icons-round">add</span>
+                    <span className="material-icons-round">check_circle</span>
+                  </button>
                 </div>
-              )}
-            </div>
-          ))}
+                {/* Header row for task columns */}
+                <div className="todo-items-header">
+                  <span></span>
+                  <span className="todo-header-label">{t("projects_title")}</span>
+                  <span className="todo-header-label">{t("projects_priority") || "Priority"}</span>
+                  <span className="todo-header-label">{t("projects_responsible_person") || "Responsible Person"}</span>
+                  <span className="todo-header-label">{t("projects_due_date") || "Due Date"}</span>
+                  <span></span>
+                </div>
+                {filteredToDos.length === 0 ? (
+                  <div className="todo-empty">{t("projects_no_todos") || "No to-dos for this project."}
+                    <p style={{ textAlign: 'center', marginTop: 16, fontSize: 16, color: '#888' }}>
+                      There are no tasks to display!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="todo-tasks-list">
+                    {filteredToDos.map(todo => {
+                      let statusClass = 'status-pending';
+                      switch (todo.status) {
+                        case 'Pending': statusClass = 'status-pending'; break;
+                        case 'In Progress': statusClass = 'status-inprogress'; break;
+                        case 'Completed': statusClass = 'status-completed'; break;
+                        case 'On Hold': statusClass = 'status-onhold'; break;
+                        default: statusClass = 'status-pending';
+                      }
+                      const assignedUser = (project.assignedUsers || [])
+                        .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+                        .find(u => u && u.id === todo.assigned_to);
+                      return (
+                        <div
+                          key={todo.id}
+                          className={`todoItem ${statusClass}`}
+                          onClick={() => openEditToDoModal(todo)}
+                        >
+                          <span className="todo-task-icon">
+                            <span className="material-icons-round">check_circle</span>
+                          </span>
+                          <span className="todo-task-value" style={{ fontWeight: 600 }}>{todo.title}</span>
+                          <span className="todo-task-value">{t(`projects_priority_${todo.priority?.toLowerCase()}`) || todo.priority}</span>
+                          <span className="todo-task-value">{assignedUser ? `${assignedUser.name} ${assignedUser.surname}` : ''}</span>
+                          <span className="todo-task-value">{todo.due_date}</span>
+                          <span className="todo-task-delete">
+                            <button
+                              className="buttonTertiary"
+                              style={{background: '#FC3140', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 8, justifySelf: 'end'}}
+                              title={t("projects_delete") || "Delete task"}
+                              onClick={e => {
+                                e.stopPropagation();
+                                setToDoToDelete(todo);
+                                const modal = document.getElementById('DeleteTaskModal') as HTMLDialogElement | null;
+                                if (modal) modal.showModal();
+                              }}
+                            >
+                              <span className="material-icons-round" style={{fontSize: 18}}>close</span>
+                            </button>
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
         {/* Edit To-Do Modal */}
         <dialog id="editToDoModal">

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation } from "./LanguageContext";
 
 export function Sidebar({ customStyle }: { customStyle?: React.CSSProperties }) {
     const { t } = useTranslation();

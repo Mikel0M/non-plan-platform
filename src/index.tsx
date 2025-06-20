@@ -17,7 +17,7 @@ import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
 import { ProjectsManager } from './classes/ProjectsManager';
 import { ToDoPage } from "./react-components/toDoPage";
 import { UsersPage } from './react-components/UsersPage';
-import { LanguageProvider } from "./context/LanguageContext";
+import { LanguageProvider } from "./react-components/LanguageContext";
 
 const projectsManager = new ProjectsManager();
 

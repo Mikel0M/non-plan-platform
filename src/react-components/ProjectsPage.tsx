@@ -3,7 +3,8 @@ import * as Router from 'react-router-dom';
 import { IProject, userRole, status, phase, Project } from '../classes/Project';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { ProjectCard } from './ProjectCard';
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation } from "./LanguageContext";
+import { SearchBox } from './SearchBox';
 
 interface Props {
     projectManager: ProjectsManager;
@@ -12,14 +13,18 @@ interface Props {
 
 export function ProjectsPage({ projectManager, customStyle }: Props) {
     const { t } = useTranslation();
-    const [projects, setProjects] = React.useState<Project[]>(projectManager.list)
+    const [searchQuery, setSearchQuery] = React.useState("");
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState('');
-    projectManager.onProjectCreated = () => { setProjects([...projectManager.list]) }
-    projectManager.onProjectDeleted = () => { setProjects([...projectManager.list]) }
+    // Update UI when projects are created or deleted
+    const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+    projectManager.onProjectCreated = () => { forceUpdate(); }
+    projectManager.onProjectDeleted = () => { forceUpdate(); }
 
-    const projectCards = projects.map((project) => {
+    const filteredProjects = projectManager.filterByName(searchQuery);
+
+    const projectCards = filteredProjects.map((project) => {
         return (
             <Router.Link to={`/project/${project.id}`} key={project.id} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <ProjectCard project={project} />
@@ -28,12 +33,12 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     })
 
     React.useEffect(() => {
-        console.log("Projects state updated", projects)
+        console.log("Projects state updated", projectManager.list)
         const grid = document.querySelector('.project-cards-grid');
         if (grid) {
             console.log('Grid width:', grid.clientWidth);
         }
-    }, [projects])
+    }, [projectManager.list])
     
 
     const onNewProjectClick = () => {
@@ -47,7 +52,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
 
     const onImportClick = () => {
         projectManager.importFromJSON(() => {
-            setProjects([...projectManager.list]);
+            // No need to update projects state, it's derived from projectManager.list
         });
     }
 
@@ -77,7 +82,6 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
 
         try {
             const project = projectManager.newProject(ProjectData);
-            setProjects([...projectManager.list]); // Force update after new project
             projectForm.reset(); // Reset the form
             setIsModalOpen(false);
         } catch (error) {
@@ -89,6 +93,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     return (
         <div className="page" id="projectsPage">
             <header>
+                <SearchBox onValueChange={setSearchQuery} />
                 <div style={{ display: "flex", gap: "10px", margin: "15px 0" }}>
                     <button id="importProjectsBtn" className="buttonTertiary" onClick={onImportClick} title={t("projects_import") || "Import projects"}>
                         <span className="material-icons-round">file_download</span>
@@ -104,6 +109,11 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
             <div className="project-cards-grid">
                 {projectCards}
             </div>
+            {filteredProjects.length === 0 && (
+                <p style={{ textAlign: 'center', marginTop: 32, fontSize: 18, color: '#888' }}>
+                    There are no projects to display!
+                </p>
+            )}
             {isModalOpen && (
                 <dialog id="newProjectModal" open>
                     <form onSubmit={(e) => {onFormSubmit(e)}} className="userForm form-wide" id="newProjectForm">
@@ -287,7 +297,6 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                     </form>
                 </dialog>
             )}
-    </div>
-
+        </div>
     )
 }

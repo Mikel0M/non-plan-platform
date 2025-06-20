@@ -5,8 +5,9 @@ import * as Router from 'react-router-dom';
 import { toDoManager } from '../classes/toDoManager';
 import { usersManagerInstance } from '../classes/UsersManager';
 import { User } from '../classes/User';
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation } from "./LanguageContext";
 import UserCard from "./UserCard";
+import { SearchBox } from './SearchBox';
 
 interface Props {
     projectsManager: ProjectsManager
@@ -14,6 +15,7 @@ interface Props {
 
 export function ProjectDetailsPage(props: Props) {
     const { t } = useTranslation();
+    const [searchQuery, setSearchQuery] = React.useState("");
     // Helper to translate status and role
     const translateStatus = (status: string) => t(`projects_status_${status?.toLowerCase()}`) || status;
     const translateRole = (role: string) => t(`projects_role_${role?.toLowerCase()}`) || role;
@@ -306,6 +308,13 @@ const handleConfirmDeleteProject = () => {
     // State for active card (users or todo)
 const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('todo');
 
+    // Add state for to-do search
+    const [toDoSearchQuery, setToDoSearchQuery] = React.useState("");
+    // Filter to-dos by title
+    const filteredToDos = toDos.filter(todo =>
+      todo.title.toLowerCase().includes(toDoSearchQuery.toLowerCase())
+    );
+
     // --- RENDER ---
     return (
       <div className="page" id="projectDetails">
@@ -460,8 +469,7 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <span className="material-icons-round" style={{ paddingRight: 10 }}>search</span>
-                      <input type="text" style={{ fontSize: "var(--fontSizeSmall)" }} placeholder={t("projects_search_todos") || "Search To-Do's by name"} />
+                      <SearchBox onValueChange={setToDoSearchQuery} style={{ minWidth: 180 }} />
                     </div>
                     <button id="newToDoBtn" className="buttonTertiary" style={{ marginLeft: 8 }} onClick={() => {
   const modal = document.getElementById('newToDoModal') as HTMLDialogElement | null;
@@ -482,9 +490,16 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
                     marginTop: 20
                   }}
                 >
-                  {/* Render To-Do list items reactively */}
-                  {toDos.length === 0 && <div style={{color: '#aaa'}}>{t("projects_no_todos") || "No to-dos for this project."}</div>}
-                  {toDos.map((todo, idx) => {
+                  {/* Render filtered To-Do list items reactively */}
+                  {filteredToDos.length === 0 && (
+                    <div style={{color: '#aaa'}}>
+                      {t("projects_no_todos") || "No to-dos for this project."}
+                      <p style={{ textAlign: 'center', marginTop: 16, fontSize: 16, color: '#888' }}>
+                        There are no tasks to display!
+                      </p>
+                    </div>
+                  )}
+                  {filteredToDos.map((todo, idx) => {
                     let statusClass = 'status-pending';
                     switch (todo.status) {
                       case 'Pending': statusClass = 'status-pending'; break;

@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation } from "./LanguageContext";
 
 interface CompanyCardProps {
   company: {

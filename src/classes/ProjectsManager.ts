@@ -876,4 +876,13 @@ export class ProjectsManager {
 
     console.log("All users imported successfully. Total users:", users.length); // Debugging statement
 }
+
+    /**
+     * Returns a filtered list of projects whose name includes the given query (case-insensitive).
+     */
+    filterByName(query: string): Project[] {
+        return this.list.filter(project =>
+            project.name.toLowerCase().includes(query.toLowerCase())
+        );
+    }
 }
