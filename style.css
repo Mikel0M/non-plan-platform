@@ -1332,3 +1332,74 @@ input:focus, textarea:focus, select:focus {
   margin-left: -40px;
 
 }
+
+.dashboardCard.calendar-fixed-size {
+  width: 100%;
+  background: var(--background-100);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 170px);
+  min-height: 300px;
+  max-height: calc(100vh - 90px);
+  overflow: hidden;
+}
+
+.calendar-scroll-vertical {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.calendar-project-selector {
+  margin-bottom: 12px;
+  max-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-project-selector + .calendar-header-spacer {
+  height: 8px;
+}
+
+.calendar-grid-cell {
+  border-right: 1px solid #444;
+  box-sizing: border-box;
+  background: transparent;
+  /* No horizontal lines */
+}
+
+.calendar-task-title-btn {
+  background: none;
+  border: none;
+  border-radius: 16px;
+  box-shadow: none;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  cursor: pointer;
+  font: inherit;
+  width: 100%;
+  text-align: left;
+  min-height: 32px;
+  padding: 8px 12px 8px 18px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.calendar-task-title-btn[data-project-color]:hover,
+.calendar-task-title-btn[data-project-color].active {
+  background: var(--project-color, var(--primary));
+  color: var(--background-100, #181818);
+  border-left: 2px solid var(--project-color, var(--primary));
+}
+
+/* Remove the vertical line between the left column (tasks) and the Gantt grid in the calendar. */
+.calendar-left-col, .calendar-left-col-sticky, .calendar-left-col-header {
+  border-right: none !important;
+  box-shadow: none !important;
+}
+
+/* If the grid or container has a border-left, remove it too */
+.calendar-grid, .calendar-grid-header {
+  border-left: none !important;
+}

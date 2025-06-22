@@ -22,8 +22,10 @@ export class toDoManager {
     }
 
     // Method to add a new to-do
+    // Defensive: always ensure dependencies is a string[] in newToDo and updateToDo
     newToDo(data: ItoDo, projectId: string): toDo {
         data.project_id = projectId;
+        data.dependencies = Array.isArray(data.dependencies) ? data.dependencies : (typeof data.dependencies === 'string' && !!data.dependencies && data.dependencies.split ? data.dependencies.split(',').map(s => s.trim()) : []);
         const newToDo = new toDo(data);
         toDos.push(newToDo);
         this.toDoListUI.appendChild(newToDo.ui);
@@ -39,8 +41,11 @@ export class toDoManager {
 
     // Method to update an existing to-do
     updateToDo(data: ItoDo): toDo | undefined {
+        data.dependencies = Array.isArray(data.dependencies) ? data.dependencies : (typeof data.dependencies === 'string' && !!data.dependencies && data.dependencies.split ? data.dependencies.split(',').map(s => s.trim()) : []);
         const toDoInstance = this.findToDoById(data.id!);
         if (toDoInstance) {
+            // Ensure dependencies is always an array
+            if (!Array.isArray(data.dependencies)) data.dependencies = [];
             toDoInstance.id = data.id ?? toDoInstance.id;
             toDoInstance.title = data.title ?? '';
             toDoInstance.description = data.description ?? '';

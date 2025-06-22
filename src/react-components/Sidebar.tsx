@@ -17,6 +17,7 @@ export function Sidebar({ customStyle }: { customStyle?: React.CSSProperties }) 
     return (
         <aside id="sidebar" style={{ display: 'flex', width: 180, minWidth: 180, maxWidth: 180, ...customStyle }}>
             <ul id="nav-buttons">
+                <li className={location.pathname === '/dashboard' ? 'active' : ''}><span className="material-icons-round">dashboard</span>{t("sidebar_dashboard") || "Dashboard"}</li>
                 <Router.Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <li id="projectsBtn" className={isActive('/') ? 'active' : ''}><span className="material-icons-round">maps_home_work</span>{t("sidebar_projects") || "Projects"}</li>
                 </Router.Link>
@@ -25,11 +26,9 @@ export function Sidebar({ customStyle }: { customStyle?: React.CSSProperties }) 
                         <span className="material-icons-round">people</span>{t("sidebar_users") || "Users"}
                     </li>
                 </Router.Link>
-                <li className={location.pathname === '/dashboard' ? 'active' : ''}><span className="material-icons-round">dashboard</span>{t("sidebar_dashboard") || "Dashboard"}</li>
                 <Router.Link to="/toDo" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <li id="toDoBtn" className={isActive('/toDo') ? 'active' : ''}><span className="material-icons-round">task</span>{t("sidebar_tasks") || "Tasks/To-Do"}</li>
                 </Router.Link>
-                <li className={location.pathname === '/calendar' ? 'active' : ''}><span className="material-icons-round">date_range</span>{t("sidebar_calendar") || "Calendar"}</li>
                 <li className={location.pathname === '/documents' ? 'active' : ''}><span className="material-icons-round">folder_open</span>{t("sidebar_documents") || "Documents"}</li>
                 <li className={location.pathname === '/tools' ? 'active' : ''}><span className="material-icons-round">build</span>{t("sidebar_tools") || "Tools"}</li>
             </ul>

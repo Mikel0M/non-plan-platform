@@ -95,7 +95,7 @@ React.useEffect(() => {
       start_date: '',
       estimated_hours: '',
       actual_hours: '',
-      dependencies: '',
+      dependencies: [] as unknown as string[],
       comments: '',
     });
 
@@ -129,7 +129,7 @@ React.useEffect(() => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         completion_date: '',
-        dependencies: [],
+        dependencies: Array.isArray(newToDo.dependencies) ? newToDo.dependencies : (typeof newToDo.dependencies === 'string' && (newToDo.dependencies as string) ? (newToDo.dependencies as string).split(',').map(s => s.trim()) : []),
         progress_percentage: '25%' as const,
         comments: [],
       };
@@ -146,7 +146,7 @@ React.useEffect(() => {
         start_date: '',
         estimated_hours: '',
         actual_hours: '',
-        dependencies: '',
+        dependencies: [] as unknown as string[],
         comments: ''
       });
       closeModal('newToDoModal');
@@ -167,7 +167,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
   estimated_hours: '',
   actual_hours: '',
   updated_at: '',
-  dependencies: '',
+  dependencies: [] as unknown as string[],
   comments: '',
 });
 
@@ -213,7 +213,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
             ...editToDoFields,
             estimated_hours: parseFloat(editToDoFields.estimated_hours) || 0,
             actual_hours: parseFloat(editToDoFields.actual_hours) || 0,
-            dependencies: editToDoFields.dependencies ? editToDoFields.dependencies.split(',').map(s => s.trim()) : [],
+            dependencies: Array.isArray(editToDoFields.dependencies) ? editToDoFields.dependencies : (typeof editToDoFields.dependencies === 'string' && (editToDoFields.dependencies as string) ? (editToDoFields.dependencies as string).split(',').map(s => s.trim()) : []),
             comments: editToDoFields.comments ? editToDoFields.comments.split('\n') : [],
           };
         }
@@ -325,6 +325,12 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
         user.name.toLowerCase().includes(assignedUserSearchQuery.toLowerCase()) ||
         user.surname.toLowerCase().includes(assignedUserSearchQuery.toLowerCase())
       );
+
+    // --- Helper to get all other tasks in the same project (for new/edit modals) ---
+function getOtherTasks(project, excludeId: string | null = null) {
+  if (!project || !project.toDos) return [];
+  return project.toDos.filter(td => excludeId ? td.id !== excludeId : true);
+}
 
     // --- RENDER ---
     return (
@@ -802,10 +808,33 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           <label><span className="material-icons-round">calendar_month</span>{t("projects_due_date") || "Due Date"}</label>
           <input name="due_date" type="date" id="toDoDueDate" value={newToDo.due_date} onChange={handleNewToDoChange} />
         </div>
+        {/* --- Dependencies as checkbox list in new to-do modal --- */}
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>{t("projects_dependencies") || "Dependencies"}</label>
-          <input name="dependencies" id="toDoDependencies" value={newToDo.dependencies || ''} onChange={e => setNewToDo({ ...newToDo, dependencies: e.target.value })} />
-          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_dependencies_tip") || "Comma-separated task IDs"}</label>
+          <label>Dependencies</label>
+          <div style={{ maxHeight: 120, overflowY: 'auto', border: '1px solid #ccc', borderRadius: 4, padding: 8 }}>
+            {getOtherTasks(projectState, null).map(td => (
+              <label key={td.id} style={{ display: 'block', marginBottom: 4 }}>
+                <input
+                  type="checkbox"
+                  value={td.id}
+                  checked={Array.isArray(newToDo.dependencies) ? newToDo.dependencies.includes(td.id) : false}
+                  onChange={e => {
+                    const checked = e.target.checked;
+                    setNewToDo(prev => {
+                      let deps = Array.isArray(prev.dependencies) ? [...prev.dependencies] : [];
+                      if (checked) {
+                        if (!deps.includes(td.id)) deps.push(td.id);
+                      } else {
+                        deps = deps.filter(id => id !== td.id);
+                      }
+                      return { ...prev, dependencies: deps };
+                    });
+                  }}
+                />
+                {td.title}
+              </label>
+            ))}
+          </div>
         </div>
         <div className="formFieldContainer">
           <label><span className="material-icons-round">subject</span>{t("projects_comments") || "Comments"}</label>
@@ -891,10 +920,33 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
           <label><span className="material-icons-round">calendar_month</span>{t("projects_due_date") || "Due Date"}</label>
           <input name="due_date" type="date" id="editToDoDueDate" value={editToDoFields.due_date} onChange={handleEditToDoChange} />
         </div>
+        {/* --- Dependencies as checkbox list in edit to-do modal --- */}
         <div className="formFieldContainer">
-          <label><span className="material-icons-round">not_listed_location</span>{t("projects_dependencies") || "Dependencies"}</label>
-          <input name="dependencies" id="editToDoDependencies" value={editToDoFields.dependencies} onChange={handleEditToDoChange} />
-          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_dependencies_tip") || "Comma-separated task IDs"}</label>
+          <label>Dependencies</label>
+          <div style={{ maxHeight: 120, overflowY: 'auto', border: '1px solid #ccc', borderRadius: 4, padding: 8 }}>
+            {getOtherTasks(projectState, editToDoFields.id || null).map(td => (
+              <label key={td.id} style={{ display: 'block', marginBottom: 4 }}>
+                <input
+                  type="checkbox"
+                  value={td.id}
+                  checked={Array.isArray(editToDoFields.dependencies) ? editToDoFields.dependencies.includes(td.id) : false}
+                  onChange={e => {
+                    const checked = e.target.checked;
+                    setEditToDoFields(prev => {
+                      let deps = Array.isArray(prev.dependencies) ? [...prev.dependencies] : [];
+                      if (checked) {
+                        if (!deps.includes(td.id)) deps.push(td.id);
+                      } else {
+                        deps = deps.filter(id => id !== td.id);
+                      }
+                      return { ...prev, dependencies: deps };
+                    });
+                  }}
+                />
+                {td.title}
+              </label>
+            ))}
+          </div>
         </div>
         <div className="formFieldContainer">
           <label><span className="material-icons-round">subject</span>{t("projects_comments") || "Comments"}</label>
