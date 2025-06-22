@@ -536,9 +536,7 @@ if (toDoForm && toDoForm instanceof HTMLFormElement) {
         e.preventDefault();
 
         const formData = new FormData(toDoForm);
-        // Get dependencies as a comma-separated string, then split and trim
-        const dependenciesStr = formData.get("toDoDependencies") as string;
-        const dependencies = dependenciesStr ? dependenciesStr.split(",").map(s => s.trim()).filter(Boolean) : [];
+        const dependencies = formData.get("toDoDependencies") as string;
         if (projectsManager?.currentProject?.id != null) {
         const toDoData: ItoDo = {
             title: formData.get("toDoTitle") as string,
@@ -555,7 +553,7 @@ if (toDoForm && toDoForm instanceof HTMLFormElement) {
             completion_date: formData.get("toDoCompletionDate") as string,
             estimated_hours: formData.get("toDoEstimatedHours") ? Number(formData.get("toDoEstimatedHours")) : 0,
             actual_hours: formData.get("toDoActualHours") ? Number(formData.get("toDoActualHours")) : 0,
-            dependencies: dependencies,
+            dependencies: dependencies ? dependencies.split(',') : [],
             progress_percentage: formData.get("toDoProgress") as toDoPercentage,
             comments: formData.get("toDoComments") ? (formData.get("toDoComments") as string).split(',') : []
         };
@@ -578,9 +576,7 @@ if (editToDoForm && editToDoForm instanceof HTMLFormElement) {
         e.preventDefault();
 
         const formData = new FormData(editToDoForm);
-        // Get dependencies as a comma-separated string, then split and trim
-        const dependenciesStr = formData.get("toDoDependencies") as string;
-        const dependencies = dependenciesStr ? dependenciesStr.split(",").map(s => s.trim()).filter(Boolean) : [];
+        const dependencies = formData.get("toDoDependencies") as string;
         const toDoData: ItoDo = {
             title: formData.get("toDoTitle") as string,
             description: formData.get("toDoDescription") as string,
@@ -596,7 +592,7 @@ if (editToDoForm && editToDoForm instanceof HTMLFormElement) {
             completion_date: formData.get("toDoCompletionDate") as string,
             estimated_hours: formData.get("toDoEstimatedHours") ? Number(formData.get("toDoEstimatedHours")) : 0,
             actual_hours: formData.get("toDoActualHours") ? Number(formData.get("toDoActualHours")) : 0,
-            dependencies: dependencies,
+            dependencies: dependencies ? dependencies.split(',') : [],
             progress_percentage: formData.get("toDoProgress") as toDoPercentage,
             comments: formData.get("toDoComments") ? (formData.get("toDoComments") as string).split(',') : []
         };
@@ -630,18 +626,9 @@ function openEditToDoModal(toDoData: ItoDo) {
         (document.getElementById("editToDoEstimatedHours") as HTMLInputElement).value = toDoData.estimated_hours.toString();
         (document.getElementById("editToDoActualHours") as HTMLInputElement).value = toDoData.actual_hours.toString();
         (document.getElementById("editToDoDueDate") as HTMLInputElement).value = toDoData.due_date;
-        // Set dependencies as comma-separated string
-        const depElem = document.getElementById("editToDoDependencies") as HTMLInputElement;
-        if (depElem) {
-            if (Array.isArray(toDoData.dependencies)) {
-                depElem.value = toDoData.dependencies.join(", ");
-            } else if (typeof toDoData.dependencies === 'string') {
-                depElem.value = toDoData.dependencies;
-            } else {
-                depElem.value = '';
-            }
-        }
-        (document.getElementById("editToDoComments") as HTMLTextAreaElement).value = Array.isArray(toDoData.comments) ? toDoData.comments.join(", ") : '';
+        (document.getElementById("editToDoDependencies") as HTMLInputElement).value = Array.isArray(toDoData.dependencies) ? toDoData.dependencies.join(", ") : (toDoData.dependencies || "");
+        (document.getElementById("editToDoComments") as HTMLTextAreaElement).value = Array.isArray(toDoData.comments) ? toDoData.comments.join(", ") : (toDoData.comments || "");
+
         // Open the modal
         editToDoModal.showModal();
     } else {

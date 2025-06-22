@@ -122,6 +122,8 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
     // Track hovered task index and tooltip position
     const [hoveredTaskIdx, setHoveredTaskIdx] = React.useState<number | null>(null);
     const [tooltip, setTooltip] = React.useState<{ idx: number, x: number, y: number } | null>(null);
+    // Track hovered dependency arrow (by depId-taskId)
+    const [hoveredArrow, setHoveredArrow] = React.useState<string | null>(null);
 
     // Tooltip width for clamping
     const tooltipWidth = 220;
@@ -162,21 +164,7 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
 
     return (
         <div className="dashboardCard calendar-fixed-size" style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Sticky header for both columns */}
-            <div style={{ display: 'flex', position: 'sticky', top: 0, zIndex: 3, background: 'var(--background-100)' }}>
-                <div style={{ width: 200, flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: days.length * colWidth }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${days.length}, ${colWidth}px)`, minWidth: days.length * colWidth }}>
-                        {monthYearLabels.map((m, i) => (
-                            <div key={i} style={{ textAlign: "center", fontWeight: 600, fontSize: 14, gridColumn: `span ${m.span}`, minHeight: rowHeight, maxHeight: rowHeight, borderBottom: '1px solid #ccc', background: 'var(--background-100)' }}>{m.label}</div>
-                        ))}
-                        {days.map((d, i) => (
-                            <div key={i} style={{ textAlign: "center", fontSize: 12, minHeight: rowHeight, maxHeight: rowHeight, borderBottom: '1px solid #ccc', background: 'var(--background-100)' }}>{d.getDate()}</div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-            {/* Scrollable area for both left column and grid */}
+            {/* Scrollable area for both left column and grid, including sticky header */}
             <div style={{ flex: 1, minHeight: 0, display: 'flex', height: '100%', overflow: 'auto' }} ref={scrollContainerRef}>
                 {/* Fixed left column for task names */}
                 <div
@@ -192,6 +180,10 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
                         zIndex: 10, // Increase zIndex to ensure buttons are above grid lines
                     }}
                 >
+                    {/* Sticky header for left column */}
+                    <div style={{ position: 'sticky', top: 0, zIndex: 11, background: 'var(--background-100)' }}>
+                        <div style={{ height: rowHeight, borderBottom: '1px solid #ccc' }} />
+                    </div>
                     <div id="taskNamesScroller" style={{ height: '100%' }}>
                         {taskTitles.map((title, idx) => (
                             <button
@@ -231,125 +223,276 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
                         ))}
                     </div>
                 </div>
-                {/* Gantt grid */}
-                <div style={{ flex: 1, minWidth: days.length * colWidth, height: '100%' }}>
-                    <div
-                        ref={gridRef}
-                        style={{
-                            display: 'grid',
-                            gridTemplateColumns: `repeat(${days.length}, ${colWidth}px)`,
-                            gridTemplateRows: `repeat(${taskTitles.length}, ${rowHeight}px)`,
-                            rowGap: rowGap,
-                            minWidth: days.length * colWidth,
-                            width: days.length * colWidth,
-                            minHeight: taskTitles.length * (rowHeight + rowGap),
-                            borderLeft: 'none',
-                            borderTop: 'none',
-                            borderBottom: '1px solid #ccc',
-                            borderRight: '1px solid #ccc',
-                            position: 'relative',
-                        }}
-                    >
-                        {/* Render grid cells */}
-                        {taskTitles.map((_, rowIdx) =>
-                            days.map((_, colIdx) => (
-                                <div
-                                    key={`cell-${rowIdx}-${colIdx}`}
-                                    className="calendar-grid-cell"
-                                    style={{
-                                        borderRight: '1px solid #444',
-                                        minHeight: rowHeight,
-                                        maxHeight: rowHeight,
-                                        minWidth: colWidth,
-                                        maxWidth: colWidth,
-                                        boxSizing: 'border-box',
-                                        background: 'transparent',
-                                    }}
-                                />
-                            ))
-                        )}
-                        {/* Task bars as colored lines */}
-                        {tasks.map((task, rowIdx) => {
-                            // Bar for tasks with both start and due date
-                            if (task.startDate && task.dueDate) {
-                                const taskStart = new Date(task.startDate);
-                                const taskEnd = new Date(task.dueDate);
-                                const offset = Math.floor((taskStart.getTime() - calendarStart.getTime()) / (1000 * 3600 * 24));
-                                const width = Math.floor((taskEnd.getTime() - taskStart.getTime()) / (1000 * 3600 * 24)) + 1;
-                                return (
+                {/* Main right area: header + grid in a column */}
+                <div style={{ flex: 1, minWidth: days.length * colWidth, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                    {/* Sticky header for months/days */}
+                    <div style={{ position: 'sticky', top: 0, zIndex: 9, background: 'var(--background-100)' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${days.length}, ${colWidth}px)`, minWidth: days.length * colWidth }}>
+                            {monthYearLabels.map((m, i) => (
+                                <div key={i} style={{ textAlign: "center", fontWeight: 600, fontSize: 14, gridColumn: `span ${m.span}`, minHeight: rowHeight, maxHeight: rowHeight, borderBottom: '1px solid #ccc', background: 'var(--background-100)' }}>{m.label}</div>
+                            ))}
+                            {days.map((d, i) => (
+                                <div key={i} style={{ textAlign: "center", fontSize: 12, minHeight: rowHeight, maxHeight: rowHeight, borderBottom: '1px solid #ccc', background: 'var(--background-100)' }}>{d.getDate()}</div>
+                            ))}
+                        </div>
+                    </div>
+                    {/* Gantt grid and SVG overlay */}
+                    <div style={{ position: 'relative', flex: 1, minWidth: days.length * colWidth, height: '100%' }}>
+                        {/* SVG overlay for dependency arrows */}
+                        <svg
+                            width={days.length * colWidth}
+                            height={taskTitles.length * (rowHeight + rowGap)}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                pointerEvents: 'none',
+                                zIndex: 5,
+                            }}
+                        >
+                            {tasks.map((task, idx) => {
+                                if (!task.rawToDo || !Array.isArray(task.rawToDo.dependencies)) return null;
+                                // Track used verticals for this target row to avoid overlap
+                                const usedVerticals = {};
+                                return task.rawToDo.dependencies.map((depId, depOrder) => {
+                                    const depIdx = tasks.findIndex(t => t.id === depId);
+                                    if (depIdx === -1) return null;
+                                    const depTask = tasks[depIdx];
+                                    if (!depTask.startDate && !depTask.dueDate) return null;
+                                    if (!task.startDate && !task.dueDate) return null;
+                                    // Calculate positions
+                                    const fromCol = depTask.dueDate
+                                        ? Math.floor((new Date(depTask.dueDate).getTime() - calendarStart.getTime()) / (1000 * 3600 * 24))
+                                        : depTask.startDate
+                                            ? Math.floor((new Date(depTask.startDate).getTime() - calendarStart.getTime()) / (1000 * 3600 * 24))
+                                            : 0;
+                                    const fromRow = depIdx;
+                                    const toCol = task.startDate
+                                        ? Math.floor((new Date(task.startDate).getTime() - calendarStart.getTime()) / (1000 * 3600 * 24))
+                                        : task.dueDate
+                                            ? Math.floor((new Date(task.dueDate).getTime() - calendarStart.getTime()) / (1000 * 3600 * 24))
+                                            : 0;
+                                    const toRow = idx;
+                                    // Calculate offset for multiple dependencies to avoid vertical overlap
+                                    let verticalOffset = 0;
+                                    let baseX1 = (fromCol + 1) * colWidth - 2;
+                                    let baseX2 = toCol * colWidth + 2;
+                                    // If there are multiple dependencies ending at the same x2, offset them
+                                    const key = `${toRow}-${baseX2}`;
+                                    if (!usedVerticals[key]) usedVerticals[key] = 0;
+                                    verticalOffset = usedVerticals[key] * 10;
+                                    usedVerticals[key]++;
+                                    baseX1 -= verticalOffset;
+                                    baseX2 -= verticalOffset;
+                                    // Arrow coordinates
+                                    const x1 = baseX1; // right edge of predecessor
+                                    const y1 = fromRow * (rowHeight + rowGap) + rowHeight / 2;
+                                    const x2 = baseX2; // left edge of dependent
+                                    const y2 = toRow * (rowHeight + rowGap) + rowHeight / 2;
+                                    // Routing logic
+                                    let points = '';
+                                    let dotX = x1, dotY = y1;
+                                    let startLine = '';
+                                    if (x2 >= x1) {
+                                        // Normal left-to-right: horizontal, then vertical
+                                        const midX = x1 + Math.max(16, (x2 - x1) / 2);
+                                        startLine = `${dotX},${dotY} ${dotX + 10},${dotY}`;
+                                        points = `${dotX + 10},${dotY} ${midX},${y1} ${midX},${y2} ${x2},${y2}`;
+                                    } else {
+                                        // Right-to-left: horizontal, down 10px, horizontal, up
+                                        const downY = y1 + 10;
+                                        startLine = `${dotX},${dotY} ${dotX + 10},${dotY}`;
+                                        points = `${dotX + 10},${dotY} ${dotX + 10},${downY} ${x2 - 10},${downY} ${x2 - 10},${y2} ${x2},${y2}`;
+                                    }
+                                    const arrowKey = depId + '-' + task.id;
+                                    return (
+                                        <g key={arrowKey}>
+                                            {/* Start dot */}
+                                            <circle cx={dotX} cy={dotY} r={5} fill="var(--primary)" stroke="#222" strokeWidth={1} />
+                                            {/* Short horizontal line from dot to start of arrow */}
+                                            <polyline
+                                                points={startLine}
+                                                fill="none"
+                                                stroke="var(--primary)"
+                                                strokeWidth={hoveredArrow === arrowKey ? 2 : 1}
+                                                opacity={0.85}
+                                            />
+                                            {/* Arrow polyline */}
+                                            <polyline
+                                                className="calendar-gantt-arrow"
+                                                points={points}
+                                                fill="none"
+                                                stroke="var(--primary)"
+                                                strokeWidth={hoveredArrow === arrowKey ? 2 : 1}
+                                                markerEnd="url(#arrowhead)"
+                                                opacity={0.85}
+                                                style={{ pointerEvents: 'stroke' }}
+                                                onMouseEnter={() => setHoveredArrow(arrowKey)}
+                                                onMouseLeave={() => setHoveredArrow(null)}
+                                            />
+                                        </g>
+                                    );
+                                });
+                            })}
+                            {/* Arrowhead marker definition */}
+                            <defs>
+                                <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                                    <polygon points="0 0, 8 3, 0 6" fill="var(--primary)" />
+                                </marker>
+                            </defs>
+                        </svg>
+                        <div
+                            ref={gridRef}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: `repeat(${days.length}, ${colWidth}px)`,
+                                gridTemplateRows: `repeat(${taskTitles.length}, ${rowHeight}px)`,
+                                rowGap: rowGap,
+                                minWidth: days.length * colWidth,
+                                width: days.length * colWidth,
+                                minHeight: taskTitles.length * (rowHeight + rowGap),
+                                borderLeft: 'none',
+                                borderTop: 'none',
+                                borderBottom: '1px solid #ccc',
+                                borderRight: '1px solid #ccc',
+                                position: 'relative',
+                            }}
+                        >
+                            {/* Render grid cells */}
+                            {taskTitles.map((_, rowIdx) =>
+                                days.map((_, colIdx) => (
                                     <div
-                                        key={task.id}
-                                        className="calendar-task-bar"
+                                        key={`cell-${rowIdx}-${colIdx}`}
+                                        className="calendar-grid-cell"
                                         style={{
-                                            gridRow: rowIdx + 1,
-                                            gridColumn: `${offset + 1} / span ${width}`,
-                                            background: task.color || (task.completed ? 'var(--green)' : 'var(--primary-100)'),
-                                            borderRadius: 4,
-                                            height: 10,
-                                            marginTop: 10,
-                                            marginBottom: 10,
-                                            zIndex: 2,
-                                            position: 'relative',
-                                            transition: 'border 0.2s',
-                                            border: hoveredTaskIdx === rowIdx ? '1px solid var(--primary)' : undefined,
+                                            borderRight: '1px solid #444',
+                                            minHeight: rowHeight,
+                                            maxHeight: rowHeight,
+                                            minWidth: colWidth,
+                                            maxWidth: colWidth,
+                                            boxSizing: 'border-box',
+                                            background: 'transparent',
                                         }}
-                                        onMouseEnter={e => {
-                                            setHoveredTaskIdx(rowIdx);
-                                            const rect = e.currentTarget.getBoundingClientRect();
-                                            setTooltip({ idx: rowIdx, x: rect.right + 8, y: rect.top });
-                                        }}
-                                        onMouseLeave={() => {
-                                            setHoveredTaskIdx(null);
-                                            setTooltip(null);
-                                        }}
-                                        onClick={() => onEditTask && tasks[rowIdx] && onEditTask(tasks[rowIdx])}
                                     />
-                                );
-                            }
-                            // Dot for tasks with only due date
-                            if (!task.startDate && task.dueDate) {
-                                const due = new Date(task.dueDate);
-                                const offset = Math.floor((due.getTime() - calendarStart.getTime()) / (1000 * 3600 * 24));
-                                return (
-                                    <div
-                                        key={task.id}
-                                        style={{
-                                            gridRow: rowIdx + 1,
-                                            gridColumn: offset + 1,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            height: rowHeight,
-                                            zIndex: 3,
-                                        }}
-                                        onMouseEnter={e => {
-                                            setHoveredTaskIdx(rowIdx);
-                                            const rect = e.currentTarget.getBoundingClientRect();
-                                            setTooltip({ idx: rowIdx, x: rect.right + 8, y: rect.top });
-                                        }}
-                                        onMouseLeave={() => {
-                                            setHoveredTaskIdx(null);
-                                            setTooltip(null);
-                                        }}
-                                    >
-                                        <span
-                                            className="calendar-task-dot"
+                                ))
+                            )}
+                            {/* Task bars as colored lines */}
+                            {tasks.map((task, rowIdx) => {
+                                // Bar for tasks with both start and due date
+                                if (task.startDate && task.dueDate) {
+                                    const taskStart = new Date(task.startDate);
+                                    const taskEnd = new Date(task.dueDate);
+                                    const offset = Math.floor((taskStart.getTime() - calendarStart.getTime()) / (1000 * 3600 * 24));
+                                    const width = Math.floor((taskEnd.getTime() - taskStart.getTime()) / (1000 * 3600 * 24)) + 1;
+                                    return (
+                                        <div
+                                            key={task.id}
+                                            className="calendar-task-bar"
                                             style={{
-                                                display: 'inline-block',
-                                                width: 14,
-                                                height: 14,
-                                                borderRadius: '50%',
-                                                background: task.color || 'var(--primary-100)',
+                                                gridRow: rowIdx + 1,
+                                                gridColumn: `${offset + 1} / span ${width}`,
+                                                background: task.color || (task.completed ? 'var(--green)' : 'var(--primary-100)'),
+                                                borderRadius: 4,
+                                                height: 10,
+                                                marginTop: 10,
+                                                marginBottom: 10,
+                                                zIndex: 2,
+                                                position: 'relative',
                                                 transition: 'border 0.2s',
-                                                border: hoveredTaskIdx === rowIdx ? '1px solid var(--primary)' : '',
+                                                border: hoveredTaskIdx === rowIdx ? '1px solid var(--primary)' : undefined,
+                                            }}
+                                            onMouseEnter={e => {
+                                                setHoveredTaskIdx(rowIdx);
+                                                const rect = e.currentTarget.getBoundingClientRect();
+                                                setTooltip({ idx: rowIdx, x: rect.right + 8, y: rect.top });
+                                            }}
+                                            onMouseLeave={() => {
+                                                setHoveredTaskIdx(null);
+                                                setTooltip(null);
                                             }}
                                             onClick={() => onEditTask && tasks[rowIdx] && onEditTask(tasks[rowIdx])}
-                                        />
-                                    </div>
-                                );
-                            }
-                            return null;
-                        })}
+                                        >
+                                            {/* Always show task title above bar, primary color, visible at all times */}
+                                            <span
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: '50%',
+                                                    top: '-15px', // 5px above the bar (bar is 10px tall, so -15px)
+                                                    transform: 'translateX(-50%)',
+                                                    color: 'var(--primary)',
+                                                    fontWeight: 600,
+                                                    fontSize: 13,
+                                                    pointerEvents: 'none',
+                                                    whiteSpace: 'nowrap',
+                                                    textShadow: '0 1px 4px #222',
+                                                    zIndex: 10,
+                                                }}
+                                            >{task.title}</span>
+                                        </div>
+                                    );
+                                }
+                                // Dot for tasks with only due date
+                                if (!task.startDate && task.dueDate) {
+                                    const due = new Date(task.dueDate);
+                                    const offset = Math.floor((due.getTime() - calendarStart.getTime()) / (1000 * 3600 * 24));
+                                    return (
+                                        <div
+                                            key={task.id}
+                                            style={{
+                                                gridRow: rowIdx + 1,
+                                                gridColumn: offset + 1,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                height: rowHeight,
+                                                zIndex: 3,
+                                                position: 'relative',
+                                            }}
+                                            onMouseEnter={e => {
+                                                setHoveredTaskIdx(rowIdx);
+                                                const rect = e.currentTarget.getBoundingClientRect();
+                                                setTooltip({ idx: rowIdx, x: rect.right + 8, y: rect.top });
+                                            }}
+                                            onMouseLeave={() => {
+                                                setHoveredTaskIdx(null);
+                                                setTooltip(null);
+                                            }}
+                                        >
+                                            {/* Always show task title above dot, primary color, visible at all times */}
+                                            <span
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: '50%',
+                                                    top: '-15px', // 5px above the dot
+                                                    transform: 'translateX(-50%)',
+                                                    color: 'var(--primary)',
+                                                    fontWeight: 600,
+                                                    fontSize: 13,
+                                                    pointerEvents: 'none',
+                                                    whiteSpace: 'nowrap',
+                                                    textShadow: '0 1px 4px #222',
+                                                    zIndex: 10,
+                                                }}
+                                            >{task.title}</span>
+                                            <span
+                                                className="calendar-task-dot"
+                                                style={{
+                                                    display: 'inline-block',
+                                                    width: 14,
+                                                    height: 14,
+                                                    borderRadius: '50%',
+                                                    background: task.color || 'var(--primary-100)',
+                                                    transition: 'border 0.2s',
+                                                    border: hoveredTaskIdx === rowIdx ? '1px solid var(--primary)' : '',
+                                                }}
+                                                onClick={() => onEditTask && tasks[rowIdx] && onEditTask(tasks[rowIdx])}
+                                            />
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>
