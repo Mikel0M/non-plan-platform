@@ -101,13 +101,7 @@ React.useEffect(() => {
 
     // Handle new to-do form changes
     const handleNewToDoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      const { name, value } = e.target;
-      // Special handling for dependencies (should always be string[])
-      if (name === 'dependencies') {
-        // Not used for checkboxes, handled inline below
-        return;
-      }
-      setNewToDo({ ...newToDo, [name]: value });
+      setNewToDo({ ...newToDo, [e.target.name]: e.target.value });
     };
 
     // Refs
@@ -135,8 +129,7 @@ React.useEffect(() => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         completion_date: '',
-        // dependencies is always a string[] now
-        dependencies: newToDo.dependencies,
+        dependencies: Array.isArray(newToDo.dependencies) ? newToDo.dependencies : (typeof newToDo.dependencies === 'string' && (newToDo.dependencies as string) ? (newToDo.dependencies as string).split(',').map(s => s.trim()) : []),
         progress_percentage: '25%' as const,
         comments: [],
       };
@@ -153,7 +146,7 @@ React.useEffect(() => {
         start_date: '',
         estimated_hours: '',
         actual_hours: '',
-        dependencies: [],
+        dependencies: [] as unknown as string[],
         comments: ''
       });
       closeModal('newToDoModal');
@@ -174,7 +167,6 @@ const [editToDoFields, setEditToDoFields] = React.useState({
   estimated_hours: '',
   actual_hours: '',
   updated_at: '',
-  // Always set dependencies as string[]
   dependencies: [] as unknown as string[],
   comments: '',
 });
@@ -195,12 +187,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
         estimated_hours: todo.estimated_hours?.toString() || '',
         actual_hours: todo.actual_hours?.toString() || '',
         updated_at: todo.updated_at || '',
-        // Always set dependencies as string[]
-        dependencies: Array.isArray(todo.dependencies)
-          ? todo.dependencies
-          : (typeof todo.dependencies === 'string' && todo.dependencies
-            ? todo.dependencies.split(',').map((s: string) => s.trim()).filter(Boolean)
-            : []),
+        dependencies: Array.isArray(todo.dependencies) ? todo.dependencies.join(', ') : (todo.dependencies || ''),
         comments: Array.isArray(todo.comments) ? todo.comments.join('\n') : (todo.comments || ''),
       });
       setTimeout(() => {
@@ -211,12 +198,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
 
     // --- HANDLE EDIT MODAL FIELD CHANGES ---
     const handleEditToDoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      const { name, value, type } = e.target;
-      // Special handling for dependencies (should always be string[])
-      if (name === 'dependencies') {
-        // Not used for checkboxes, handled inline below
-        return;
-      }
+      const { name, value } = e.target;
       setEditToDoFields(prev => ({ ...prev, [name]: value }));
     };
 
@@ -231,8 +213,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
             ...editToDoFields,
             estimated_hours: parseFloat(editToDoFields.estimated_hours) || 0,
             actual_hours: parseFloat(editToDoFields.actual_hours) || 0,
-            // dependencies is always a string[] now
-            dependencies: editToDoFields.dependencies,
+            dependencies: Array.isArray(editToDoFields.dependencies) ? editToDoFields.dependencies : (typeof editToDoFields.dependencies === 'string' && (editToDoFields.dependencies as string) ? (editToDoFields.dependencies as string).split(',').map(s => s.trim()) : []),
             comments: editToDoFields.comments ? editToDoFields.comments.split('\n') : [],
           };
         }
