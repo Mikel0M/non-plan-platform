@@ -536,7 +536,9 @@ if (toDoForm && toDoForm instanceof HTMLFormElement) {
         e.preventDefault();
 
         const formData = new FormData(toDoForm);
-        const dependencies = formData.get("toDoDependencies") as string;
+        // Get dependencies as a comma-separated string, then split and trim
+        const dependenciesStr = formData.get("toDoDependencies") as string;
+        const dependencies = dependenciesStr ? dependenciesStr.split(",").map(s => s.trim()).filter(Boolean) : [];
         if (projectsManager?.currentProject?.id != null) {
         const toDoData: ItoDo = {
             title: formData.get("toDoTitle") as string,
@@ -553,8 +555,8 @@ if (toDoForm && toDoForm instanceof HTMLFormElement) {
             completion_date: formData.get("toDoCompletionDate") as string,
             estimated_hours: formData.get("toDoEstimatedHours") ? Number(formData.get("toDoEstimatedHours")) : 0,
             actual_hours: formData.get("toDoActualHours") ? Number(formData.get("toDoActualHours")) : 0,
-            dependencies: dependencies ? dependencies.split(',') : [],
-            progress_percentage: formData.get("toDoProgress") as toDoPercentage,
+            dependencies: dependencies,
+            progress_percentage: formData.get("toDoProgress") as toDoPercentage || '0%',
             comments: formData.get("toDoComments") ? (formData.get("toDoComments") as string).split(',') : []
         };
 
@@ -576,7 +578,9 @@ if (editToDoForm && editToDoForm instanceof HTMLFormElement) {
         e.preventDefault();
 
         const formData = new FormData(editToDoForm);
-        const dependencies = formData.get("toDoDependencies") as string;
+        // Get dependencies as a comma-separated string, then split and trim
+        const dependenciesStr = formData.get("toDoDependencies") as string;
+        const dependencies = dependenciesStr ? dependenciesStr.split(",").map(s => s.trim()).filter(Boolean) : [];
         const toDoData: ItoDo = {
             title: formData.get("toDoTitle") as string,
             description: formData.get("toDoDescription") as string,
@@ -592,8 +596,8 @@ if (editToDoForm && editToDoForm instanceof HTMLFormElement) {
             completion_date: formData.get("toDoCompletionDate") as string,
             estimated_hours: formData.get("toDoEstimatedHours") ? Number(formData.get("toDoEstimatedHours")) : 0,
             actual_hours: formData.get("toDoActualHours") ? Number(formData.get("toDoActualHours")) : 0,
-            dependencies: dependencies ? dependencies.split(',') : [],
-            progress_percentage: formData.get("toDoProgress") as toDoPercentage,
+            dependencies: dependencies,
+            progress_percentage: formData.get("toDoProgress") as toDoPercentage || '0%',
             comments: formData.get("toDoComments") ? (formData.get("toDoComments") as string).split(',') : []
         };
         console.log("testing editToDoForm")
@@ -610,10 +614,38 @@ if (editToDoForm && editToDoForm instanceof HTMLFormElement) {
     console.warn("The edit to-do form was not found. Check the ID!");
 }
 
-// Function to open the edit modal and populate it with existing data
-function openEditToDoModal(toDoData: ItoDo) {
-    const editToDoModal = document.getElementById("editToDoModal") as HTMLDialogElement;
-    if (editToDoModal) {
+// Helper: Populate dependencies select with all tasks for the current project
+function populateDependenciesSelect(currentTaskId = null) {
+    const depSelects = [
+        document.getElementById("toDoDependencies"),
+        document.getElementById("editToDoDependencies")
+    ];
+    depSelects.forEach(depElem => {
+        if (depElem && depElem instanceof HTMLSelectElement) {
+            depElem.innerHTML = '';
+            // Get all tasks for the current project
+            const projectId = projectsManager.currentProject?.id;
+            if (!projectId) return;
+            // Fallback: filter all to-dos by project_id
+            const allTasks = (toDoManagerInstance.getToDos()).filter(task => task.project_id === projectId);
+            allTasks.forEach(task => {
+                if (!currentTaskId || task.id !== currentTaskId) {
+                    const opt = document.createElement('option');
+                    opt.value = task.id;
+                    opt.textContent = task.title;
+                    depElem.appendChild(opt);
+                }
+            });
+        }
+    });
+}
+
+// Call this when opening the new/edit modal
+function openEditToDoModal(toDoData) {
+    const editToDoModal = document.getElementById("editToDoModal");
+    if (editToDoModal && editToDoModal instanceof HTMLDialogElement) {
+        // Populate dependencies select
+        populateDependenciesSelect(toDoData.id);
         // Populate the form with existing data
         (document.getElementById("editToDoTitle") as HTMLInputElement).value = toDoData.title;
         (document.getElementById("editToDoDescription") as HTMLTextAreaElement).value = toDoData.description;
@@ -626,9 +658,14 @@ function openEditToDoModal(toDoData: ItoDo) {
         (document.getElementById("editToDoEstimatedHours") as HTMLInputElement).value = toDoData.estimated_hours.toString();
         (document.getElementById("editToDoActualHours") as HTMLInputElement).value = toDoData.actual_hours.toString();
         (document.getElementById("editToDoDueDate") as HTMLInputElement).value = toDoData.due_date;
-        (document.getElementById("editToDoDependencies") as HTMLSelectElement).value = toDoData.dependencies.join(", ");
-        (document.getElementById("editToDoComments") as HTMLTextAreaElement).value = toDoData.comments.join(", ");
-
+        // Set dependencies as selected options
+        const depElem = document.getElementById("editToDoDependencies") as HTMLSelectElement;
+        if (depElem && depElem.multiple) {
+            Array.from(depElem.options).forEach(option => {
+                option.selected = Array.isArray(toDoData.dependencies) && toDoData.dependencies.includes(option.value);
+            });
+        }
+        (document.getElementById("editToDoComments") as HTMLTextAreaElement).value = Array.isArray(toDoData.comments) ? toDoData.comments.join(", ") : '';
         // Open the modal
         editToDoModal.showModal();
     } else {
@@ -636,147 +673,94 @@ function openEditToDoModal(toDoData: ItoDo) {
     }
 }
 
-
-document.addEventListener('DOMContentLoaded', () => {
-    const showMoreButton = document.getElementById('showMoreButton');
-    const showLessButton = document.getElementById('showLessButton');
-    const hiddenItems = document.querySelectorAll('.grid-item.hidden');
-
-    // Show More: Display hidden items and toggle buttons
-    showMoreButton?.addEventListener('click', () => {
-        hiddenItems.forEach(item => item.classList.remove('hidden'));
-
-        if (showMoreButton) showMoreButton.style.display = 'none';
-        if (showLessButton) showLessButton.style.display = 'inline-block';
+// Populate dependencies select on new to-do modal open
+const newToDoBtn = document.getElementById("newToDoBtn");
+if (newToDoBtn) {
+    newToDoBtn.addEventListener("click", () => {
+        populateDependenciesSelect();
     });
-
-    // Show Less: Hide extra items and toggle buttons
-    showLessButton?.addEventListener('click', () => {
-        hiddenItems.forEach(item => item.classList.add('hidden'));
-
-        if (showLessButton) showLessButton.style.display = 'none';
-        if (showMoreButton) showMoreButton.style.display = 'inline-block';
-    });});
-
-
-// Function to format the date as dd.mm.yy
-function formatDate(date: Date): string {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = String(date.getFullYear()).slice(-2);
-    return `${day}.${month}.${year}`;
 }
 
-// Get today's date
-const today = new Date();
+// Update form submit logic for dependencies
+if (toDoForm && toDoForm instanceof HTMLFormElement) {
+    toDoForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(toDoForm);
+        // Get dependencies as array from multi-select
+        const dependencies = formData.getAll("toDoDependencies").filter((v): v is string => typeof v === 'string');
+        const projectId = projectsManager.currentProject?.id || '';
+        if (projectId) {
+        const toDoData: ItoDo = {
+            title: formData.get("toDoTitle") as string,
+            description: formData.get("toDoDescription") as string,
+            status: formData.get("toDoStatus") as toDoStatus,
+            priority: formData.get("toDoPriority") as toDoPriority,
+            project_id: projectId,
+            dependencies: dependencies,
+            progress_percentage: formData.get("toDoProgress") as toDoPercentage || '0%',
+            created_by: formData.get("toDoCreatedBy") as string,
+            assigned_to: formData.get("toDoAssignedTo") as string,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            due_date: formData.get("toDoDueDate") as string,
+            start_date: formData.get("toDoStartDate") as string,
+            completion_date: '',
+            estimated_hours: parseFloat((document.getElementById('toDoEstimatedHours') as HTMLInputElement).value),
+            actual_hours: parseFloat((document.getElementById('toDoActualHours') as HTMLInputElement).value),
+            comments: []
+        };
+        try {
+            toDoManagerInstance.newToDo(toDoData, projectId);
+            toDoForm.reset();
+            closeModal("newToDoModal");
+        } catch (error) {
+            alert(error);
+        }
+    }});
+} else {
+    console.warn("The to-do form was not found. Check the ID!");
+}
+if (editToDoForm && editToDoForm instanceof HTMLFormElement) {
+    editToDoForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(editToDoForm);
+        // Get dependencies as array from multi-select
+        const dependencies = formData.getAll("toDoDependencies").filter((v): v is string => typeof v === 'string');
+        const toDoData: ItoDo = {
+            title: formData.get("toDoTitle") as string,
+            description: formData.get("toDoDescription") as string,
+            status: formData.get("toDoStatus") as toDoStatus,
+            priority: formData.get("toDoPriority") as toDoPriority,
+            project_id: formData.get("toDoProject") as string,
+            assigned_to: formData.get("toDoAssignedTo") as string,
+            created_by: formData.get("toDoCreatedBy") as string,
+            created_at: formData.get("toDoCreatedAt") as string,
+            updated_at: formData.get("toDoUpdatedAt") as string,
+            due_date: formData.get("toDoDueDate") as string,
+            start_date: formData.get("toDoStartDate") as string,
+            completion_date: formData.get("toDoCompletionDate") as string,
+            estimated_hours: formData.get("toDoEstimatedHours") ? Number(formData.get("toDoEstimatedHours")) : 0,
+            actual_hours: formData.get("toDoActualHours") ? Number(formData.get("toDoActualHours")) : 0,
+            dependencies: dependencies,
+            progress_percentage: formData.get("toDoProgress") as toDoPercentage || '0%',
+            comments: formData.get("toDoComments") ? (formData.get("toDoComments") as string).split(',') : []
+        };
+        try {
+            const toDo = toDoManagerInstance.updateToDo(toDoData);
+            editToDoForm.reset();
+            closeModal("editToDoModal");
+        } catch (error) {
+            //alert(error);
+        }
+    });
+} else {
+    console.warn("The edit to-do form was not found. Check the ID!");
+}
 
-// Format the date and display it in the span elements
-document.addEventListener('DOMContentLoaded', () => {
-    const currentDateElement = document.getElementById('currentDate');
-    const updateDateElement = document.getElementById('updateDate');
-    if (currentDateElement) {
-        currentDateElement.textContent = formatDate(today);
-    }
-    if (updateDateElement) {
-        updateDateElement.textContent = formatDate(today);
-    }
-});
-
-// Update the update date when the form is submitted
-document.getElementById('newToDoForm')?.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const updateDateElement = document.getElementById('updateDate');
-    if (updateDateElement) {
-        updateDateElement.textContent = formatDate(new Date());
-    }
-    // Add your form submission logic here
-});
-
-document.getElementById("editToDoForm")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    // Extract data from form fields
-    const toDoId = (document.getElementById("editToDoId") as HTMLInputElement).value ?? '';
-    const title = (document.getElementById("editToDoTitle") as HTMLInputElement).value ?? '';
-    const description = (document.getElementById("editToDoDescription") as HTMLTextAreaElement).value ?? '';
-    const status = (document.getElementById("editToDoStatus") as HTMLSelectElement).value as toDoStatus ?? 'Pending';
-    const priority = (document.getElementById("editToDoPriority") as HTMLSelectElement).value as toDoPriority ?? 'Low';
-    const assigned_to = (document.getElementById("editToDoAssignedTo") as HTMLSelectElement).value ?? '';
-    const created_by = (document.getElementById("editToDoCreatedBy") as HTMLSelectElement).value ?? '';
-    const start_date = (document.getElementById("editToDoStartDate") as HTMLInputElement).value ?? '';
-    const updated_at = (document.getElementById("editToDoUpdatedAt") as HTMLInputElement).value ?? '';
-    const estimated_hours = parseFloat((document.getElementById("editToDoEstimatedHours") as HTMLInputElement).value ?? '0');
-    const actual_hours = parseFloat((document.getElementById("editToDoActualHours") as HTMLInputElement).value ?? '0');
-    const due_date = (document.getElementById("editToDoDueDate") as HTMLInputElement).value ?? '';
-    const dependencies = (document.getElementById("editToDoDependencies") as HTMLInputElement).value?.split(", ") ?? [];
-    const comments = (document.getElementById("editToDoComments") as HTMLTextAreaElement).value?.split(", ") ?? [];
-
-    // Find the corresponding toDo instance
-    const toDoInstance = toDoManagerInstance.findToDoById(toDoId);
-    if (!toDoInstance) {
-        alert("Error: To-Do item not found");
-        return;
-    }
-
-    // Update the toDo instance
-    toDoInstance.title = title;
-    toDoInstance.description = description;
-    toDoInstance.status = status;
-    toDoInstance.priority = priority;
-    toDoInstance.assigned_to = assigned_to;
-    toDoInstance.created_by = created_by;
-    toDoInstance.start_date = start_date;
-    toDoInstance.updated_at = updated_at;
-    toDoInstance.estimated_hours = estimated_hours;
-    toDoInstance.actual_hours = actual_hours;
-    toDoInstance.due_date = due_date;
-    toDoInstance.dependencies = dependencies;
-    toDoInstance.comments = comments;
-
-    // Update the UI
-    toDoInstance.updateUI();
-
-    // Close the modal
-    closeModal("editToDoModal");
-});
-
-document.getElementById('newToDoForm')!.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    if (!projectsManager.currentProject?.id) {
-        console.error("currentProjectId is null");
-        return;
-    }
-
-    console.log("this is the id in index",projectsManager.currentProject?.id)
-    console.log("this is the list of toDos",toDosManager.getToDoListUI)
-
-    const newToDoData: ItoDo = {
-        title: (document.getElementById('toDoTitle') as HTMLInputElement).value,
-        description: (document.getElementById('toDoDescription') as HTMLTextAreaElement).value,
-        status: (document.getElementById('toDoStatus') as HTMLSelectElement).value as toDoStatus,
-        priority: (document.getElementById('toDoPriority') as HTMLSelectElement).value as toDoPriority,
-        project_id: projectsManager.currentProject?.id,
-        assigned_to: (document.getElementById('toDoAssignedTo') as HTMLSelectElement).value,
-        created_by: (document.getElementById('toDoCreatedBy') as HTMLSelectElement).value,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        due_date: (document.getElementById('toDoDueDate') as HTMLInputElement).value,
-        start_date: (document.getElementById('toDoStartDate') as HTMLInputElement).value,
-        completion_date: '',
-        estimated_hours: parseFloat((document.getElementById('toDoEstimatedHours') as HTMLInputElement).value),
-        actual_hours: parseFloat((document.getElementById('toDoActualHours') as HTMLInputElement).value),
-        dependencies: [],
-        progress_percentage: '0%' as toDoPercentage,
-        comments: []
-    };
-
-    toDoManagerInstance.newToDo(newToDoData, projectsManager.currentProject?.id);
-
-    closeModal('newToDoModal');
-});
-
-// Export all to-dos and users
+/**
+ * Export all to-dos and users
+ * @returns An object containing exported to-dos, users, and companies
+ */
 function exportData() {
     const toDos = toDoManagerInstance.exportToDos();
     const users = projectsManager.exportUsers();
