@@ -78,14 +78,6 @@ export function ToDoPage(props: Props) {
       comments: '', // string for textarea
     });
 
-    // --- Dependencies select helpers for modals ---
-    // For ToDoPage and ProjectDetailsPage
-    // Usage: getOtherTasks(project, excludeId) returns all tasks except the one being edited (if any)
-    function getOtherTasks(project, excludeId: string | null = null) {
-      if (!project || !project.toDos) return [];
-      return project.toDos.filter(td => excludeId ? td.id !== excludeId : true);
-    }
-
     // Handle new to-do form changes
     const handleNewToDoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       const { name, value } = e.target;
@@ -151,10 +143,6 @@ export function ToDoPage(props: Props) {
     });
     const [editToDoProject, setEditToDoProject] = React.useState<any | null>(null);
 
-    // --- ToDoPage: Controlled state for dependencies ---
-    const [newToDoDependencies, setNewToDoDependencies] = React.useState<string[]>([]);
-    const [editToDoDependencies, setEditToDoDependencies] = React.useState<string[]>([]);
-
     // Function to open the edit modal for a to-do
     const openEditToDoModal = (todo: any) => {
       setEditToDo(todo);
@@ -177,7 +165,6 @@ export function ToDoPage(props: Props) {
         dependencies: (todo.dependencies || []).join(', '),
         comments: (todo.comments || []).join('\n'),
       });
-      setEditToDoDependencies(Array.isArray(todo.dependencies) ? todo.dependencies : (typeof todo.dependencies === 'string' && todo.dependencies ? todo.dependencies.split(',').map((s: string) => s.trim()).filter(Boolean) : []));
       setTimeout(() => {
         const modal = document.getElementById('editToDoModal') as HTMLDialogElement | null;
         if (modal) modal.showModal();
@@ -210,7 +197,7 @@ export function ToDoPage(props: Props) {
               td.estimated_hours = parseFloat(editToDoFields.estimated_hours) || 0;
               td.actual_hours = parseFloat(editToDoFields.actual_hours) || 0;
               td.due_date = editToDoFields.due_date;
-              td.dependencies = editToDoDependencies;
+              td.dependencies = editToDoFields.dependencies || [];
               td.comments = editToDoFields.comments ? [editToDoFields.comments] : [];
             }
           });
@@ -278,6 +265,12 @@ export function ToDoPage(props: Props) {
 
     // Add state for view mode (list or calendar)
     const [viewMode, setViewMode] = React.useState<'list' | 'calendar'>('list');
+
+    // --- Helper to get all other tasks in the same project (for new/edit modals) ---
+    function getOtherTasks(project, excludeId: string | null = null) {
+      if (!project || !project.toDos) return [];
+      return project.toDos.filter(td => excludeId ? td.id !== excludeId : true);
+    }
 
     return (
       <div className="page page-column" id="toDoPage">
@@ -549,26 +542,25 @@ export function ToDoPage(props: Props) {
                 <label><span className="material-icons-round">calendar_month</span>{t("projects_due_date") || "Due Date"}</label>
                 <input name="due_date" type="date" id="editToDoDueDate" value={editToDoFields.due_date} onChange={handleEditToDoChange} />
               </div>
-              {/* --- Dependencies as checkbox list in edit to-do modal --- */}
               <div className="formFieldContainer">
                 <label><span className="material-icons-round">link</span>{t("projects_dependencies") || "Dependencies"}</label>
                 <div style={{ maxHeight: 120, overflowY: 'auto', border: '1px solid #ccc', borderRadius: 4, padding: 8 }}>
-                  {getOtherTasks(editToDoProject, editToDoFields.id).map(td => (
+                  {getOtherTasks(editToDoProject || projectState, editToDoFields.id || null).map(td => (
                     <label key={td.id} style={{ display: 'block', marginBottom: 4 }}>
                       <input
                         type="checkbox"
                         value={td.id}
-                        checked={Array.isArray(editToDoDependencies) ? editToDoDependencies.includes(td.id) : false}
+                        checked={Array.isArray(editToDoFields.dependencies) ? editToDoFields.dependencies.includes(td.id) : false}
                         onChange={e => {
                           const checked = e.target.checked;
-                          setEditToDoDependencies(prev => {
-                            let deps = Array.isArray(prev) ? [...prev] : [];
+                          setEditToDoFields(prev => {
+                            let deps = Array.isArray(prev.dependencies) ? [...prev.dependencies] : [];
                             if (checked) {
                               if (!deps.includes(td.id)) deps.push(td.id);
                             } else {
                               deps = deps.filter(id => id !== td.id);
                             }
-                            return deps;
+                            return { ...prev, dependencies: deps };
                           });
                         }}
                       />
@@ -673,7 +665,7 @@ export function ToDoPage(props: Props) {
                 <label><span className="material-icons-round">calendar_month</span>{t("projects_due_date") || "Due Date"}</label>
                 <input name="due_date" type="date" id="newToDoDueDate" value={newToDo.due_date} onChange={handleNewToDoChange} />
               </div>
-              {/* --- Dependencies as checkbox list in new to-do modal --- */}
+              {/* Dependencies as checkbox list in new to-do modal */}
               <div className="formFieldContainer">
                 <label><span className="material-icons-round">link</span>{t("projects_dependencies") || "Dependencies"}</label>
                 <div style={{ maxHeight: 120, overflowY: 'auto', border: '1px solid #ccc', borderRadius: 4, padding: 8 }}>
@@ -682,17 +674,17 @@ export function ToDoPage(props: Props) {
                       <input
                         type="checkbox"
                         value={td.id}
-                        checked={Array.isArray(newToDoDependencies) ? newToDoDependencies.includes(td.id) : false}
+                        checked={Array.isArray(newToDo.dependencies) ? newToDo.dependencies.includes(td.id) : false}
                         onChange={e => {
                           const checked = e.target.checked;
-                          setNewToDoDependencies(prev => {
-                            let deps = Array.isArray(prev) ? [...prev] : [];
+                          setNewToDo(prev => {
+                            let deps = Array.isArray(prev.dependencies) ? [...prev.dependencies] : [];
                             if (checked) {
                               if (!deps.includes(td.id)) deps.push(td.id);
                             } else {
                               deps = deps.filter(id => id !== td.id);
                             }
-                            return deps;
+                            return { ...prev, dependencies: deps };
                           });
                         }}
                       />

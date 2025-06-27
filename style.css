@@ -1403,3 +1403,11 @@ input:focus, textarea:focus, select:focus {
 .calendar-grid, .calendar-grid-header {
   border-left: none !important;
 }
+
+/* Dependency arrow hover effect for Gantt calendar */
+.calendar-gantt-arrow:hover,
+.calendar-gantt-arrow.active {
+  stroke-width: 2 !important;
+  stroke: var(--primary) !important;
+  opacity: 1 !important;
+}

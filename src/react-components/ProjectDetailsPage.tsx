@@ -2,12 +2,12 @@ import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import * as Router from 'react-router-dom';
-import { toDoManager } from '../classes/toDoManager';
 import { usersManagerInstance } from '../classes/UsersManager';
 import { User } from '../classes/User';
 import { useTranslation } from "./LanguageContext";
 import UserCard from "./UserCard";
 import { SearchBox } from './SearchBox';
+import { ThreeViewer } from './ThreeViewer';
 
 interface Props {
     projectsManager: ProjectsManager
@@ -557,7 +557,7 @@ function getOtherTasks(project, excludeId: string | null = null) {
             )}
           </div>
           <div className="project-details-right-col">
-            <div id="viewerContainer" className="dashboardCard" />
+          <ThreeViewer/>
           </div>
         </div>
         {/* All dialogs and modals remain here, outside the grid */}
