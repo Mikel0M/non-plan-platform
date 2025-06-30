@@ -1,19 +1,30 @@
 {
   "name": "non-plan-web",
   "version": "1.0.0",
+  "description": "A modern, feature-rich project management platform built with React, TypeScript, and Three.js",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "start": "NODE_OPTIONS=--max-old-space-size=4096 node your-script.js"
+    "preview": "vite preview",
+    "start": "npm run dev"
   },
-  "keywords": [],
+  "keywords": [
+    "project-management",
+    "react",
+    "typescript",
+    "threejs",
+    "gantt",
+    "3d-visualization"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
+  "private": true,
   "devDependencies": {
     "@types/react": "18.2.31",
     "@types/react-dom": "18.2.14",
     "@types/three": "0.156.0",
+    "@types/uuid": "^9.0.8",
     "@vitejs/plugin-react": "4.0.3",
     "typescript": "^5.7.2",
     "vite": "^4.2.1"
@@ -30,6 +41,5 @@
       "dom",
       "esnext"
     ]
-  },
-  "description": ""
+  }
 }
