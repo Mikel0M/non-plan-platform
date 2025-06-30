@@ -33,7 +33,7 @@ appRoot.render(
                 <Router.Routes>
                     <Router.Route path="/" element={<ProjectsPage projectManager={projectsManager} />} />
                     <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} />} />
-                    <Router.Route path="/toDo" element={<ToDoPage toDoManager={toDoManagerInstance} projectsManager={projectsManager} />} />
+                    <Router.Route path="/toDo" element={<ToDoPage projectsManager={projectsManager} />} />
                     <Router.Route path="/users" element={<UsersPage usersManager={usersManagerInstance} projectsManager={projectsManager} />} />
                 </Router.Routes>
             </div>

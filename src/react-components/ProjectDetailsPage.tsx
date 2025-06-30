@@ -88,7 +88,7 @@ React.useEffect(() => {
       title: '',
       description: '',
       status: 'Pending',
-      priority: 'Standard',
+      priority: 'Medium',
       assigned_to: '',
       created_by: '',
       due_date: '',
@@ -131,7 +131,7 @@ React.useEffect(() => {
         completion_date: '',
         dependencies: Array.isArray(newToDo.dependencies) ? newToDo.dependencies : (typeof newToDo.dependencies === 'string' && (newToDo.dependencies as string) ? (newToDo.dependencies as string).split(',').map(s => s.trim()) : []),
         progress_percentage: '25%' as const,
-        comments: [],
+        comments: newToDo.comments ? newToDo.comments.split('\n').filter(c => c.trim()) : [],
       };
       projectState.addToDo(toDoObj);
       setToDos([...projectState.toDos]);
@@ -139,7 +139,7 @@ React.useEffect(() => {
         title: '',
         description: '',
         status: 'Pending',
-        priority: 'Standard',
+        priority: 'Medium',
         assigned_to: '',
         created_by: '',
         due_date: '',
@@ -159,7 +159,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
   title: '',
   description: '',
   status: 'Pending',
-  priority: 'Standard',
+  priority: 'Medium',
   assigned_to: '',
   created_by: '',
   due_date: '',
@@ -167,7 +167,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
   estimated_hours: '',
   actual_hours: '',
   updated_at: '',
-  dependencies: [] as unknown as string[],
+  dependencies: [] as string[],
   comments: '',
 });
 
@@ -179,7 +179,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
         title: todo.title || '',
         description: todo.description || '',
         status: todo.status || 'Pending',
-        priority: todo.priority || 'Standard',
+        priority: todo.priority || 'Medium',
         assigned_to: todo.assigned_to || '',
         created_by: todo.created_by || '',
         due_date: todo.due_date || '',
@@ -187,7 +187,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
         estimated_hours: todo.estimated_hours?.toString() || '',
         actual_hours: todo.actual_hours?.toString() || '',
         updated_at: todo.updated_at || '',
-        dependencies: Array.isArray(todo.dependencies) ? todo.dependencies.join(', ') : (todo.dependencies || ''),
+        dependencies: Array.isArray(todo.dependencies) ? todo.dependencies : [],
         comments: Array.isArray(todo.comments) ? todo.comments.join('\n') : (todo.comments || ''),
       });
       setTimeout(() => {
@@ -205,27 +205,45 @@ const [editToDoFields, setEditToDoFields] = React.useState({
     // --- HANDLE EDIT SUBMIT ---
     const handleEditToDoSubmit = (e: React.FormEvent) => {
       e.preventDefault();
+      if (!projectState) return;
+      
       const id = editToDoFields.id;
-      const updatedToDos = toDos.map(td => {
-        if (td.id === id) {
-          return {
-            ...td,
-            ...editToDoFields,
-            estimated_hours: parseFloat(editToDoFields.estimated_hours) || 0,
-            actual_hours: parseFloat(editToDoFields.actual_hours) || 0,
-            dependencies: Array.isArray(editToDoFields.dependencies) ? editToDoFields.dependencies : (typeof editToDoFields.dependencies === 'string' && (editToDoFields.dependencies as string) ? (editToDoFields.dependencies as string).split(',').map(s => s.trim()) : []),
-            comments: editToDoFields.comments ? editToDoFields.comments.split('\n') : [],
-          };
-        }
-        return td;
-      });
-      setToDos(updatedToDos);
-      // Update the to-do in the projectState's toDos array
-      if (projectState && projectState.toDos) {
-        projectState.toDos = updatedToDos;
+      
+      // Build the updated todo object with proper type conversions
+      const updatedToDoData = {
+        id: id,
+        title: editToDoFields.title,
+        description: editToDoFields.description,
+        status: editToDoFields.status as any, // toDoStatus
+        priority: editToDoFields.priority as any, // toDoPriority
+        assigned_to: editToDoFields.assigned_to,
+        created_by: editToDoFields.created_by,
+        due_date: editToDoFields.due_date,
+        start_date: editToDoFields.start_date,
+        estimated_hours: parseFloat(editToDoFields.estimated_hours) || 0,
+        actual_hours: parseFloat(editToDoFields.actual_hours) || 0,
+        updated_at: new Date().toISOString(),
+        project_id: projectState.id,
+        created_at: editToDo.created_at || new Date().toISOString(),
+        completion_date: editToDo.completion_date || '',
+        progress_percentage: editToDo.progress_percentage || '25%',
+        dependencies: editToDoFields.dependencies,
+        comments: editToDoFields.comments ? editToDoFields.comments.split('\n').filter(c => c.trim()) : [],
+      };
+
+      try {
+        // Use the project's updateToDo method to properly persist changes
+        projectState.updateToDo(updatedToDoData);
+        
+        // Update local state to reflect changes in UI
+        setToDos([...projectState.toDos]);
+        
+        setEditToDo(null);
+        closeModal('editToDoModal');
+      } catch (error) {
+        console.error('Failed to update todo:', error);
+        // You could add user feedback here
       }
-      setEditToDo(null);
-      closeModal('editToDoModal');
     };
 
     // Add state for deleting a to-do
@@ -768,8 +786,9 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
           <label><span className="material-icons-round">not_listed_location</span>{t("projects_priority") || "Priority"}</label>
           <select name="priority" id="toDoPriority" value={newToDo.priority} onChange={handleNewToDoChange}>
             <option>High</option>
-            <option>Standard</option>
+            <option>Medium</option>
             <option>Low</option>
+            <option>Critical</option>
           </select>
         </div>
         <div className="formFieldContainer">
@@ -874,8 +893,9 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
           <label><span className="material-icons-round">not_listed_location</span>{t("projects_priority") || "Priority"}</label>
           <select name="priority" id="editToDoPriority" value={editToDoFields.priority} onChange={handleEditToDoChange}>
             <option>High</option>
-            <option>Standard</option>
+            <option>Medium</option>
             <option>Low</option>
+            <option>Critical</option>
           </select>
         </div>
         <div className="formFieldContainer">

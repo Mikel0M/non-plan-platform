@@ -601,8 +601,9 @@ form h2 {
 .userForm .userCard {
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 0; /* Remove padding to eliminate inner border effect */
     row-gap: 25px;
+    background: transparent; /* Ensure no background creates visual separation */
 }
 
 /* Styles for toDoForm */
@@ -634,7 +635,7 @@ form h2 {
     border-radius: 10px; /* Optional: Add rounded corners */
     padding: 20px; /* Optional: Add padding inside the form */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
-    background-color: var()var(--background-200); /* Optional: Add a background color */
+    background-color: var(--background-100);
 }
 
 .toDoForm {
@@ -643,7 +644,7 @@ form h2 {
     border-radius: 10px; /* Optional: Add rounded corners */
     padding: 20px; /* Optional: Add padding inside the form */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
-    background-color: var()var(--background-200); /* Optional: Add a background color */
+    background-color: var(--background-100);
 }
 
 /* Styles for infoForm */
@@ -893,6 +894,7 @@ input:focus, textarea:focus, select:focus {
     border-radius: 30px;     /* Rounded corners */
     padding: 0;              /* Reset padding (if not intentional) */
     box-sizing: border-box;  /* Ensure padding/borders are within size */
+    background-color: var(--background-100);
 }
 
 #insightsModal {
@@ -900,6 +902,7 @@ input:focus, textarea:focus, select:focus {
     border-radius: 30px;     /* Rounded corners */
     padding: 0;              /* Reset padding (if not intentional) */
     box-sizing: border-box;  /* Ensure padding/borders are within size */
+    background-color: var(--background-100);
 }
 
 #servicesModal {
@@ -907,6 +910,7 @@ input:focus, textarea:focus, select:focus {
     border-radius: 30px;     /* Rounded corners */
     padding: 0;              /* Reset padding (if not intentional) */
     box-sizing: border-box;  /* Ensure padding/borders are within size */
+    background-color: var(--background-100);
 }
 
 #npInfoModal {
@@ -914,6 +918,7 @@ input:focus, textarea:focus, select:focus {
     border-radius: 30px;     /* Rounded corners */
     padding: 0;              /* Reset padding (if not intentional) */
     box-sizing: border-box;  /* Ensure padding/borders are within size */
+    background-color: var(--background-100);
 }
 
 
@@ -1101,6 +1106,18 @@ input:focus, textarea:focus, select:focus {
   display: flex;
 }
 
+/* Fix calendar layout alignment in ToDo page */
+#toDoPage .dashboardCard.calendar-fixed-size {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Project selector styling for todo list view */
+.todo-cards-list .calendar-project-selector {
+  padding: 16px;
+  margin-bottom: 0;
+}
+
 /* Flex and gap helpers */
 .flex-row-gap-10 {
   display: flex;
@@ -1225,189 +1242,161 @@ input:focus, textarea:focus, select:focus {
   color: #fff;
 }
 
-.tabs-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: nowrap;
-}
-
-.tabCircle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: var(--background-200, #222);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-  color: var(--text-100, #fff);
-  font-size: 20px;
-  margin: 0;
-  padding: 0;
-}
-.tabCircle .material-icons-round {
-  color: var(--background-200, #222) !important;
-  transition: color 0.2s;
-}
-.tabCircle.active {
-  background: var(--primary-100, #0078d4);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0,120,212,0.15);
-}
-.tabCircle.active .material-icons-round {
-  color: var(--background-200, #222) !important;
-}
-.tabCircle:not(.active) {
-  background: var(--primary-100, #0078d4);
-  color: #fff;
-}
-.tabCircle:not(.active) .material-icons-round {
-  color: var(--background-200, #222) !important;
-}
-
-.todo-header-label {
-  color: var(--gray);
-  font-size: var(--fontSizeStandard);
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  font-style: italic;
-  letter-spacing: 0.01em;
-  padding-left: 2px;
-  display: flex;
-  align-items: center;
-}
-
-.todo-task-value {
-  color: var(--text-100, #fff);
-  font-size: var(--fontSizeStandard);
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  padding-left: 2px;
-  display: flex;
-  align-items: center;
-}
-
-.todo-task-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary);
-  font-size: 22px;
-}
-.todo-task-delete {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.user-count-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-left: 10px;
-  gap: 8px;
-}
-
-.myCustomSearchBox {
-    border-radius: 8px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    width: 100%;
-    font-size: 1rem;
-}
-
-.projects-content {
-  padding-left: 0;
-  padding-right: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.projects-content-header {
-  margin-left: -40px;
-
-}
-
-.dashboardCard.calendar-fixed-size {
-  width: 100%;
+/* Modal container for consistent styling */
+.modal-container {
+  border: 2px solid white;
+  padding: 10px;
+  border-radius: 8px;
   background: var(--background-100);
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 170px);
-  min-height: 300px;
-  max-height: calc(100vh - 90px);
-  overflow: hidden;
-}
-
-.calendar-scroll-vertical {
-  flex: 1;
-  min-height: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  min-width: 320px;
+  max-width: 95vw;
+  max-height: 90vh;
   overflow-y: auto;
-  overflow-x: hidden;
+  color: #fff;
 }
 
-.calendar-project-selector {
-  margin-bottom: 12px;
-  max-height: 32px;
+.modal-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.calendar-project-selector + .calendar-header-spacer {
-  height: 8px;
-}
-
-.calendar-grid-cell {
-  border-right: 1px solid #444;
-  box-sizing: border-box;
-  background: transparent;
-  /* No horizontal lines */
-}
-
-.calendar-task-title-btn {
+.modal-close-btn {
   background: none;
   border: none;
-  border-radius: 16px;
-  box-shadow: none;
-  transition: background 0.2s, color 0.2s, border 0.2s;
+  color: #fff;
+  font-size: 24px;
   cursor: pointer;
-  font: inherit;
-  width: 100%;
-  text-align: left;
-  min-height: 32px;
-  padding: 8px 12px 8px 18px;
+  padding: 0;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
-  position: relative;
-}
-.calendar-task-title-btn[data-project-color]:hover,
-.calendar-task-title-btn[data-project-color].active {
-  background: var(--project-color, var(--primary));
-  color: var(--background-100, #181818);
-  border-left: 2px solid var(--project-color, var(--primary));
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
 }
 
-/* Remove the vertical line between the left column (tasks) and the Gantt grid in the calendar. */
-.calendar-left-col, .calendar-left-col-sticky, .calendar-left-col-header {
-  border-right: none !important;
-  box-shadow: none !important;
+.modal-close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* If the grid or container has a border-left, remove it too */
-.calendar-grid, .calendar-grid-header {
-  border-left: none !important;
+.modal-content {
+  flex: 1;
+  min-height: 0;
 }
 
-/* Dependency arrow hover effect for Gantt calendar */
-.calendar-gantt-arrow:hover,
-.calendar-gantt-arrow.active {
-  stroke-width: 2 !important;
-  stroke: var(--primary) !important;
-  opacity: 1 !important;
+/* Confirm modal styles */
+.confirm-modal-content {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.confirm-modal-content p {
+  margin-bottom: 24px;
+  font-size: var(--fontSizeMedium);
+  line-height: 1.5;
+}
+
+/* Error and loading states */
+.error-message {
+  background-color: rgba(252, 49, 64, 0.1);
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  color: var(--red);
+}
+
+.loading-message {
+  text-align: center;
+  padding: 20px;
+  color: var(--gray);
+  font-style: italic;
+}
+
+/* Button variants */
+.acceptButton.danger {
+  background-color: var(--red);
+  color: white;
+}
+
+.acceptButton.danger:hover {
+  background-color: #e02835;
+}
+
+/* Form field improvements */
+.error-text {
+  color: var(--red);
+  font-size: var(--fontSizeSmall);
+  margin-top: 4px;
+  display: block;
+}
+
+/* Todo item improvements */
+.todo-item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.todo-item-title {
+  margin: 0;
+  font-weight: 600;
+  color: #fff;
+}
+
+.todo-item-desc {
+  font-size: var(--fontSizeSmall);
+  color: #bbb;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Status indicators */
+.todoItem.status-pending {
+  background: var(--gray);
+}
+.todoItem.status-inprogress {
+  background: var(--primary-100);
+}
+.todoItem.status-completed {
+  background: var(--green);
+}
+.todoItem.status-onhold {
+  background: var(--red);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .form-wide,
+  .form-extra-wide {
+    width: 95vw;
+    margin: 0 auto;
+  }
+  
+  .formGrid {
+    flex-direction: column;
+  }
+  
+  .separator {
+    display: none;
+  }
+  
+  .todo-items-header,
+  .todoItem {
+    grid-template-columns: 40px 2fr 1fr 40px;
+  }
+  
+  .todo-items-header > div:nth-child(4),
+  .todo-items-header > div:nth-child(5),
+  .todoItem > div:nth-child(4),
+  .todoItem > div:nth-child(5) {
+    display: none;
+  }
 }

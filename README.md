@@ -23,6 +23,9 @@ A modern, feature-rich project management platform built with React, TypeScript,
 ### Technical Features
 - **TypeScript**: Full type safety and improved developer experience
 - **React 18**: Modern React with hooks and functional components
+- **Custom Hooks**: Reusable state management with useTodos, useModal
+- **Modern React Patterns**: No direct DOM manipulation, declarative UI
+- **Component Architecture**: Separation of concerns with reusable components
 - **Three.js Integration**: 3D rendering capabilities with orbit controls
 - **CSS Custom Properties**: Themeable design system
 - **Modular Architecture**: Clean, maintainable code structure
@@ -75,7 +78,12 @@ non-plan-platform/
 │   │   ├── toDoManager.ts     # Tasks collection management
 │   │   ├── User.ts            # User entity and logic
 │   │   └── UsersManager.ts    # Users collection management
-│   ├── react-components/       # React UI components
+│   ├── components/             # Reusable UI components
+│   │   ├── Modal.tsx          # Modern modal component system
+│   │   └── TodoForm.tsx       # Task form component
+│   ├── hooks/                  # Custom React hooks
+│   │   └── useTodos.ts        # Todo management and form hooks
+│   ├── react-components/       # Page-level React components
 │   │   ├── Banner.tsx         # Application header
 │   │   ├── Calendar.tsx       # Custom Gantt calendar component
 │   │   ├── Dashboard.tsx      # Main dashboard
@@ -85,7 +93,7 @@ non-plan-platform/
 │   │   ├── Sidebar.tsx        # Navigation sidebar
 │   │   ├── ThreeViewer.tsx    # 3D model viewer component
 │   │   ├── ToDoCard.tsx       # Task display card
-│   │   ├── toDoPage.tsx       # Tasks management page
+│   │   ├── toDoPage.tsx       # Tasks management page (refactored)
 │   │   ├── UserCard.tsx       # User display card
 │   │   ├── UsersPage.tsx      # Users management page
 │   │   └── LanguageContext.tsx # Internationalization context
@@ -186,9 +194,19 @@ The platform uses a comprehensive CSS custom properties system for consistent th
 
 ### Adding New Features
 1. **Business Logic**: Add classes in `src/classes/`
-2. **UI Components**: Create React components in `src/react-components/`
-3. **Styling**: Use CSS custom properties in `style.css`
-4. **Types**: Define TypeScript interfaces alongside implementation
+2. **Custom Hooks**: Create reusable hooks in `src/hooks/`
+3. **UI Components**: Create reusable components in `src/components/`
+4. **Page Components**: Create page-level components in `src/react-components/`
+5. **Styling**: Use CSS custom properties in `style.css`
+6. **Types**: Define TypeScript interfaces alongside implementation
+
+### Modern React Patterns Used
+- **Custom Hooks**: `useTodos`, `useModal`, `useTodoForm` for state management
+- **Component Composition**: Reusable Modal and Form components
+- **Declarative UI**: No direct DOM manipulation
+- **Immutable State Updates**: Using React's setState patterns
+- **Error Boundaries**: Proper error handling and user feedback
+- **TypeScript Integration**: Full type safety throughout the application
 
 ## 🌐 Internationalization
 
