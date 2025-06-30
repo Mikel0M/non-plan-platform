@@ -1,26 +1,20 @@
-import * as THREE from "three"
-import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js"
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { IProject, Project, userRole, status, phase } from "./Project";
 import { toDoManagerInstance } from "./toDoManager"; // Import the toDoManager instance
-import { setCurrentProjectId } from "../index"; // Import the global constant and setter function
-import { toDo, ItoDo } from "./toDo";
 import { IUser, User } from "./User";
 import { users } from "./UsersManager";
-import { CompaniesManager, companiesManagerInstance } from "./CompaniesManager";
+import { companiesManagerInstance } from "./CompaniesManager";
 
 export let currentProject: Project | null = null; // Ensure it's globally accessible
 
 export class ProjectsManager {
     list: Project[] = [];
-    onProjectCreated = (project: Project) => {}; // Callback for when a project is created
+    onProjectCreated = (_project: Project) => {}; // Callback for when a project is created
     onProjectDeleted = () => {}; 
     currentProject: Project | null = null;
     projectsListContainer: HTMLElement | null = null; // To hold the #projectsList container
 
     constructor() {
-        const project = this.newProject({
+        this.newProject({
             name: "Default Project",
             description: "This is a default project",
             status: "Pending",
@@ -202,18 +196,18 @@ export class ProjectsManager {
         }
 
         // Capture the project details into a constant
-        const projectDetails = {
-            name: project.name, // Project name
-            location: project.location, // Project location
-            description: project.description, // Project description
-            progress: project.progress, // Project progress
-            cost: project.cost, // Project costs
-            status: project.status, // Project status
-            role: project.userRole, // Project role
-            startDate: project.startDate, // Project start date
-            endDate: project.finishDate, // Project end date
-            // You can add more project properties here
-        };
+        // const projectDetails = {
+        //     name: project.name, // Project name
+        //     location: project.location, // Project location
+        //     description: project.description, // Project description
+        //     progress: project.progress, // Project progress
+        //     cost: project.cost, // Project costs
+        //     status: project.status, // Project status
+        //     role: project.userRole, // Project role
+        //     startDate: project.startDate, // Project start date
+        //     endDate: project.finishDate, // Project end date
+        //     // You can add more project properties here
+        // };
         
     }
 
@@ -320,7 +314,7 @@ export class ProjectsManager {
         }
     }
 
-    refreshModalToDo(project){
+    refreshModalToDo(project: Project): void {
         const modaltoDo = document.getElementById("newToDoModal") as HTMLDialogElement;
         const name = modaltoDo.querySelector("[data-project-info='toDoProjectName']");
             if (name) { name.textContent = project.name}

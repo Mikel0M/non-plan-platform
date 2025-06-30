@@ -327,9 +327,9 @@ const [activeLeftCard, setActiveLeftCard] = React.useState<'users' | 'todo'>('to
       );
 
     // --- Helper to get all other tasks in the same project (for new/edit modals) ---
-function getOtherTasks(project, excludeId: string | null = null) {
+function getOtherTasks(project: any, excludeId: string | null = null) {
   if (!project || !project.toDos) return [];
-  return project.toDos.filter(td => excludeId ? td.id !== excludeId : true);
+  return project.toDos.filter((td: any) => excludeId ? td.id !== excludeId : true);
 }
 
     // --- RENDER ---
@@ -812,7 +812,7 @@ function getOtherTasks(project, excludeId: string | null = null) {
         <div className="formFieldContainer">
           <label>Dependencies</label>
           <div style={{ maxHeight: 120, overflowY: 'auto', border: '1px solid #ccc', borderRadius: 4, padding: 8 }}>
-            {getOtherTasks(projectState, null).map(td => (
+            {getOtherTasks(projectState, null).map((td: any) => (
               <label key={td.id} style={{ display: 'block', marginBottom: 4 }}>
                 <input
                   type="checkbox"
@@ -924,7 +924,7 @@ function getOtherTasks(project, excludeId: string | null = null) {
         <div className="formFieldContainer">
           <label>Dependencies</label>
           <div style={{ maxHeight: 120, overflowY: 'auto', border: '1px solid #ccc', borderRadius: 4, padding: 8 }}>
-            {getOtherTasks(projectState, editToDoFields.id || null).map(td => (
+            {getOtherTasks(projectState, editToDoFields.id || null).map((td: any) => (
               <label key={td.id} style={{ display: 'block', marginBottom: 4 }}>
                 <input
                   type="checkbox"

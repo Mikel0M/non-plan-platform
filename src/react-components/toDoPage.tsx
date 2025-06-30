@@ -243,10 +243,10 @@ export function ToDoPage(props: Props) {
     };
 
     // Helper to get assigned users for a project
-    const getAssignedUsers = (project) => {
+    const getAssignedUsers = (project: any) => {
       if (!project || !project.assignedUsers) return [];
       return project.assignedUsers
-        .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+        .map((au: any) => usersManagerInstance.getUsers().find(u => u.id === au.userId))
         .filter(Boolean);
     };
 
@@ -267,9 +267,9 @@ export function ToDoPage(props: Props) {
     const [viewMode, setViewMode] = React.useState<'list' | 'calendar'>('list');
 
     // --- Helper to get all other tasks in the same project (for new/edit modals) ---
-    function getOtherTasks(project, excludeId: string | null = null) {
+    function getOtherTasks(project: any, excludeId: string | null = null) {
       if (!project || !project.toDos) return [];
-      return project.toDos.filter(td => excludeId ? td.id !== excludeId : true);
+      return project.toDos.filter((td: any) => excludeId ? td.id !== excludeId : true);
     }
 
     return (

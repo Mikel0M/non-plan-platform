@@ -1,17 +1,17 @@
 export interface ICompany {
   id?: string;
   name: string;
-  address?: string;
-  email?: string;
-  phone?: string;
+  address?: string | undefined;
+  email?: string | undefined;
+  phone?: string | undefined;
 }
 
 export class Company implements ICompany {
   id: string;
   name: string;
-  address?: string;
-  email?: string;
-  phone?: string;
+  address?: string | undefined;
+  email?: string | undefined;
+  phone?: string | undefined;
 
   constructor(data: ICompany) {
     this.id = data.id || Math.random().toString(36).slice(2);

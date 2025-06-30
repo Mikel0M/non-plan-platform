@@ -16,7 +16,7 @@ export class Company implements ICompany{
 
 
     //Class internals
-    ui: HTMLDivElement
+    ui!: HTMLDivElement;
 
     constructor (data: ICompany) {
         //Project data definition

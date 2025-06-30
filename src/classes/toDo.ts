@@ -3,7 +3,7 @@ import { showModalPopulated } from '../utils/modalUtils';
 
 export type toDoStatus = "Pending" | "In Progress" | "Completed" | "On Hold";
 export type toDoPriority = "Low" | "Medium" | "High" | "Critical";
-export type toDoPercentage = "25%" | "50%" | "75%" | "100%";
+export type toDoPercentage = "0%" | "25%" | "50%" | "75%" | "100%";
 
 export interface ItoDo {
     id?: string;
@@ -21,7 +21,7 @@ export interface ItoDo {
     completion_date: string;
     estimated_hours: number;
     actual_hours: number;
-    dependencies?: string[] | string;
+    dependencies: string[];
     progress_percentage: toDoPercentage;
     comments: string[];
 }
@@ -42,7 +42,7 @@ export class toDo {
     completion_date: string;
     estimated_hours: number;
     actual_hours: number;
-    dependencies: string[] | string | undefined;
+    dependencies: string[];
     progress_percentage: toDoPercentage;
     comments: string[];
     ui: HTMLDivElement;
@@ -63,8 +63,8 @@ export class toDo {
         this.completion_date = data.completion_date;
         this.estimated_hours = data.estimated_hours;
         this.actual_hours = data.actual_hours;
-        // Defensive: always ensure dependencies is a string[]
-        this.dependencies = Array.isArray(data.dependencies) ? data.dependencies : (typeof data.dependencies === 'string' && !!data.dependencies && data.dependencies.split ? data.dependencies.split(',').map(s => s.trim()) : []);
+        // Ensure dependencies is always a string[]
+        this.dependencies = data.dependencies;
         this.progress_percentage = data.progress_percentage;
         this.comments = data.comments;
 
@@ -145,13 +145,7 @@ export class toDo {
 
         const dependenciesElement = this.ui.querySelector(".todoItem > div > div > .dependencies");
         if (dependenciesElement) {
-          if (Array.isArray(this.dependencies)) {
             dependenciesElement.textContent = this.dependencies.join(", ");
-          } else if (typeof this.dependencies === 'string') {
-            dependenciesElement.textContent = this.dependencies;
-          } else {
-            dependenciesElement.textContent = '';
-          }
         }
 
         const progressPercentageElement = this.ui.querySelector(".todoItem > div > div > .progress_percentage");
@@ -159,9 +153,6 @@ export class toDo {
 
         const commentsElement = this.ui.querySelector(".todoItem > div > div > .comments");
         if (commentsElement) commentsElement.textContent = this.comments.join(", ");
-
-        // Defensive: always ensure dependencies is a string[] in updateUI
-        this.dependencies = Array.isArray(this.dependencies) ? this.dependencies : (typeof this.dependencies === 'string' && !!this.dependencies && this.dependencies.split ? this.dependencies.split(',').map(s => s.trim()) : []);
 
         console.log(`UI updated for to-do: ${this.title}`);
     }

@@ -22,10 +22,13 @@ export class toDoManager {
     }
 
     // Method to add a new to-do
-    // Defensive: always ensure dependencies is a string[] in newToDo and updateToDo
+    // Ensure dependencies is a string[] in newToDo
     newToDo(data: ItoDo, projectId: string): toDo {
         data.project_id = projectId;
-        data.dependencies = Array.isArray(data.dependencies) ? data.dependencies : (typeof data.dependencies === 'string' && !!data.dependencies && data.dependencies.split ? data.dependencies.split(',').map(s => s.trim()) : []);
+        // Ensure dependencies is always a string[]
+        if (!Array.isArray(data.dependencies)) {
+            data.dependencies = [];
+        }
         const newToDo = new toDo(data);
         toDos.push(newToDo);
         this.toDoListUI.appendChild(newToDo.ui);
@@ -41,7 +44,10 @@ export class toDoManager {
 
     // Method to update an existing to-do
     updateToDo(data: ItoDo): toDo | undefined {
-        data.dependencies = Array.isArray(data.dependencies) ? data.dependencies : (typeof data.dependencies === 'string' && !!data.dependencies && data.dependencies.split ? data.dependencies.split(',').map(s => s.trim()) : []);
+        // Ensure dependencies is always a string[]
+        if (!Array.isArray(data.dependencies)) {
+            data.dependencies = [];
+        }
         const toDoInstance = this.findToDoById(data.id!);
         if (toDoInstance) {
             // Ensure dependencies is always an array
@@ -79,7 +85,9 @@ export class toDoManager {
         const toDoIndex = toDos.findIndex(toDo => toDo.id === id);
         if (toDoIndex !== -1) {
             const toDoInstance = toDos[toDoIndex];
-            toDoInstance.deleteUI();
+            if (toDoInstance) {
+                toDoInstance.deleteUI();
+            }
             toDos.splice(toDoIndex, 1);
             console.log(`To-do with ID ${id} deleted`); // Debugging statement
             console.log("Current toDos list after deletion:", toDos); // Debugging statement

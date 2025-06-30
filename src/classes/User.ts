@@ -1,6 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';import { UsersManager, usersManagerInstance } from "./UsersManager";
-
-const usersListUI = document.getElementById("usersList") as HTMLElement;
+import { v4 as uuidv4 } from 'uuid';
+import { usersManagerInstance } from "./UsersManager";
 
 export type usersRole = "Architect" | "Engineer" | "Developer";
 export type access = "Administrator" | "Editor" | "Guest";
@@ -33,7 +32,7 @@ function sliceTwoEachWord(input: string): string {
     if (words.length === 0) {
         return ""; 
     } else if (words.length === 1) {
-        return words[0].slice(0, 2).toUpperCase();
+        return words[0]?.slice(0, 2).toUpperCase() || "";
     }
     
     const firstTwoWords = words.slice(0, 2); 
@@ -56,7 +55,7 @@ export class User implements IUser {
     id: string;
 
     // Class internals
-    ui: HTMLDivElement;
+    ui!: HTMLDivElement;
 
     constructor(data: IUser) {
         // Allow existing id, otherwise generate a new one
@@ -143,7 +142,7 @@ export class User implements IUser {
 
                 const modal = document.getElementById("ChangeUserModal") as HTMLDialogElement;
                 if (modal) {
-                    modal.dataset.userId = this.id; // Store the user ID in the modal
+                    modal.dataset['userId'] = this.id; // Store the user ID in the modal
 
                     // Populate the form fields with the user's data
                     const nameInput = document.querySelector<HTMLInputElement>("input[name='CH_name']");

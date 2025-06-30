@@ -40,7 +40,7 @@ function sliceTwoEachWord(input: string): string {
     if (words.length === 0) {
         return ""; 
     } else if (words.length === 1) {
-        return words[0].slice(0, 2).toUpperCase();
+        return words[0]?.slice(0, 2).toUpperCase() || "";
     }
     
     const firstTwoWords = words.slice(0, 2); 
@@ -59,22 +59,22 @@ function formatDate(date: Date): string {
 
 export class Project implements IProject {
     id: string;
-    icon: string;
-    name: string;
-    color: string;
-    description: string;
-    location: string;
-    progress: number;
-    cost: number;
-    userRole: userRole;
-    status: status;
-    phase: phase;
-    startDate: string;
-    finishDate: string;
+    icon!: string;
+    name!: string;
+    color!: string;
+    description!: string;
+    location!: string;
+    progress!: number;
+    cost!: number;
+    userRole!: userRole;
+    status!: status;
+    phase!: phase;
+    startDate!: string;
+    finishDate!: string;
     toDos: toDo[]; // Add toDos property
     PUsers: User[]; // Add users property
     assignedUsers: Array<{ userId: string, role: string }> = [];
-    ui: HTMLDivElement;
+    ui!: HTMLDivElement;
 
     constructor(data: IProject) {
         // Allow existing id, otherwise generate a new one
@@ -86,19 +86,27 @@ export class Project implements IProject {
         const defaults = {
             name: "Default Project Name",
             description: "Default Project Description",
-            userRole: "not defined",
+            userRole: "not defined" as userRole,
             location: "not defined",
             progress: 0,
             cost: 0,
-            status: "Pending",
-            phase: "Design",
+            status: "Pending" as status,
+            phase: "Design" as phase,
             startDate: formatDate(new Date()), // default to today's date
             finishDate: formatDate(nextYear)  // default to next year
         };
 
-        for (const key in defaults) {
-            this[key] = data[key] || defaults[key];
-        }
+        // Explicitly assign each property
+        this.name = data.name || defaults.name;
+        this.description = data.description || defaults.description;
+        this.userRole = data.userRole || defaults.userRole;
+        this.location = data.location || defaults.location;
+        this.progress = data.progress ?? defaults.progress;
+        this.cost = data.cost ?? defaults.cost;
+        this.status = data.status || defaults.status;
+        this.phase = data.phase || defaults.phase;
+        this.startDate = data.startDate || defaults.startDate;
+        this.finishDate = data.finishDate || defaults.finishDate;
 
         // Initialize toDos and users
         this.toDos = data.toDos?.map(toDoData => new toDo(toDoData)) || [];
@@ -187,7 +195,9 @@ export class Project implements IProject {
         const toDoIndex = this.toDos.findIndex(toDo => toDo.id === id);
         if (toDoIndex !== -1) {
             const toDoInstance = this.toDos[toDoIndex];
-            toDoInstance.deleteUI();
+            if (toDoInstance) {
+                toDoInstance.deleteUI();
+            }
             this.toDos.splice(toDoIndex, 1);
             console.log(`To-do with ID ${id} deleted`); // Debugging statement
         } else {

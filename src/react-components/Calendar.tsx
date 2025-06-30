@@ -43,24 +43,6 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
     const calendarEnd = extendedEnd > endDate ? extendedEnd : endDate;
     const days = getDaysArray(calendarStart, calendarEnd);
 
-    // Helper function to get the offset and width for a task bar
-    const getBarStyle = (task: ToDO) => {
-        if (!task.startDate || !task.dueDate) return {};
-        const taskStart = new Date(task.startDate);
-        const taskEnd = new Date(task.dueDate);
-        const offset = Math.floor((taskStart.getTime() - calendarStart.getTime()) / (1000 * 3600 * 24));
-        const width = Math.floor((taskEnd.getTime() - taskStart.getTime()) / (1000 * 3600 * 24)) + 1;
-        return {
-            gridColumnStart: offset + 1,
-            gridColumnEnd: offset + width + 1,
-            background: task.completed ? "var(--color-success)" : "var(--color-complementary)",
-            color: "var(--primary)",
-            borderRadius: 4,
-            padding: "2px 8px",
-            margin: "2px 0"
-        };
-    };
-
     // Group days by month and year for header
     const monthYearLabels: { label: string; span: number }[] = [];
     let lastMonth = -1, lastYear = -1, currentSpan = 0;
@@ -90,21 +72,6 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
     const gridRef = React.useRef<HTMLDivElement>(null);
     // Scroll to today on mount or when days change
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
-
-    // Prevent infinite scroll loop
-    const isSyncingScroll = React.useRef(false);
-
-    // Sync vertical scroll between left column and grid
-    const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        if (isSyncingScroll.current) return;
-        isSyncingScroll.current = true;
-        if (e.target === leftColRef.current && gridRef.current) {
-            gridRef.current.scrollTop = (e.target as HTMLDivElement).scrollTop;
-        } else if (e.target === gridRef.current && leftColRef.current) {
-            leftColRef.current.scrollTop = (e.target as HTMLDivElement).scrollTop;
-        }
-        setTimeout(() => { isSyncingScroll.current = false; }, 0);
-    };
 
     // Get unique task titles for the left column
     const taskTitles = tasks.length > 0 ? tasks.map(task => task.title) : ['No tasks'];
@@ -253,12 +220,12 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
                             {tasks.map((task, idx) => {
                                 if (!task.rawToDo || !Array.isArray(task.rawToDo.dependencies)) return null;
                                 // Track used verticals for this target row to avoid overlap
-                                const usedVerticals = {};
-                                return task.rawToDo.dependencies.map((depId, depOrder) => {
+                                const usedVerticals: Record<string, number> = {};
+                                return task.rawToDo.dependencies.map((depId: string, _depOrder: number) => {
                                     const depIdx = tasks.findIndex(t => t.id === depId);
                                     if (depIdx === -1) return null;
                                     const depTask = tasks[depIdx];
-                                    if (!depTask.startDate && !depTask.dueDate) return null;
+                                    if (!depTask || (!depTask.startDate && !depTask.dueDate)) return null;
                                     if (!task.startDate && !task.dueDate) return null;
                                     // Calculate positions
                                     const fromCol = depTask.dueDate
@@ -506,7 +473,7 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
                     zIndex: 9999,
                     width: tooltipWidth
                 }}>
-                    {getTooltipJSX(tasks[tooltip.idx])}
+                    {tasks[tooltip.idx] && getTooltipJSX(tasks[tooltip.idx]!)}
                 </div>
             )}
         </div>

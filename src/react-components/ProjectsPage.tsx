@@ -85,7 +85,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
             projectForm.reset(); // Reset the form
             setIsModalOpen(false);
         } catch (error) {
-            setErrorMessage(error.message);
+            setErrorMessage((error as Error).message);
             setIsErrorModalOpen(true);
         }
     };

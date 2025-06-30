@@ -25,9 +25,9 @@ export class CompaniesManager {
     return this.companies.map(c => ({
       id: c.id,
       name: c.name,
-      address: c.address,
-      email: c.email,
-      phone: c.phone,
+      ...(c.address !== undefined && { address: c.address }),
+      ...(c.email !== undefined && { email: c.email }),
+      ...(c.phone !== undefined && { phone: c.phone }),
     }));
   }
 }
