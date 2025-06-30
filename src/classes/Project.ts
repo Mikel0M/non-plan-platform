@@ -74,7 +74,6 @@ export class Project implements IProject {
     toDos: toDo[]; // Add toDos property
     PUsers: User[]; // Add users property
     assignedUsers: Array<{ userId: string, role: string }> = [];
-    ui!: HTMLDivElement;
 
     constructor(data: IProject) {
         // Allow existing id, otherwise generate a new one
@@ -119,39 +118,45 @@ export class Project implements IProject {
         
     }
 
-    
-
-    updateUI() {
-        if (!this.ui) {
-            console.warn(`UI not found for project: ${this.name}`);
-            return;
+    // Pure data method for updating project properties
+    update(data: Partial<IProject>) {
+        if (data.name !== undefined) this.name = data.name;
+        if (data.description !== undefined) this.description = data.description;
+        if (data.userRole !== undefined) this.userRole = data.userRole;
+        if (data.location !== undefined) this.location = data.location;
+        if (data.progress !== undefined) this.progress = data.progress;
+        if (data.cost !== undefined) this.cost = data.cost;
+        if (data.status !== undefined) this.status = data.status;
+        if (data.phase !== undefined) this.phase = data.phase;
+        if (data.startDate !== undefined) this.startDate = data.startDate;
+        if (data.finishDate !== undefined) this.finishDate = data.finishDate;
+        
+        // Regenerate icon if name changed
+        if (data.name !== undefined) {
+            this.icon = sliceTwoEachWord(this.name);
         }
-    
-        const header = this.ui.querySelector(".cardHeader");
-        if (header) {
-            const icon = header.querySelector("p");
-            if (icon) icon.style.backgroundColor = this.color;
-    
-            const headerText = header.querySelector("h5");
-            if (headerText) headerText.textContent = this.name;
-    
-            const description = header.querySelector("p + div p");
-            if (description) description.textContent = this.description;
-        }
-    
-        // Correct selectors for each property
-        const statusElement = this.ui.querySelector(".cardProperty:nth-child(1) p:nth-child(2)");
-        if (statusElement) statusElement.textContent = this.status;
-    
-        const userRoleElement = this.ui.querySelector(".cardProperty:nth-child(2) p:nth-child(2)");
-        if (userRoleElement) userRoleElement.textContent = this.userRole;
-    
-        const costElement = this.ui.querySelector(".cardProperty:nth-child(3) p:nth-child(2)");
-        if (costElement) costElement.textContent = `${this.cost}$`;
+    }
 
-    
-        const progressElement = this.ui.querySelector(".cardProperty:nth-child(4) p:nth-child(2)");
-        if (progressElement) progressElement.textContent = `${this.progress}%`;
+    // Convert to JSON for serialization
+    toJSON(): IProject {
+        return {
+            id: this.id,
+            icon: this.icon,
+            color: this.color,
+            name: this.name,
+            description: this.description,
+            location: this.location,
+            userRole: this.userRole,
+            progress: this.progress,
+            cost: this.cost,
+            status: this.status,
+            phase: this.phase,
+            startDate: this.startDate,
+            finishDate: this.finishDate,
+            toDos: this.toDos.map(todo => todo.toJSON()),
+            PUsers: this.PUsers.map(user => user.toJSON()),
+            assignedUsers: this.assignedUsers
+        };
     }
 
     // Method to add a new to-do
@@ -165,25 +170,7 @@ export class Project implements IProject {
     updateToDo(data: ItoDo): toDo | undefined {
         const toDoInstance = this.toDos.find(toDo => toDo.id === data.id);
         if (toDoInstance) {
-            toDoInstance.title = data.title ?? toDoInstance.title;
-            toDoInstance.description = data.description ?? toDoInstance.description;
-            toDoInstance.status = data.status ?? toDoInstance.status;
-            toDoInstance.priority = data.priority ?? toDoInstance.priority;
-            toDoInstance.assigned_to = data.assigned_to ?? toDoInstance.assigned_to;
-            toDoInstance.project_id = data.project_id ?? toDoInstance.project_id;
-            toDoInstance.created_by = data.created_by ?? toDoInstance.created_by;
-            toDoInstance.created_at = data.created_at ?? toDoInstance.created_at;
-            toDoInstance.updated_at = data.updated_at ?? toDoInstance.updated_at;
-            toDoInstance.due_date = data.due_date ?? toDoInstance.due_date;
-            toDoInstance.start_date = data.start_date ?? toDoInstance.start_date;
-            toDoInstance.completion_date = data.completion_date ?? toDoInstance.completion_date;
-            toDoInstance.estimated_hours = data.estimated_hours ?? toDoInstance.estimated_hours;
-            toDoInstance.actual_hours = data.actual_hours ?? toDoInstance.actual_hours;
-            toDoInstance.dependencies = data.dependencies ?? toDoInstance.dependencies;
-            toDoInstance.progress_percentage = data.progress_percentage ?? toDoInstance.progress_percentage;
-            toDoInstance.comments = data.comments ?? toDoInstance.comments;
-
-            toDoInstance.updateUI();
+            toDoInstance.update(data);
             return toDoInstance;
         } else {
             throw new Error("To-Do item not found(project)");
@@ -194,10 +181,6 @@ export class Project implements IProject {
     deleteToDoById(id: string): void {
         const toDoIndex = this.toDos.findIndex(toDo => toDo.id === id);
         if (toDoIndex !== -1) {
-            const toDoInstance = this.toDos[toDoIndex];
-            if (toDoInstance) {
-                toDoInstance.deleteUI();
-            }
             this.toDos.splice(toDoIndex, 1);
             console.log(`To-do with ID ${id} deleted`); // Debugging statement
         } else {
@@ -216,15 +199,7 @@ export class Project implements IProject {
     updateUser(data: IUser): User | undefined {
         const userInstance = this.PUsers.find(user => user.id === data.id);
         if (userInstance) {
-            userInstance.name = data.name ?? userInstance.name;
-            userInstance.surname = data.surname ?? userInstance.surname;
-            userInstance.email = data.email ?? userInstance.email;
-            userInstance.phone = data.phone ?? userInstance.phone;
-            userInstance.role = data.role ?? userInstance.role;
-            userInstance.access = data.access ?? userInstance.access;
-            userInstance.company = data.company ?? userInstance.company;
-
-            userInstance.setUI();
+            userInstance.update(data);
             return userInstance;
         } else {
             throw new Error("User not found(project)");
