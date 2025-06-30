@@ -31,7 +31,7 @@ export class toDoManager {
         }
         const newToDo = new toDo(data);
         toDos.push(newToDo);
-        this.toDoListUI.appendChild(newToDo.ui);
+        // UI handling removed - React components will handle UI updates
         console.log(`New to-do added with project ID: ${projectId}`, newToDo); // Debugging statement
         console.log("Current toDos list after addition:", toDos); // Debugging statement
         return newToDo;
@@ -52,26 +52,8 @@ export class toDoManager {
         if (toDoInstance) {
             // Ensure dependencies is always an array
             if (!Array.isArray(data.dependencies)) data.dependencies = [];
-            toDoInstance.id = data.id ?? toDoInstance.id;
-            toDoInstance.title = data.title ?? '';
-            toDoInstance.description = data.description ?? '';
-            toDoInstance.status = data.status ?? 'Pending';
-            toDoInstance.priority = data.priority ?? 'Low';
-            toDoInstance.assigned_to = data.assigned_to ?? '';
-            toDoInstance.project_id = data.project_id ?? '';
-            toDoInstance.created_by = data.created_by ?? '';
-            toDoInstance.created_at = data.created_at ?? '';
-            toDoInstance.updated_at = data.updated_at ?? '';
-            toDoInstance.due_date = data.due_date ?? '';
-            toDoInstance.start_date = data.start_date ?? '';
-            toDoInstance.completion_date = data.completion_date ?? '';
-            toDoInstance.estimated_hours = data.estimated_hours ?? 0;
-            toDoInstance.actual_hours = data.actual_hours ?? 0;
-            toDoInstance.dependencies = data.dependencies ?? [];
-            toDoInstance.progress_percentage = data.progress_percentage ?? '0%';
-            toDoInstance.comments = data.comments ?? [];
-
-            toDoInstance.updateUI();
+            // Use the update method instead of direct property assignment
+            toDoInstance.update(data);
             console.log(`To-do with ID ${data.id} updated`, toDoInstance); // Debugging statement
             console.log("Current toDos list after update:", toDos); // Debugging statement
             return toDoInstance;
@@ -84,10 +66,6 @@ export class toDoManager {
     deleteToDoById(id: string): void {
         const toDoIndex = toDos.findIndex(toDo => toDo.id === id);
         if (toDoIndex !== -1) {
-            const toDoInstance = toDos[toDoIndex];
-            if (toDoInstance) {
-                toDoInstance.deleteUI();
-            }
             toDos.splice(toDoIndex, 1);
             console.log(`To-do with ID ${id} deleted`); // Debugging statement
             console.log("Current toDos list after deletion:", toDos); // Debugging statement
@@ -98,26 +76,7 @@ export class toDoManager {
 
     // Method to gather and return all to-dos
     exportToDos(): ItoDo[] {
-        return toDos.map(toDo => ({
-            id: toDo.id,
-            title: toDo.title,
-            description: toDo.description,
-            status: toDo.status,
-            priority: toDo.priority,
-            project_id: toDo.project_id,
-            assigned_to: toDo.assigned_to,
-            created_by: toDo.created_by,
-            created_at: toDo.created_at,
-            updated_at: toDo.updated_at,
-            due_date: toDo.due_date,
-            start_date: toDo.start_date,
-            completion_date: toDo.completion_date,
-            estimated_hours: toDo.estimated_hours,
-            actual_hours: toDo.actual_hours,
-            dependencies: toDo.dependencies,
-            progress_percentage: toDo.progress_percentage,
-            comments: toDo.comments
-        }));
+        return toDos.map(toDo => toDo.toJSON());
     }
 }
 

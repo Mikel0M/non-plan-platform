@@ -1,13 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
-:root{
+/* ===== CSS CUSTOM PROPERTIES (DESIGN SYSTEM) ===== */
+:root {
+    /* === Color System === */
     --primary: #1CFFCA;
     --primary-100: #4FFFD6;
     --primary-200: #80FFE2;
     --primary-300: #E6FFFB;
     --primary-400: #B3FFEF;
     --primary-500: #E6FFFB;
-    --red:#FC3140;
+    --red: #FC3140;
     --complementary: #300B5F;
     --complementary-100: #593A85;
     --complementary-200: #8666A8;
@@ -17,6 +19,9 @@
     --background: #300B5F;
     --background-100: #4B2680;
     --background-200: #6540A1;
+    --green: #4CAF50;
+
+    /* === Typography Scale === */
     --fontSizeSmallest: 10px;
     --fontSizeSmall: 12px;
     --fontSizeStandard: 14px;
@@ -28,51 +33,44 @@
     --fontSizeGiantXL: 40px;
     --fontSizeGiantXXL: 50px;
     --fontSizeGiantXXXL: 100px;
-    --green: #4CAF50;
 
+    /* === Spacing System === */
+    --space-xs: 2px;
+    --space-sm: 5px;
+    --space-md: 8px;
+    --space-lg: 10px;
+    --space-xl: 12px;
+    --space-2xl: 15px;
+    --space-3xl: 16px;
+    --space-4xl: 20px;
+    --space-5xl: 24px;
+    --space-6xl: 30px;
+    --space-7xl: 40px;
+
+    /* === Layout Constants === */
+    --sidebar-width: 200px;
+    --header-height: 70px;
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 100px;
+
+    /* === Z-Index Scale === */
+    --z-dropdown: 100;
+    --z-modal: 1000;
+    --z-overlay: 9999;
+
+    /* === Common Measurements === */
+    --button-height: 40px;
+    --input-height: 40px;
+    --gap-standard: 20px;
+    --gap-small: 10px;
+    --gap-tiny: 5px;
+    --border-width: 2px;
 }
 
-*{
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
-
-#app {
-    /* Remove margin-top, header is fixed and overlays content */
-    /* margin-top: 70px; */
-    display: grid;
-    grid-template-areas:
-        "header header"
-        "sidebar main";
-    grid-template-rows: 70px 1fr;
-    grid-template-columns: 200px auto;
-    min-height: 100vh;
-    background-color: var(--background);
-    color: #fff;
-    vertical-align: middle;
-    height: 100vh;
-    box-sizing: border-box;
-    overflow: visible; /* Allow scrolling if content overflows */
-}
-
-#banner {
-    position: fixed;
-    top: 0;
-    left: 200px; /* Start after sidebar */
-    right: 0;
-    height: 70px;
-    background-color: var(--background);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    z-index: 100;
-    padding: 0 24px;
-    box-sizing: border-box;
-}
-
+/* ===== GLOBAL RESET ===== */
 * {
+    font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -82,14 +80,43 @@ body, html {
     height: 100vh;
     min-height: 100vh;
     background: var(--background);
-    overflow: auto; /* Allow scrolling for overflow */
+    overflow: auto;
+}
+
+/* ===== MAIN LAYOUT GRID ===== */
+#app {
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "sidebar main";
+    grid-template-rows: var(--header-height) 1fr;
+    grid-template-columns: var(--sidebar-width) auto;
+    min-height: 100vh;
+    background-color: var(--background);
+    color: #fff;
+    vertical-align: middle;
+    height: 100vh;
+    overflow: visible;
+}
+
+#banner {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    height: var(--header-height);
+    background-color: var(--background);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    z-index: var(--z-dropdown);
+    padding: 0 var(--space-5xl);
 }
 
 main {
-    margin-top: 70px; /* Push main content below fixed header */
-    height: calc(100vh - 70px);
+    margin-top: var(--header-height);
+    height: calc(100vh - var(--header-height));
     overflow-y: auto;
-    /* Allow scrolling for overflow on all pages */
 }
 
 #navigationHeader {
@@ -97,7 +124,7 @@ main {
     top: 0;
     left: 0;
     width: 100%;
-    padding: 30px 40px;
+    padding: var(--space-6xl) var(--space-7xl);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -111,200 +138,227 @@ h0 {
     font-size: var(--fontSizeGiantXL);
 }
 
+/* ===== TYPOGRAPHY ===== */
+h1 { font-size: var(--fontSizeGiant); }
+h2 { font-size: var(--fontSizeBiggest); }
+h3 { font-size: var(--fontSizeBigger); }
+h4 { font-size: var(--fontSizeBig); }
+h5 { font-size: var(--fontSizeStandard); }
+h6 { font-size: var(--fontSizeSmall); }
+h7 { font-size: var(--fontSizeSmallest); }
 
-h1 {
-    font-size: var(--fontSizeGiant);
-}
-
-h2 {
-    font-size: var(--fontSizeBiggest);
-}
-
-
-h3 {
-    font-size: var(--fontSizeBigger);
-}
-
-h4 {
-    font-size: var(--fontSizeBig);
-}
-
-h5 {
-    font-size: var(--fontSizeStandard);
-}
-
-h6 {
-    font-size: var(--fontSizeSmall);
-}
-
-h7 {
-    font-size: var(--fontSizeSmallest);
-}
-
+/* ===== BUTTON SYSTEM ===== */
 button {
-    padding: 8px 15px;
+    padding: var(--space-md) var(--space-2xl);
     cursor: pointer;
-    height: 40px;
+    height: var(--button-height);
     font-size: var(--fontSizeMedium);
     background-color: var(--primary);
     color: var(--complementary);
-    border-radius: 100px;
+    border-radius: var(--border-radius-lg);
     border: none;
     display: flex;
     align-items: center;
-    column-gap: 10px; 
+    column-gap: var(--gap-small);
 }
 
 button:hover {
     background-color: var(--primary-300);
 }
 
-buttonBlue {
-    padding: 8px 15px;
+.buttonBlue {
+    padding: var(--space-md) var(--space-2xl);
     cursor: pointer;
-    height: 40px;
+    height: var(--button-height);
     font-size: var(--fontSizeMedium);
     background-color: var(--primary);
     color: white;
-    border-radius: 100px;
+    border-radius: var(--border-radius-lg);
     border: none;
     display: flex;
     align-items: center;
-    column-gap: 10px; 
+    column-gap: var(--gap-small);
 }
 
-buttonBlue:hover {
+.buttonTertiary {
+    padding: var(--space-md) var(--space-2xl);
+    cursor: pointer;
+    height: var(--button-height);
+    font-size: var(--fontSizeMedium);
+    background-color: transparent;
+    color: white;
+    border-radius: var(--border-radius-lg);
+    border: none;
+    display: flex;
+    align-items: center;
+    column-gap: var(--gap-small);
+}
+
+.buttonBlue:hover {
     background-color: var(--complementary-200);
 }
 
 .buttonTextBlue {
-    padding: 8px 15px;
+    padding: var(--space-md) var(--space-2xl);
     cursor: pointer;
-    height: 40px;
+    height: var(--button-height);
     font-size: var(--fontSizeMedium);
     background-color: transparent;
     color: var(--primary);
-    border-radius: 100px;
+    border-radius: var(--border-radius-lg);
     border: none;
     display: flex;
     align-items: center;
-    column-gap: 10px; 
+    column-gap: var(--gap-small);
 }
 
+.buttonTextBlue:hover {
+    color: var(--primary-300);
+}
+
+/* ===== UTILITY CLASSES ===== */
 .formGrid {
     display: flex;
-    gap: 20px;
+    gap: var(--gap-standard);
     width: 100%;
 }
 
 .formColumn {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: var(--gap-tiny);
     flex: 1;
 }
 
 .separator {
-    width: 2px;
+    width: var(--border-width);
     background-color: var(--complementary-200);
-    margin: 0 20px;
+    margin: 0 var(--gap-standard);
 }
 
 .separator-horizontal {
-    height: 2px;
+    height: var(--border-width);
     background-color: var(--complementary-200);
-    margin: 40px 0;
+    margin: var(--space-7xl) 0;
 }
 
 .formFieldContainerToDo,
 .formFieldContainer {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: var(--gap-tiny);
     width: 100%;
 }
 
-.buttonTextBlue:hover {
-    color: var(--primary-300);
-    background-color: transparent;
-}
-
+/* ===== BUTTON VARIANTS ===== */
 .acceptButton {
     background-color: var(--complementary-200);
-    margin-bottom: 20px;
-
-    
-}
-
-.loginButton:hover {
-    background-color: var(--primary-300);
-}
-
-.loginButton {
-    background-color: var(--primary-100);
-    margin-bottom: 20px;
-
-    
+    margin-bottom: var(--gap-standard);
 }
 
 .acceptButton:hover {
     background-color: var(--complementary-300);
 }
 
+.loginButton {
+    background-color: var(--primary-100);
+    margin-bottom: var(--gap-standard);
+}
+
+.loginButton:hover {
+    background-color: var(--primary-300);
+}
 
 .cancelButton {
     background-color: transparent;
-    margin-bottom: 20px;
-    
+    margin-bottom: var(--gap-standard);
 }
 
 .cancelButton:hover {
     background-color: var(--complementary-300);
 }
 
+.buttonSecondary {
+    background-color: transparent;
+    outline: var(--border-width) solid var(--primary);
+    width: 20%;
+    text-align: center;
+    color: var(--primary);
+    margin-bottom: var(--gap-standard);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--fontSizeSmall);
+}
+
+.buttonSecondary:hover {
+    background-color: var(--primary);
+    color: var(--complementary);
+    outline: none;
+}
+
+.buttonMainPage:hover {
+    outline: var(--border-width) solid var(--primary);
+    cursor: pointer;
+    filter: brightness(120%);
+    transition: filter 0.3s ease;
+}
+
+.buttonTertiary {
+    cursor: pointer;
+    height: 55px;
+    width: 55px;
+    font-size: var(--fontSizeMedium);
+    background-color: transparent;
+    color: var(--primary);
+    border-radius: 50%;
+    border: var(--border-width) solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: 0;
+}
+
+.buttonTertiary:hover {
+    background-color: var(--primary-300);
+    outline: none;
+}
+
+/* ===== LAYOUT COMPONENTS ===== */
 .cancelAccept {
     display: flex;
     flex-direction: row;
     justify-content: end;
-    padding-top: 20px;
-    padding-right: 20px;
-    column-gap: 10px;
-
+    padding-top: var(--gap-standard);
+    padding-right: var(--gap-standard);
+    column-gap: var(--gap-small);
 }
 
 .upperDashboard {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 10px;
-    column-gap: 5px;
+    padding: var(--gap-small) var(--gap-small) var(--gap-small) var(--gap-small);
+    column-gap: var(--gap-tiny);
     height: 60px;
-
 }
 
 .middleDashboard {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding-left: 20px;
-    padding-right: 20px;
-    column-gap: 5px;
+    padding-left: var(--gap-standard);
+    padding-right: var(--gap-standard);
+    column-gap: var(--gap-tiny);
     height: 30px;
-
 }
 
 .bottomDashboard {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 0px;
-    column-gap: 5px;
-
+    padding: var(--gap-standard) var(--gap-standard) 0 var(--gap-standard);
+    column-gap: var(--gap-tiny);
 }
 
 
@@ -327,51 +381,15 @@ buttonBlue:hover {
     outline: none;
 }
 
-.buttonMainPage {
-    
-}
-
-.buttonMainPage:hover {
-    outline: 2px solid var(--primary);
-    cursor: pointer;
-    filter: brightness(120%);
-    transition: filter 0.3s ease;
-}
-
-
-.buttonTertiary {
-
-    cursor: pointer;
-    height: 55px;
-    width: 55px;
-    font-size: var(--fontSizeMedium);
-    background-color: transparent;
-    color: var(--primary);
-    border-radius: 50%;
-    border: none;
-    display: flex;
-    align-items: center;
-    column-gap: 0px;
-    display: flex;
-    justify-content: center;
-    border: 2px solid var(--primary);
-}
-
-.buttonTertiary:hover {
-    background-color: var(--primary-300);
-    outline: none;
-    
-}
-
+/* ===== PAGE LAYOUT ===== */
 .page {
     display: flex;
     flex-direction: column;
-    height: 100%-70px; /* Full height minus header */
+    height: calc(100% - var(--header-height));
 }
 
-/* Main page layout helpers for content areas */
 .page-flex {
-  display: flex;
+    display: flex;
   gap: 16px;
 }
 
@@ -381,35 +399,31 @@ buttonBlue:hover {
   gap: 16px;
 }
 
-/* Header styles */
+/* ===== HEADER STYLES ===== */
 #navigationHeader {
     grid-area: header;
     background-color: var(--background-100);
-    border-bottom: 2px solid var(--background-200);
+    border-bottom: var(--border-width) solid var(--background-200);
     color: white;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 10px;
-    padding-right: 30px;
-    height: 70px;
+    padding: 0 var(--gap-small) 0 var(--gap-small);
+    padding-right: var(--space-6xl);
+    height: var(--header-height);
 }
 
-/* Sidebar styles */
-
+/* ===== SIDEBAR STYLES ===== */
 #sidebar {
     background-color: var(--background-100);
-    padding-top: 30px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: var(--space-6xl) var(--gap-small) var(--gap-small) var(--gap-small);
     display: flex;
     flex-direction: column;
-    row-gap: 20px;
-    height: calc(100vh - 70px); /* Subtract header height so sidebar fits below header */
-    margin-top: 70px; /* Push sidebar below fixed header */
+    row-gap: var(--gap-standard);
+    height: calc(100vh - var(--header-height));
+    margin-top: var(--header-height);
     z-index: 10;
     position: fixed;
-    
 }
 
 #non-plan-logo {
@@ -419,45 +433,41 @@ buttonBlue:hover {
 #nav-buttons {
     display: flex;
     flex-direction: column;
-    row-gap: 10px;
+    row-gap: var(--gap-small);
     color: white !important;
     text-decoration: none;
-
 }
-
 
 #nav-buttons li {
     list-style-type: none;
-    padding: 15px;
+    padding: var(--space-2xl);
     border-radius: 50px;
     font-size: var(--fontSizeMedium);
     cursor: pointer;
-    background-color: var(--background-300); /* Default background */
+    background-color: var(--background-300);
     display: flex;
     align-items: center;
-    column-gap: 10px;
-    height: 10px;
+    column-gap: var(--gap-small);
+    height: var(--gap-small);
     border: 1px solid var(--primary);
     color: white !important;
     text-decoration: none;
 }
 
-/* Hover effect */
 #nav-buttons li:hover {
     background-color: var(--primary-300);
 }
 
-/* Active (pressed) state */
 #nav-buttons li.active {
     background-color: var(--primary);
     color: white;
 }
 
-
+/* ===== ICONS ===== */
 .material-icons-round {
     display: flex;
     align-content: center;
-    height: 20px;
+    height: var(--gap-standard);
     color: white;
     text-decoration: none;
 }
@@ -466,18 +476,18 @@ buttonBlue:hover {
     color: var(--background-200, #222) !important;
     transition: color 0.2s;
 }
+
 .tabCircle.active .material-icons-round {
     color: var(--background-200, #222) !important;
 }
+
 .tabCircle:hover .material-icons-round {
     color: var(--background-200, #222) !important;
 }
 
-/* Content styles */
-
+/* ===== CONTENT STYLES ===== */
 #content {
     font-size: var(--fontSizeStandard);
-    
 }
 
 /* Header styles */
@@ -489,37 +499,34 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    
-    
 }
 
-/* Card Classes */
-
+/* ===== CARD COMPONENTS ===== */
 .projectCard {
     background-color: var(--background-100);
-    border-radius: 8px;
+    border-radius: var(--border-radius-sm);
     cursor: pointer;
 }
 
 .projectCard:hover {
-    outline: 2px solid var(--primary);
+    outline: var(--border-width) solid var(--primary);
 }
 
 .cardHeader {
     display: flex;
-    column-gap: 20px;
-    padding: 15px 20px;
+    column-gap: var(--gap-standard);
+    padding: var(--space-2xl) var(--gap-standard);
     align-items: center;
     justify-content: start;
-    border-bottom: 2px solid var(--complementary-300);
-    min-height: 60px; /* Optional: set a reasonable min-height */
+    border-bottom: var(--border-width) solid var(--complementary-300);
+    min-height: 60px;
 }
 
 .cardContent {
-    padding: 30px 20px;
+    padding: var(--space-6xl) var(--gap-standard);
     display: flex;
-    flex-direction:column;
-    row-gap: 20px;
+    flex-direction: column;
+    row-gap: var(--gap-standard);
     align-items: start;
 }
 
@@ -533,121 +540,107 @@ header {
 .projectsList {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    padding: 10px 30px;
-    gap: 20px;
-
+    padding: var(--gap-small) var(--space-6xl);
+    gap: var(--gap-standard);
 }
 
+/* ===== TODO ITEMS ===== */
 .todoItem {
-    background-color: #444; /* Slightly lighter dark background for To-Do items */
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    color: #fff; /* White text color */
+    background-color: #444;
+    padding: var(--gap-small);
+    margin-bottom: var(--gap-small);
+    border-radius: var(--border-radius-sm);
+    color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: border-color 0.2s;
-    border: 2px solid transparent;
+    border: var(--border-width) solid transparent;
     box-sizing: border-box;
-    cursor: pointer; /* Hand cursor on hover */
+    cursor: pointer;
 }
 
 .todoItem:hover {
-  border-color: var(--primary-100, #0078d4);
+    border-color: var(--primary-100, #0078d4);
 }
 
-.todoItem.status-pending {
-  background: var(--gray);
-}
-.todoItem.status-inprogress {
-  background: var(--primary-100);
-}
-.todoItem.status-completed {
-  background: var(--green);
-}
-.todoItem.status-onhold {
-  background: var(--red);
-}
+.todoItem.status-pending { background: var(--gray); }
+.todoItem.status-inprogress { background: var(--primary-100); }
+.todoItem.status-completed { background: var(--green); }
+.todoItem.status-onhold { background: var(--red); }
 
-/* Form Styles */
-
+/* ===== MODAL SYSTEM ===== */
 dialog {
     background-color: transparent;
     border: none;
-    margin:auto;
+    margin: auto;
 }
 
 dialog::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(3xp);
+    backdrop-filter: blur(3px);
 }
 
-
-/* Default form styles */
+/* ===== FORM SYSTEM ===== */
 form {
-    border-radius: 10px;
+    border-radius: var(--gap-small);
     width: 450px;
     background-color: var(--background-100);
     color: white;
 }
 
 form h2 {
-    padding: 20px;
-    /*border-bottom: 2px solid var(--complementary-200);*/
+    padding: var(--gap-standard);
 }
 
 /* Styles for userForm */
 .userForm .userCard {
     display: flex;
     flex-direction: column;
-    padding: 0; /* Remove padding to eliminate inner border effect */
+    padding: 0;
     row-gap: 25px;
-    background: transparent; /* Ensure no background creates visual separation */
+    background: transparent;
 }
 
-/* Styles for toDoForm */
-.toDoForm{
+.toDoForm {
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: var(--gap-standard);
     row-gap: 25px;
 }
 
-/* Styles for loginForm */
 .loginForm {
-    width: 450px; /* Total width, including padding and border */
-    box-sizing: border-box; /* Ensures padding and borders don't add to width */
-    margin: 0 auto; /* Centers the form horizontally */
+    width: 450px;
+    box-sizing: border-box;
+    margin: 0 auto;
 }
 
 .loginForm .loginCard {
     display: flex;
     flex-direction: column;
-    width: 100%; /* Ensures it stays within the form's width */
-    padding: 20px; /* Inner padding */
-    box-sizing: border-box; /* Includes padding in width */
-    row-gap: 20px; /* Space between children */
+    width: 100%;
+    padding: var(--gap-standard);
+    box-sizing: border-box;
+    row-gap: var(--gap-standard);
 }
 
 .userForm {
-    border: 2px solid white; /* Add a white border */
-    border-radius: 10px; /* Optional: Add rounded corners */
-    padding: 20px; /* Optional: Add padding inside the form */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+    border: var(--border-width) solid white;
+    border-radius: var(--gap-small);
+    padding: var(--gap-standard);
+    box-shadow: 0 var(--border-width) 4px rgba(0, 0, 0, 0.1);
     background-color: var(--background-100);
 }
 
 .toDoForm {
     width: 1200px;
-    border: 2px solid white; /* Add a white border */
-    border-radius: 10px; /* Optional: Add rounded corners */
-    padding: 20px; /* Optional: Add padding inside the form */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+    border: var(--border-width) solid white;
+    border-radius: var(--gap-small);
+    padding: var(--gap-standard);
+    box-shadow: 0 var(--border-width) 4px rgba(0, 0, 0, 0.1);
     background-color: var(--background-100);
 }
 
-/* Styles for infoForm */
 .infoForm {
     width: 900px;
 }
@@ -655,8 +648,8 @@ form h2 {
 .infoForm .infoCard {
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    row-gap: 10px;
+    padding: var(--gap-small);
+    row-gap: var(--gap-small);
 }
 
 form .formFieldContainer {
@@ -671,50 +664,48 @@ form .formFieldContainerToDo {
     width: 100%;
 }
 
-
-
+/* ===== FORM ELEMENTS ===== */
 label {
     font-size: var(--fontSizeStandard);
-    margin-bottom: 10px;
+    margin-bottom: var(--gap-small);
     font-weight: 500;
     color: rgba(150, 150, 150, 1);
     display: flex;
-    flex-direction:row;
+    flex-direction: row;
     align-items: center;
-    column-gap: 5px;
+    column-gap: var(--gap-tiny);
 }
 
 input, textarea, select {
     color: white;
     background-color: var(--background-200);
-    padding: 15px;
-    border-radius: 8px;
+    padding: var(--space-2xl);
+    border-radius: var(--border-radius-sm);
     border: none;
     font-size: var(--fontSizeStandard);
 }
 
 input:focus, textarea:focus, select:focus {
-    outline: 2px solid var(--primary)
+    outline: var(--border-width) solid var(--primary);
 }
 
-/* Project Details Page */
-
+/* ===== PROJECT DETAILS PAGE ===== */
 .dashboardCard {
     background-color: var(--background-100);
-    border-radius: 8px;
+    border-radius: var(--border-radius-sm);
     display: flex;
     flex-direction: column;
 }
 
 #projectDetails {
-  width: calc(100vw - 200px);
+    width: calc(100vw - var(--sidebar-width));
 }
 
 #projectDetails > .mainPageContent {
-    z-index: 5; /* Ensure it doesn't overlap the sidebar */
+    z-index: 5;
     position: relative;
-    display:grid;
-    padding: 20px 40px;
+    display: grid;
+    padding: var(--gap-standard) var(--space-7xl);
     gap: 30px;
     grid-template-columns: 475px 1fr;
     height: 100%;

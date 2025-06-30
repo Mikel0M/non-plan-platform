@@ -159,11 +159,8 @@ export const useTodos = (projectsManager: ProjectsManager, projectId?: string) =
           updated_at: new Date().toISOString(),
         });
         
-        // Also trigger UI update if available (toDo class has updateUI method)
-        const todoInstance = foundProject.toDos![todoIndex] as any;
-        if (todoInstance && typeof todoInstance.updateUI === 'function') {
-          todoInstance.updateUI();
-        }
+        // The toDo class no longer has updateUI method as it's now pure data
+        // UI updates are handled by React state changes
       }
 
       // Update local state with interface data

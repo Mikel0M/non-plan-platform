@@ -298,7 +298,6 @@ export class ProjectsManager {
             saveButton.addEventListener("click", () => {
                 if (this.currentProject) {
                     this.updateProjectData(this.currentProject.id);
-                    this.currentProject.updateUI()
                     this.updateProjectCards(this.currentProject);
                     this.updateProgressBar(this.currentProject.progress)
 
@@ -529,30 +528,7 @@ export class ProjectsManager {
 
     exportToJSON() {
         const projects = this.list.map(project => {
-            const { ui, ...projectData } = project; // Destructure to exclude `ui`
-            return {
-                ...projectData,
-                toDos: (project.toDos || []).map(toDo => ({
-                    id: toDo.id,
-                    title: toDo.title,
-                    description: toDo.description,
-                    status: toDo.status,
-                    priority: toDo.priority,
-                    project_id: toDo.project_id,
-                    assigned_to: toDo.assigned_to,
-                    created_by: toDo.created_by,
-                    created_at: toDo.created_at,
-                    updated_at: toDo.updated_at,
-                    due_date: toDo.due_date,
-                    start_date: toDo.start_date,
-                    completion_date: toDo.completion_date,
-                    estimated_hours: toDo.estimated_hours,
-                    actual_hours: toDo.actual_hours,
-                    dependencies: toDo.dependencies,
-                    progress_percentage: toDo.progress_percentage,
-                    comments: toDo.comments
-                }))
-            };
+            return project.toJSON(); // Use the new toJSON method
         });
 
         const usersExports = this.exportUsers();
@@ -672,39 +648,18 @@ export class ProjectsManager {
         input.click();
     }
 
-    // Method to filter to-dos by project ID and update the UI
-    filterAndDisplayToDosByProjectId(projectId: string): void {
+    // Method to filter to-dos by project ID (data only, UI handled by React)
+    filterToDosByProjectId(projectId: string): any[] {
         console.log(`Filtering to-dos for project ID: ${projectId}`); // Debugging statement
 
         // Log all elements of the toDos list
         console.log("All to-dos before filtering:", toDoManagerInstance.getToDos()); // Debugging statement
 
-        // Clear existing tasks
-        const toDoListUI = toDoManagerInstance.getToDoListUI();
-        toDoListUI.innerHTML = '';
-
-        // Delete all UI elements
-        toDoManagerInstance.getToDos().forEach(toDo => {
-            toDo.deleteUI();
-        });
-
-        // Log the length of the toDos list
-        console.log(`Number of to-dos before filtering: ${toDoManagerInstance.getToDos().length}`); // Debugging statement
-
-        // Log the title of each task
-        toDoManagerInstance.getToDos().forEach(toDo => {
-            console.log(`Task title: ${toDo.title}`);
-        });
-
         // Get the filtered tasks
         const filteredToDos = toDoManagerInstance.getToDos().filter(toDo => toDo.project_id === projectId);
 
-        // Append the filtered tasks to the to-do list container
-        filteredToDos.forEach(toDo => {
-            toDoListUI.appendChild(toDo.ui);
-        });
-
-        console.log(`Displayed ${filteredToDos.length} to-dos for project ID: ${projectId}`); // Debugging statement
+        console.log(`Found ${filteredToDos.length} to-dos for project ID: ${projectId}`); // Debugging statement
+        return filteredToDos;
     }
 
     // Method to gather and return all users

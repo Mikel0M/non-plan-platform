@@ -719,22 +719,21 @@ document.getElementById("editToDoForm")?.addEventListener("submit", (e) => {
     }
 
     // Update the toDo instance
-    toDoInstance.title = title;
-    toDoInstance.description = description;
-    toDoInstance.status = status;
-    toDoInstance.priority = priority;
-    toDoInstance.assigned_to = assigned_to;
-    toDoInstance.created_by = created_by;
-    toDoInstance.start_date = start_date;
-    toDoInstance.updated_at = updated_at;
-    toDoInstance.estimated_hours = estimated_hours;
-    toDoInstance.actual_hours = actual_hours;
-    toDoInstance.due_date = due_date;
-    toDoInstance.dependencies = dependencies;
-    toDoInstance.comments = comments;
-
-    // Update the UI
-    toDoInstance.updateUI();
+    toDoInstance.update({
+        title,
+        description,
+        status,
+        priority,
+        assigned_to,
+        created_by,
+        start_date,
+        updated_at,
+        estimated_hours,
+        actual_hours,
+        due_date,
+        dependencies,
+        comments
+    });
 
     // Close the modal
     closeModal("editToDoModal");

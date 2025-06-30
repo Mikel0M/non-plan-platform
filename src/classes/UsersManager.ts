@@ -136,7 +136,6 @@ export class UsersManager {
 
                 if (this.currentUser) {
                     this.updateUserData(this.currentUser.id); // Update user data
-                    this.currentUser.updateUI(); // Update the user's UI
                     this.updateUsersCards(this.currentUser); // Update the user's card in the UI
                     this.refreshToDoList(); // Refresh the To-Do user list
                     const modal = document.getElementById("ChangeUserModal") as HTMLDialogElement;
