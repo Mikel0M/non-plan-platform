@@ -26,6 +26,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     React.useEffect(() => {
         projectManager.onProjectCreated = () => { forceUpdate(); };
         projectManager.onProjectDeleted = () => { forceUpdate(); };
+        projectManager.onProjectUpdated = () => { forceUpdate(); };
         projectManager.onProjectError = (error: string) => {
             setErrorMessage(error);
             setIsErrorModalOpen(true);
@@ -36,22 +37,65 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
 
     const getFirestoreProject = async () => {
         try {
-            const projectsCollection = Firestore.collection(firebaseDB, "projects") as Firestore.CollectionReference<IProject>;
+            const projectsCollection = Firestore.collection(firebaseDB, "projects");
             const firebaseProjects = await Firestore.getDocs(projectsCollection);
+            
             for (const doc of firebaseProjects.docs) {
                 const data = doc.data();
                 console.log("Raw Firestore data:", data);
+
+                // Helper function to convert Firestore Timestamp to date string
+                const convertTimestampToDateString = (timestamp: any): string => {
+                    if (timestamp && timestamp.toDate) {
+                        return timestamp.toDate().toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+                    }
+                    return timestamp || ""; // Fallback if it's already a string or null
+                };
                 
-                // Add document ID to the data
-                const projectData = {
-                    ...data,
-                    id: doc.id
+                // Convert ALL the data properly, ensuring IProject interface compliance
+                const projectData: IProject = {
+                    id: doc.id,
+                    icon: data.icon || "DP",
+                    color: data.color || "#FFFFFF",
+                    name: data.name || "Untitled Project",
+                    description: data.description || "",
+                    userRole: data.userRole || "not defined",
+                    location: data.location || "",
+                    progress: data.progress || 0,
+                    cost: data.cost || 0,
+                    status: data.status || "Pending",
+                    phase: data.phase || "Design",
+                    startDate: convertTimestampToDateString(data.startDate),
+                    finishDate: convertTimestampToDateString(data.finishDate),
+                    PUsers: data.PUsers && Array.isArray(data.PUsers) ? 
+                        data.PUsers.filter((user: string) => user && user.trim() !== "") : [],
+                    assignedUsers: data.assignedUsers && Array.isArray(data.assignedUsers) ? 
+                        data.assignedUsers.filter((user: any) => user && (typeof user === 'string' ? user.trim() !== "" : true)) : [],
+                    toDos: data.toDos && Array.isArray(data.toDos) ? 
+                        data.toDos.map((todo: any) => ({
+                            ...todo,
+                            // Convert timestamps in toDos as well
+                            due_date: convertTimestampToDateString(todo.due_date),
+                            start_date: convertTimestampToDateString(todo.start_date),
+                            created_at: convertTimestampToDateString(todo.created_at),
+                            updated_at: convertTimestampToDateString(todo.updated_at)
+                        })) : []
                 };
                 
                 try {
-                    projectManager.newProject(projectData);
+                    // Check if project already exists by ID
+                    const existingProject = projectManager.findProjectById(doc.id);
+                    
+                    if (existingProject) {
+                        // Update existing project
+                        console.log(`Updating existing project: ${existingProject.name}`);
+                        projectManager.updateProject(doc.id, projectData);
+                    } else {
+                        // Create new project
+                        console.log(`Creating new project: ${projectData.name}`);
+                        projectManager.newProject(projectData);
+                    }
                 } catch (error) {
-                    // Error will be handled by the onProjectError callback
                     console.warn("Skipping project due to error:", error);
                 }
             }

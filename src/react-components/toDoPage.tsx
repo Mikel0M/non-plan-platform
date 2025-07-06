@@ -23,7 +23,6 @@ export function ToDoPage(props: Props) {
 
   // Update project when route changes
   React.useEffect(() => {
-    props.projectsManager.setChangeButton();
     setCurrentProject(id ? props.projectsManager.getProject(id) : undefined);
   }, [props.projectsManager, id]);
 

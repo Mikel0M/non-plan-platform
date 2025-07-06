@@ -37,7 +37,6 @@ export function ProjectDetailsPage(props: Props) {
     // Only update projectState when the project ID changes
     React.useEffect(() => {
       setProjectState(id ? props.projectsManager.getProject(id) : undefined);
-      // Optionally, call setChangeButton only once on mount
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
     if (!projectState) {
@@ -652,8 +651,12 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
                   // Create a new instance to trigger React re-render
                   const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), projectState);
                   setProjectState(updated);
-                  if (props.projectsManager.updateProjectCards) {
-                    props.projectsManager.updateProjectCards(projectState);
+                  
+                  // Update the project in the manager
+                  try {
+                    props.projectsManager.updateProject(projectState.id || '', projectState);
+                  } catch (error) {
+                    console.warn("Failed to update project:", error);
                   }
                 }
                 closeModal('editProjectModal');

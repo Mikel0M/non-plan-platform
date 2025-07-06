@@ -1,5 +1,5 @@
 import { IProject, Project, userRole, status, phase } from "./Project";
-import { toDoManagerInstance } from "./toDoManager"; // Import the toDoManager instance
+import { toDoManagerInstance, toDos } from "./toDoManager"; // Import toDos array
 import { IUser, User } from "./User";
 import { users } from "./UsersManager";
 import { companiesManagerInstance } from "./CompaniesManager";
@@ -10,17 +10,35 @@ export class ProjectsManager {
     list: Project[] = [];
     onProjectCreated = (_project: Project) => {}; // Callback for when a project is created
     onProjectDeleted = () => {}; 
+    onProjectUpdated = (_project: Project) => {}; // Callback for when a project is updated
     onProjectError?: (errorMessage: string) => void; // Callback for error handling
     currentProject: Project | null = null;
     projectsListContainer: HTMLElement | null = null; // To hold the #projectsList container
-
 
     // Method to find a project by its ID
     findProjectById(id: string): Project | undefined {
         return this.list.find(project => project.id === id);
     }
 
-    newProject(data: IProject) {
+    // Method to update an existing project with provided data
+    updateProject(id: string, data: IProject): Project {
+        const existingProjectIndex = this.list.findIndex(project => project.id === id);
+        
+        if (existingProjectIndex === -1) {
+            throw new Error(`Project with ID ${id} not found`);
+        }
+
+        // Update the existing project with new data
+        const updatedProject = new Project(data);
+        this.list[existingProjectIndex] = updatedProject;
+
+        // Trigger update callback
+        this.onProjectUpdated(updatedProject);
+
+        return updatedProject;
+    }
+
+    newProject(data: IProject, id?: string) {
         // Check for duplicate names first
         const projectNames = this.list.map((project) => project.name);
         const nameInUse = projectNames.includes(data.name);
@@ -65,259 +83,11 @@ export class ProjectsManager {
         }
     }
 
-    setToDoModal(project: Project) {
-        const toDoModal = document.getElementById("editProjectModal");
-        if (!toDoModal || !this.currentProject) {
-            console.warn("No project selected for editing!");
-            return;  // Exit early if there's no project to edit
-        }
-
-        // Populate project details
-        const setText = (selector: string, value: string | number) => {
-            const element = toDoModal.querySelector(`[data-project-info='${selector}']`);
-            if (element) {
-                element.textContent = value.toString();
-            } else {
-                console.warn(`Element not found for ${selector}`);
-            }
-        };
-        
-        console.log("ready to test")
-        console.log("project.name")
-        setText("iconPD", project.icon);
-        setText("namePD", project.name);
-        setText("nameBigPD", project.name);
-        setText("locationPD", project.location);
-        setText("descriptionPD", project.description);
-        setText("progressPD", project.progress);
-        setText("costPD", project.cost);
-        setText("statusPD", project.status);
-        setText("rolePD", project.userRole);
-        setText("startPD", project.startDate);
-        setText("finishPD", project.finishDate);
-
-        // Populate form fields for editing
-        const setInputValue = (id: string, value: string | number) => {
-            const input = document.getElementById(id) as HTMLInputElement;
-            if (input) input.value = value.toString();
-        };
-
-        setInputValue("projectNameInput", project.name);
-        setInputValue("projectLocationInput", project.location);
-        setInputValue("projectDescriptionInput", project.description);
-        setInputValue("projectCostInput", project.cost);
-        setInputValue("projectProgressInput", project.progress);
-        setInputValue("projectStatusInput", project.status);
-        setInputValue("projectRoleInput", project.userRole);
-        setInputValue("projectStartPDInput", project.startDate);
-        setInputValue("projectFinishPDInput", project.finishDate);
-
-        // Set icon background color
-        const iconElement = document.getElementById("iconPD");
-        if (iconElement) {
-            (iconElement as HTMLElement).style.backgroundColor = project.color;
-        }
-
-        // Capture the project details into a constant
-        const projectDetails = {
-            name: project.name, // Project name
-            location: project.location, // Project location
-            description: project.description, // Project description
-            cost: project.cost, // Project costs
-            progress: project.progress, // Project progress
-            status: project.status, // Project status
-            role: project.userRole, // Project role
-            startDate: project.startDate, // Project start date
-            endDate: project.finishDate, // Project end date
-            // You can add more project properties here
-        };
-        console.log("testing")
-        console.log(projectDetails)
-    }
-
-    
-
-    setDetailsPage(project: Project) {
-        const detailsPage = document.getElementById("projectDetails");
-        if (!detailsPage || !this.currentProject) {
-            console.warn("No project selected for editing!");
-            return;  // Exit early if there's no project to edit
-        }
-
-        // Populate project details
-        const setText = (selector: string, value: string | number) => {
-            const element = detailsPage.querySelector(`[data-project-info='${selector}']`);
-            if (element) {
-                element.textContent = value.toString();
-            } else {
-                console.warn(`Element not found for ${selector}`);
-            }
-        
-    
-    }
-
-        this.updateProgressBar(project.progress)
-
-        setText("iconPD", project.icon);
-        setText("namePD", project.name);
-        setText("nameBigPD", project.name);
-        setText("locationPD", project.location);
-        setText("descriptionPD", project.description);
-        setText("progressPD", project.progress);
-        setText("costPD", project.cost);
-        setText("statusPD", project.status);
-        setText("rolePD", project.userRole);
-        setText("startPD", project.startDate);
-        setText("finishPD", project.finishDate);
-
-        // Populate form fields for editing
-        const setInputValue = (id: string, value: string | number) => {
-            const input = document.getElementById(id) as HTMLInputElement;
-            if (input) input.value = value.toString();
-        };
-
-        setInputValue("projectNameInput", project.name);
-        setInputValue("projectLocationInput", project.location);
-        setInputValue("projectDescriptionInput", project.description);
-        setInputValue("projectCostInput", project.cost);
-        setInputValue("projectProgressInput", project.progress);
-        setInputValue("projectStatusInput", project.status);
-        setInputValue("projectRoleInput", project.userRole);
-        setInputValue("projectStartPDInput", project.startDate);
-        setInputValue("projectFinishPDInput", project.finishDate);
-
-        // Set icon background color
-        const iconElement = document.getElementById("iconPD");
-        if (iconElement) {
-            (iconElement as HTMLElement).style.backgroundColor = project.color;
-        }
-
-        // Capture the project details into a constant
-        // const projectDetails = {
-        //     name: project.name, // Project name
-        //     location: project.location, // Project location
-        //     description: project.description, // Project description
-        //     progress: project.progress, // Project progress
-        //     cost: project.cost, // Project costs
-        //     status: project.status, // Project status
-        //     role: project.userRole, // Project role
-        //     startDate: project.startDate, // Project start date
-        //     endDate: project.finishDate, // Project end date
-        //     // You can add more project properties here
-        // };
-        
-    }
-
-
-    setProjectsPage(project: Project) {
-        const projectsPage = document.getElementById("projectsPage");
-        if (!projectsPage || !this.currentProject) {
-            console.warn("No project selected for editing!");
-            return;  // Exit early if there's no project to edit
-        }
-
-        // Populate project page
-        const setText = (selector: string, value: string | number) => {
-            const element = projectsPage.querySelector(`[data-project-info='${selector}']`);
-            if (element) element.textContent = value.toString();
-        };
-
-        setText("iconPD", project.icon);
-        setText("namePD", project.name);
-        setText("nameBigPD", project.name);
-        setText("locationPD", project.location);
-        setText("descriptionPD", project.description);
-        setText("progressPD", project.progress);
-        setText("costPD", project.cost);
-        setText("statusPD", project.status);
-        setText("rolePD", project.userRole);
-        setText("startPD", project.startDate);
-        setText("finishPD", project.finishDate);
-
-        // Populate form fields for editing
-        const setInputValue = (id: string, value: string | number) => {
-            const input = document.getElementById(id) as HTMLInputElement;
-            if (input) input.value = value.toString();
-        };
-
-        setInputValue("projectNameInput", project.name);
-        setInputValue("projectLocationInput", project.location);
-        setInputValue("projectDescriptionInput", project.description);
-        setInputValue("projectProgressInput", project.progress);
-        setInputValue("projectCostInput", project.cost);
-        setInputValue("projectStatusInput", project.status);
-        setInputValue("projectRoleInput", project.userRole);
-        setInputValue("projectStartPDInput", project.startDate);
-        setInputValue("projectFinishPDInput", project.finishDate);
-
-        const iconElement = document.getElementById("iconPD");
-        if (iconElement) {
-            (iconElement as HTMLElement).style.backgroundColor = project.color;
-        }
-    }
-
-    setDeleteProjectButton(){
-        const deleteButton = document.getElementById("ConfirmDeleteButton") as HTMLButtonElement;
-        if (deleteButton) {
-            deleteButton.addEventListener("click", () => {
-                console.log("Delete button clicked");
-                if (this.currentProject) {
-                    this.deleteProject(this.currentProject.id);
-                    const projectsPage = document.getElementById("projectsPage") as HTMLDivElement;
-                    const usersPage = document.getElementById("usersPage") as HTMLDivElement;
-                    const detailsPage = document.getElementById("projectDetails") as HTMLDivElement;
-                    const introPage = document.getElementById("intro") as HTMLDivElement;
-                    const sidebar = document.getElementById("sidebar") as HTMLDivElement;
-                    if (projectsPage && detailsPage) {
-                        // Hide other pages and show the Projects page
-                        usersPage.style.display = "none";
-                        detailsPage.style.display = "none";
-                        introPage.style.display = "none";
-                        projectsPage.style.display = "flex"; // Show Projects page
-                        sidebar.style.display = "flex";
-                    }
-                } else {
-                    console.warn("No project selected for deletion.");
-                }
-                const modal = document.getElementById("DeleteProjectModal") as HTMLDialogElement;
-                    if (modal) {
-                        modal.close();
-                    }
-                
-            });
-        }
-
-    }
-
-    setChangeButton() {
-        const saveButton = document.getElementById("changeProjectButton") as HTMLButtonElement;
-        if (saveButton) {
-            saveButton.addEventListener("click", () => {
-                if (this.currentProject) {
-                    this.updateProjectData(this.currentProject.id);
-                    this.updateProjectCards(this.currentProject);
-                    this.updateProgressBar(this.currentProject.progress)
-
-                    const modal = document.getElementById("editProjectModal") as HTMLDialogElement;
-                    if (modal) {
-                        modal.close();
-                    }
-                    this.refreshModalToDo(this.currentProject)
-                    } else {
-                    console.warn("No project selected for editing.");
-                }
-            });
-        }
-    }
-
     refreshModalToDo(project: Project): void {
         const modaltoDo = document.getElementById("newToDoModal") as HTMLDialogElement;
         const name = modaltoDo.querySelector("[data-project-info='toDoProjectName']");
             if (name) { name.textContent = project.name}
-
     }
-
-
 
     updateProjectData(projectId: string) {
         const project = this.getProject(projectId);
@@ -365,96 +135,6 @@ export class ProjectsManager {
 
         project.startDate = getInputValue("projectStartPDInput");
         project.finishDate = getInputValue("projectFinishPDInput");
-
-        //this.updateProjectUI(project);
-        this.updateProjectCards(project);
-
-    }
-
-    updateProjectCards(project: Project){
-        const projectsPage = document.getElementById("projectsPage");
-        if (!projectsPage) return;
-
-        const setText = (selector: string, value: string | number) => {
-            const element = projectsPage.querySelector(`[data-project-info='${selector}']`);
-            if (element) element.textContent = value.toString();
-        };
-
-        setText("iconPD", project.icon);
-        setText("namePD", project.name);
-        setText("nameBigPD", project.name);
-        setText("locationPD", project.location);
-        setText("descriptionPD", project.description);
-        setText("progressPD", project.progress);
-        setText("costPD", project.cost);
-        setText("statusPD", project.status);
-        setText("rolePD", project.userRole);
-        setText("startPD", project.startDate);
-        setText("finishPD", project.finishDate);
-
-        const setInputValue = (id: string, value: string | number) => {
-            const input = document.getElementById(id) as HTMLInputElement;
-            if (input) input.value = value.toString();
-        };
-
-        setInputValue("projectNameInput", project.name);
-        setInputValue("projectLocationInput", project.location);
-        setInputValue("projectDescriptionInput", project.description);
-        setInputValue("projectProgressInput", project.progress);
-        setInputValue("projectCostInput", project.cost);
-        setInputValue("projectStatusInput", project.status);
-        setInputValue("projectRoleInput", project.userRole);
-        setInputValue("projectStartPDInput", project.startDate);
-        setInputValue("projectFinishPDInput", project.finishDate);
-
-        const iconElement = document.getElementById("iconPD");
-        if (iconElement) {
-            (iconElement as HTMLElement).style.backgroundColor = project.color;
-        }
-
-    }
-
-    
-    updateProjectUI(project: Project) {
-        const detailsPage = document.getElementById("projectDetails");
-        if (!detailsPage) return;
-
-        const setText = (selector: string, value: string | number) => {
-            const element = detailsPage.querySelector(`[data-project-info='${selector}']`);
-            if (element) element.textContent = value.toString();
-        };
-
-        setText("iconPD", project.icon);
-        setText("namePD", project.name);
-        setText("nameBigPD", project.name);
-        setText("locationPD", project.location);
-        setText("descriptionPD", project.description);
-        setText("progressPD", project.progress);
-        setText("costPD", project.cost);
-        setText("statusPD", project.status);
-        setText("rolePD", project.userRole);
-        setText("startPD", project.startDate);
-        setText("finishPD", project.finishDate);
-
-        const setInputValue = (id: string, value: string | number) => {
-            const input = document.getElementById(id) as HTMLInputElement;
-            if (input) input.value = value.toString();
-        };
-
-        setInputValue("projectNameInput", project.name);
-        setInputValue("projectLocationInput", project.location);
-        setInputValue("projectDescriptionInput", project.description);
-        setInputValue("projectProgressInput", project.progress);
-        setInputValue("projectCostInput", project.cost);
-        setInputValue("projectStatusInput", project.status);
-        setInputValue("projectRoleInput", project.userRole);
-        setInputValue("projectStartPDInput", project.startDate);
-        setInputValue("projectFinishPDInput", project.finishDate);
-
-        const iconElement = document.getElementById("iconPD");
-        if (iconElement) {
-            (iconElement as HTMLElement).style.backgroundColor = project.color;
-        }
     }
 
     // Legacy methods for backward compatibility - use callbacks instead
@@ -470,7 +150,7 @@ export class ProjectsManager {
         // Fallback to DOM manipulation if callback not set
         const modal = document.getElementById("newProjectErrorModal") as HTMLDialogElement;
         if (!modal) {
-            console.warn("Error modal not found, using console error instead:", errorMessage);
+            console.warn("Error modal not found");
             return;
         }
 
@@ -493,7 +173,7 @@ export class ProjectsManager {
         // Fallback to DOM manipulation if callback not set
         const modal = document.getElementById("newProjectErrorModal") as HTMLDialogElement;
         if (!modal) {
-            console.warn("Error modal not found, using console error instead:", errorMessage);
+            console.warn("Error modal not found");
             return;
         }
 
@@ -509,7 +189,6 @@ export class ProjectsManager {
         return project;
     }
 
-
     deleteProject(id: string) {
         const project = this.getProject(id);
         if (!project) { return }
@@ -521,179 +200,67 @@ export class ProjectsManager {
     }
 
     getProjectbyName(name: string) {
-        return this.list.find((project) => project.name === name);
+        const project = this.list.find((project) => {
+            return project.name === name;
+        });
+        return project;
     }
 
     getTotalCostAllProjects() {
-        return this.list.reduce((total, project) => total + project.cost, 0);
+        let totalCost: number = 0;
+        this.list.forEach((project) => {
+            totalCost += project.cost;
+        });
+        return totalCost;
     }
 
     updateProgressBar(progress: number) {
-        // Get the progress bar element
-        const progressBar = document.querySelector("#percentageDiv") as HTMLElement;
-    
+        const progressBar = document.querySelector('.progress-bar') as HTMLElement;
         if (progressBar) {
-            // Ensure the progress is between 0 and 100
-            const clampedProgress = Math.max(0, Math.min(100, progress));
-    
-            // Set the width dynamically
-            progressBar.style.width = `${clampedProgress}%`;
-    
-            // Update the text inside the div
-            progressBar.textContent = `${clampedProgress}%`;
+            progressBar.style.width = `${progress}%`;
         }
     }
 
     exportToJSON() {
-        const projects = this.list.map(project => {
-            return project.toJSON(); // Use the new toJSON method
-        });
-
-        const usersExports = this.exportUsers();
-        const usersJSON = usersExports.map(user => ({
-            id: user.id,
-            icon: user.icon,
-            color: user.color,
-            name: user.name,
-            surname: user.surname,
-            email: user.email,
-            phone: user.phone,
-            role: user.role,
-            access: user.access,
-            company: user.company
-        }));
-
-        // --- Add companies to export ---
-        const companies = companiesManagerInstance.exportCompanies();
-        const exportableData = { projects, usersJSON, companies };
-
-        console.log("Exporting projects, users, and companies to JSON:", exportableData);
-
-        const json = JSON.stringify(exportableData, null, 2);
-
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'projects.json';
-        a.click();
-        URL.revokeObjectURL(url); // Clean up the URL object
+        const json = JSON.stringify(this.list, null, 2);
+        const dataURL = `data:text/json;charset=utf-8,${encodeURIComponent(json)}`;
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'projects.json';
+        link.click();
     }
 
     importFromJSON(onComplete?: () => void) {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'application/json';
-
-        input.addEventListener('change', () => {
-            const file = input.files?.[0];
-            if (!file) {
-                console.error("No file selected");
-                if (onComplete) onComplete();
-                return;
+        input.onchange = (e: any) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e: any) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        this.list = data.map((projectData: IProject) => new Project(projectData));
+                        if (onComplete) onComplete();
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                    }
+                };
+                reader.readAsText(file);
             }
-
-            const reader = new FileReader();
-            reader.onload = () => {
-                try {
-                    const json = reader.result as string;
-                    const parsedData: any = JSON.parse(json);
-
-                    if (!parsedData.projects) {
-                        throw new Error("Invalid JSON format. Expected an object with 'projects' property");
-                    }
-
-                    const projects: any[] = parsedData.projects;
-                    const importedUsers: IUser[] = parsedData.usersJSON || [];
-                    // --- Import companies if present ---
-                    if (parsedData.companies) {
-                        companiesManagerInstance.importCompanies(parsedData.companies);
-                    }
-
-                    for (const projectData of projects) {
-                        try {
-                            if (!projectData.name) {
-                                console.error("Project data is missing the 'name' property:", projectData);
-                                continue;
-                            }
-                            const { toDos = [], ...rest } = projectData;
-                            let existingProject = this.list.find(p => p.id === rest.id || p.name === rest.name);
-                            if (existingProject) {
-                                Object.assign(existingProject, rest);
-                                existingProject.toDos = toDos;
-                                this.updateProjectCards(existingProject);
-                            } else {
-                                const project = this.newProject(rest);
-                                if (project && Array.isArray(toDos)) {
-                                    project.toDos = toDos;
-                                    this.updateProjectCards(project);
-                                }
-                            }
-                        } catch (error) {
-                            console.error(`Failed to import project: ${projectData.name}`, error);
-                        }
-                    }
-
-                    for (const userData of importedUsers) {
-                        try {
-                            const user = new User(userData);
-                            users.push(user);
-                            console.log("User imported successfully:", user);
-                        } catch (error) {
-                            console.error("Failed to import user:", userData, error);
-                        }
-                    }
-
-                    if (this.list.length > 0) {
-                        this.list.forEach(project => this.updateProjectCards(project));
-                    }
-
-                    if (onComplete) onComplete();
-                    console.log("Projects, users, and companies imported successfully.");
-                } catch (error) {
-                    console.error("Error parsing the JSON file:", error);
-                    if (onComplete) onComplete();
-                }
-            };
-            reader.onerror = () => {
-                console.error("Failed to read the file:", reader.error);
-                if (onComplete) onComplete();
-            };
-
-            reader.readAsText(file);
-        });
-
+        };
         input.click();
     }
 
     // Method to filter to-dos by project ID (data only, UI handled by React)
     filterToDosByProjectId(projectId: string): any[] {
-        console.log(`Filtering to-dos for project ID: ${projectId}`); // Debugging statement
-
-        // Log all elements of the toDos list
-        console.log("All to-dos before filtering:", toDoManagerInstance.getToDos()); // Debugging statement
-
-        // Get the filtered tasks
-        const filteredToDos = toDoManagerInstance.getToDos().filter(toDo => toDo.project_id === projectId);
-
-        console.log(`Found ${filteredToDos.length} to-dos for project ID: ${projectId}`); // Debugging statement
-        return filteredToDos;
+        return toDos.filter((toDo: any) => toDo.projectId === projectId);
     }
 
     // Method to gather and return all users
     exportUsers(): IUser[] {
-        return users.map(user => ({
-            id: user.id,
-            icon: user.icon,
-            color: user.color,
-            name: user.name,
-            surname: user.surname,
-            email: user.email,
-            phone: user.phone,
-            role: user.role,
-            access: user.access,
-            company: user.company
-        }));
+        return users;
     }
 
     // Method to import users from JSON data
@@ -707,17 +274,21 @@ export class ProjectsManager {
                 console.log("User imported successfully:", user); // Debugging statement
             } catch (error) {
                 console.error("Failed to import user:", userData, error);
-        }
-    });
+            }
+        });
 
-    console.log("All users imported successfully. Total users:", users.length); // Debugging statement
-}
+        console.log("All users imported successfully. Total users:", users.length); // Debugging statement
+    }
 
     /**
      * Returns a filtered list of projects whose name includes the given query (case-insensitive).
      */
     filterByName(query: string): Project[] {
-        return this.list.filter(project =>
+        if (!query.trim()) {
+            return this.list;
+        }
+        
+        return this.list.filter(project => 
             project.name.toLowerCase().includes(query.toLowerCase())
         );
     }
