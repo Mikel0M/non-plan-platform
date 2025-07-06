@@ -18,7 +18,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, projectRole, onEdit, onDelete
     >
       <span className="material-icons-round">person</span>
       <span>{user.name} {user.surname}</span>
-      <span>{projectRole ? projectRole : (t(`projects_role_${user.role?.toLowerCase()}`) || user.role)}</span>
+      <span>{projectRole ? projectRole : (t(`projects_role_${user.role?.toLowerCase().replace(/\s+/g, '_')}`) || user.role)}</span>
       <span>{user.company}</span>
       <button
         className="buttonTertiary"

@@ -10,7 +10,11 @@ export function ProjectCard(props: Props) {
     const { t } = useTranslation();
     // Helper to translate status and role
     const translateStatus = (status: string) => t(`projects_status_${status.toLowerCase()}`) || status;
-    const translateRole = (role: string) => t(`projects_role_${role.toLowerCase()}`) || role;
+    const translateRole = (role: string) => {
+        // Normalize role key: lowercase and replace spaces with underscores
+        const normalizedRole = role.toLowerCase().replace(/\s+/g, '_');
+        return t(`projects_role_${normalizedRole}`) || role;
+    };
     return (
         <div className="projectCard">
             <div
