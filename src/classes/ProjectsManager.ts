@@ -10,27 +10,10 @@ export class ProjectsManager {
     list: Project[] = [];
     onProjectCreated = (_project: Project) => {}; // Callback for when a project is created
     onProjectDeleted = () => {}; 
+    onProjectError?: (errorMessage: string) => void; // Callback for error handling
     currentProject: Project | null = null;
     projectsListContainer: HTMLElement | null = null; // To hold the #projectsList container
 
-    constructor() {
-        this.newProject({
-            name: "Default Project",
-            description: "This is a default project",
-            status: "Pending",
-            userRole: "Architect",
-            finishDate: "2023-12-31",
-            icon: "MM",                // <-- Add a default icon
-            color: "#e0e0e0",          // <-- Add a default color
-            location: "Unknown",       // <-- Add a default location
-            progress: 0,               // <-- Add a default progress
-            cost: 0,                   // <-- Add a default cost
-            startDate: "2023-01-01",   // <-- Add a default start date
-            phase: "Design",           // <-- Add a default phase if required
-            id: crypto.randomUUID?.() || Math.random().toString(36).slice(2), // <-- Add a default id if required
-        })
-        
-    }
 
     // Method to find a project by its ID
     findProjectById(id: string): Project | undefined {
@@ -38,16 +21,39 @@ export class ProjectsManager {
     }
 
     newProject(data: IProject) {
+        // Check for duplicate names first
         const projectNames = this.list.map((project) => project.name);
         const nameInUse = projectNames.includes(data.name);
-        const project = new Project(data);
-        this.onProjectCreated(project)
-
+        
         if (nameInUse) {
-            this.showErrorModalDupName(data.name);
-            return null; // Prevent further execution
+            const errorMessage = `A project with the name "${data.name}" already exists.`;
+            if (this.onProjectError) {
+                this.onProjectError(errorMessage);
+            }
+            throw new Error(errorMessage);
         }
 
+        // Check for minimum name length
+        if (data.name.length < 5) {
+            const errorMessage = `A valid project name should have at least 5 characters.`;
+            if (this.onProjectError) {
+                this.onProjectError(errorMessage);
+            }
+            throw new Error(errorMessage);
+        }
+
+        // Create and add the project
+        const project = new Project(data);
+        this.list.push(project);
+        this.onProjectCreated(project);
+
+        // Handle modal setup only if DOM elements exist (legacy support)
+        this.setupToDoModalIfExists(data);
+
+        return project;
+    }
+
+    private setupToDoModalIfExists(data: IProject) {
         const newtoDoModalBtn = document.getElementById("newToDoBtn");
         const modaltoDo = document.getElementById("newToDoModal") as HTMLDialogElement;
         if (newtoDoModalBtn && modaltoDo) {
@@ -57,15 +63,6 @@ export class ProjectsManager {
             if (projectID) { projectID.textContent = data.id ? data.id : "" }
             newtoDoModalBtn.addEventListener("click", () => { modaltoDo.showModal() })
         }
-
-        if (data.name.length < 5) {
-            this.showErrorModalShortName();
-            return null; // Prevent further execution
-        }
-
-
-        this.list.push(project);
-        return project;
     }
 
     setToDoModal(project: Project) {
@@ -460,30 +457,51 @@ export class ProjectsManager {
         }
     }
 
+    // Legacy methods for backward compatibility - use callbacks instead
     showErrorModalShortName() {
+        const errorMessage = `A valid project name should have at least 5 characters.`;
+        
+        // Try to use callback first
+        if (this.onProjectError) {
+            this.onProjectError(errorMessage);
+            return;
+        }
+
+        // Fallback to DOM manipulation if callback not set
         const modal = document.getElementById("newProjectErrorModal") as HTMLDialogElement;
+        if (!modal) {
+            console.warn("Error modal not found, using console error instead:", errorMessage);
+            return;
+        }
+
         const errorMessageElement = modal.querySelector("#errorMessage");
-
         if (errorMessageElement) {
-            errorMessageElement.textContent = `A valid project name should have at least 5 characters.`;
+            errorMessageElement.textContent = errorMessage;
         }
-
-        if (modal) {
-            modal.showModal();
-        }
+        modal.showModal();
     }
 
     showErrorModalDupName(repeatedName: string) {
+        const errorMessage = `A project with the name "${repeatedName}" already exists.`;
+        
+        // Try to use callback first
+        if (this.onProjectError) {
+            this.onProjectError(errorMessage);
+            return;
+        }
+
+        // Fallback to DOM manipulation if callback not set
         const modal = document.getElementById("newProjectErrorModal") as HTMLDialogElement;
+        if (!modal) {
+            console.warn("Error modal not found, using console error instead:", errorMessage);
+            return;
+        }
+
         const errorMessageElement = modal.querySelector("#errorMessage");
-
         if (errorMessageElement) {
-            errorMessageElement.textContent = `A project with the name "${repeatedName}" already exists.`;
+            errorMessageElement.textContent = errorMessage;
         }
-
-        if (modal) {
-            modal.showModal();
-        }
+        modal.showModal();
     }
 
     getProject(id: string) {

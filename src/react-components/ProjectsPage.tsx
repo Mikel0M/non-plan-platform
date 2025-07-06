@@ -1,10 +1,12 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
+import * as Firestore from "firebase/firestore"
 import { IProject, userRole, status, phase, Project } from '../classes/Project';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { ProjectCard } from './ProjectCard';
 import { useTranslation } from "./LanguageContext";
 import { SearchBox } from './SearchBox';
+import { firebaseDB } from '../firebase';
 
 interface Props {
     projectManager: ProjectsManager;
@@ -19,11 +21,51 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     const [errorMessage, setErrorMessage] = React.useState('');
     // Update UI when projects are created or deleted
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
-    projectManager.onProjectCreated = () => { forceUpdate(); }
-    projectManager.onProjectDeleted = () => { forceUpdate(); }
+    
+    // Set up callbacks
+    React.useEffect(() => {
+        projectManager.onProjectCreated = () => { forceUpdate(); };
+        projectManager.onProjectDeleted = () => { forceUpdate(); };
+        projectManager.onProjectError = (error: string) => {
+            setErrorMessage(error);
+            setIsErrorModalOpen(true);
+        };
+    }, [projectManager]);
 
     const filteredProjects = projectManager.filterByName(searchQuery);
 
+    const getFirestoreProject = async () => {
+        try {
+            const projectsCollection = Firestore.collection(firebaseDB, "projects") as Firestore.CollectionReference<IProject>;
+            const firebaseProjects = await Firestore.getDocs(projectsCollection);
+            for (const doc of firebaseProjects.docs) {
+                const data = doc.data();
+                console.log("Raw Firestore data:", data);
+                
+                // Add document ID to the data
+                const projectData = {
+                    ...data,
+                    id: doc.id
+                };
+                
+                try {
+                    projectManager.newProject(projectData);
+                } catch (error) {
+                    // Error will be handled by the onProjectError callback
+                    console.warn("Skipping project due to error:", error);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching projects:", error);
+            setErrorMessage("Failed to load projects from database");
+            setIsErrorModalOpen(true);
+        }
+    }
+
+    React.useEffect(() => {
+        getFirestoreProject();
+    }, []);
+    
     const projectCards = filteredProjects.map((project) => {
         return (
             <Router.Link to={`/project/${project.id}`} key={project.id} style={{ textDecoration: 'none', color: 'inherit' }}>
