@@ -27,6 +27,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
         projectManager.onProjectCreated = () => { forceUpdate(); };
         projectManager.onProjectDeleted = () => { forceUpdate(); };
         projectManager.onProjectUpdated = () => { forceUpdate(); };
+        projectManager.onProjectsImported = () => { forceUpdate(); }; // Add this callback
         projectManager.onProjectError = (error: string) => {
             setErrorMessage(error);
             setIsErrorModalOpen(true);
@@ -137,9 +138,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     
 
     const onImportClick = () => {
-        projectManager.importFromJSON(() => {
-            // No need to update projects state, it's derived from projectManager.list
-        });
+        projectManager.importFromJSON(); // Remove callback - handled by onProjectsImported
     }
 
 

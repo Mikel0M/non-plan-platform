@@ -112,9 +112,9 @@ export class Project implements IProject {
         this.PUsers = data.PUsers?.map(userData => new User(userData)) || [];
         this.assignedUsers = data.assignedUsers || [];
 
-        // Generate icon and random color
-        this.icon = sliceTwoEachWord(this.name);
-        this.color = getRandomColor();
+        // Generate icon and use provided color or generate random color
+        this.icon = data.icon || sliceTwoEachWord(this.name);
+        this.color = data.color || getRandomColor();
         
     }
 

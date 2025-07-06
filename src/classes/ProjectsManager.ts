@@ -11,6 +11,7 @@ export class ProjectsManager {
     onProjectCreated = (_project: Project) => {}; // Callback for when a project is created
     onProjectDeleted = () => {}; 
     onProjectUpdated = (_project: Project) => {}; // Callback for when a project is updated
+    onProjectsImported?: () => void; // Callback for when projects are imported
     onProjectError?: (errorMessage: string) => void; // Callback for error handling
     currentProject: Project | null = null;
     projectsListContainer: HTMLElement | null = null; // To hold the #projectsList container
@@ -221,35 +222,187 @@ export class ProjectsManager {
         }
     }
 
-    exportToJSON() {
-        const json = JSON.stringify(this.list, null, 2);
-        const dataURL = `data:text/json;charset=utf-8,${encodeURIComponent(json)}`;
-        const link = document.createElement('a');
-        link.href = dataURL;
-        link.download = 'projects.json';
-        link.click();
+    exportToJSON(): void {
+        if (this.list.length === 0) {
+            console.warn("No projects to export");
+            if (this.onProjectError) {
+                this.onProjectError("No projects to export");
+            }
+            return;
+        }
+
+        try {
+            // Create a clean export format with all necessary data
+            const projectsToExport = this.list.map(project => ({
+                id: project.id,
+                name: project.name,
+                description: project.description,
+                userRole: project.userRole,
+                location: project.location,
+                progress: project.progress,
+                cost: project.cost,
+                status: project.status,
+                phase: project.phase,
+                startDate: project.startDate,
+                finishDate: project.finishDate,
+                color: project.color,
+                icon: project.icon,
+                PUsers: project.PUsers || [],
+                assignedUsers: project.assignedUsers || [],
+                toDos: project.toDos || []
+            }));
+
+            // Export in the original format with projects, users, and companies
+            const exportData = {
+                projects: projectsToExport,
+                usersJSON: this.exportUsers(),
+                companies: companiesManagerInstance.exportCompanies()
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `projects_export_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            console.log(`Exported ${projectsToExport.length} projects, ${this.exportUsers().length} users, and companies to ${exportFileDefaultName}`);
+        } catch (error) {
+            console.error('Failed to export projects:', error);
+            if (this.onProjectError) {
+                this.onProjectError('Failed to export projects: ' + (error as Error).message);
+            }
+        }
     }
 
-    importFromJSON(onComplete?: () => void) {
+    importFromJSON(onComplete?: () => void): void {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = 'application/json';
-        input.onchange = (e: any) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e: any) => {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        this.list = data.map((projectData: IProject) => new Project(projectData));
-                        if (onComplete) onComplete();
-                    } catch (error) {
-                        console.error('Error parsing JSON:', error);
+        input.accept = '.json';
+        
+        input.onchange = (event) => {
+            const file = (event.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const content = e.target?.result as string;
+                    const importedData = JSON.parse(content);
+                    
+                    // Handle both old format (with projects/usersJSON/companies) and new format (direct array)
+                    let importedProjects: any[] = [];
+                    let importedUsers: any[] = [];
+                    let importedCompanies: any[] = [];
+
+                    if (importedData.projects && Array.isArray(importedData.projects)) {
+                        // Old format: { projects: [...], usersJSON: [...], companies: [...] }
+                        importedProjects = importedData.projects;
+                        importedUsers = importedData.usersJSON || [];
+                        importedCompanies = importedData.companies || [];
+                    } else if (Array.isArray(importedData)) {
+                        // New format: direct array of projects
+                        importedProjects = importedData;
+                    } else {
+                        throw new Error('Invalid JSON format - expected projects array or wrapped format');
                     }
-                };
-                reader.readAsText(file);
-            }
+
+                    // Process each imported project
+                    let importedCount = 0;
+                    let updatedCount = 0;
+                    let skippedCount = 0;
+
+                    importedProjects.forEach((projectData: any) => {
+                        try {
+                            // Validate required fields
+                            if (!projectData.name || typeof projectData.name !== 'string') {
+                                throw new Error('Project name is required');
+                            }
+
+                            // Check if project already exists by ID
+                            const existingProject = projectData.id ? this.findProjectById(projectData.id) : null;
+                            
+                            if (existingProject) {
+                                // Update existing project
+                                this.updateProject(projectData.id, projectData);
+                                console.log(`Updated existing project: ${projectData.name}`);
+                                updatedCount++;
+                            } else {
+                                // For new projects, skip the duplicate name check during import
+                                // Users can import projects with duplicate names from backups
+                                try {
+                                    const newProject = this.newProject(projectData);
+                                    console.log(`Imported new project: ${projectData.name}`);
+                                    importedCount++;
+                                } catch (error) {
+                                    // If newProject fails (e.g., due to duplicate name), try with a modified name
+                                    const modifiedName = `${projectData.name} (imported)`;
+                                    const modifiedProjectData = { ...projectData, name: modifiedName };
+                                    try {
+                                        const newProject = this.newProject(modifiedProjectData);
+                                        console.log(`Imported project with modified name: ${modifiedName}`);
+                                        importedCount++;
+                                    } catch (secondError) {
+                                        console.warn(`Failed to import project even with modified name: ${projectData.name}`);
+                                        skippedCount++;
+                                    }
+                                }
+                            }
+                        } catch (error) {
+                            console.warn(`Skipping project ${projectData.name || 'Unknown'}:`, error);
+                            skippedCount++;
+                        }
+                    });
+
+                    // Import users if they exist
+                    if (importedUsers.length > 0) {
+                        try {
+                            this.importUsers(importedUsers);
+                            console.log(`Imported ${importedUsers.length} users`);
+                        } catch (error) {
+                            console.warn('Failed to import users:', error);
+                        }
+                    }
+
+                    // Import companies if they exist
+                    if (importedCompanies.length > 0) {
+                        try {
+                            companiesManagerInstance.importCompanies(importedCompanies);
+                            console.log(`Imported ${importedCompanies.length} companies`);
+                        } catch (error) {
+                            console.warn('Failed to import companies:', error);
+                        }
+                    }
+
+                    // Notify about the import results
+                    const totalProcessed = importedCount + updatedCount;
+                    const message = `Import completed: ${importedCount} new projects, ${updatedCount} updated, ${skippedCount} skipped, ${importedUsers.length} users, ${importedCompanies.length} companies`;
+                    console.log(message);
+                    
+                    if (totalProcessed === 0) {
+                        if (this.onProjectError) {
+                            this.onProjectError('No projects were imported. Check console for details.');
+                        }
+                    }
+                    
+                    // Trigger callbacks to update UI
+                    if (onComplete) onComplete();
+                    if (this.onProjectsImported) this.onProjectsImported();
+                    
+                } catch (error) {
+                    console.error('Failed to import projects:', error);
+                    if (this.onProjectError) {
+                        this.onProjectError('Failed to import projects: ' + (error as Error).message);
+                    }
+                }
+            };
+            
+            reader.readAsText(file);
         };
+        
         input.click();
     }
 
