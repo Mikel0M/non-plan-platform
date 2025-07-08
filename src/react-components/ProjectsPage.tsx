@@ -6,12 +6,14 @@ import { ProjectsManager } from '../classes/ProjectsManager';
 import { ProjectCard } from './ProjectCard';
 import { useTranslation } from "./LanguageContext";
 import { SearchBox } from './SearchBox';
-import { firebaseDB } from '../firebase';
+import { getCollection } from '../firebase';
 
 interface Props {
     projectManager: ProjectsManager;
     customStyle?: React.CSSProperties;
 }
+
+const projectsCollection = getCollection<IProject>("/projects");
 
 export function ProjectsPage({ projectManager, customStyle }: Props) {
     const { t } = useTranslation();
@@ -38,7 +40,6 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
 
     const getFirestoreProject = async () => {
         try {
-            const projectsCollection = Firestore.collection(firebaseDB, "projects");
             const firebaseProjects = await Firestore.getDocs(projectsCollection);
             
             for (const doc of firebaseProjects.docs) {
@@ -69,9 +70,23 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                     startDate: convertTimestampToDateString(data.startDate),
                     finishDate: convertTimestampToDateString(data.finishDate),
                     PUsers: data.PUsers && Array.isArray(data.PUsers) ? 
-                        data.PUsers.filter((user: string) => user && user.trim() !== "") : [],
+                        data.PUsers.filter((user: any) => {
+                            if (typeof user === 'string') {
+                                return user && user.trim() !== "";
+                            } else if (typeof user === 'object' && user !== null) {
+                                return user.userId || user.id;
+                            }
+                            return false;
+                        }) : [],
                     assignedUsers: data.assignedUsers && Array.isArray(data.assignedUsers) ? 
-                        data.assignedUsers.filter((user: any) => user && (typeof user === 'string' ? user.trim() !== "" : true)) : [],
+                        data.assignedUsers.filter((user: any) => {
+                            if (typeof user === 'string') {
+                                return user && user.trim() !== "";
+                            } else if (typeof user === 'object' && user !== null) {
+                                return user.userId || user.id;
+                            }
+                            return false;
+                        }) : [],
                     toDos: data.toDos && Array.isArray(data.toDos) ? 
                         data.toDos.map((todo: any) => ({
                             ...todo,
@@ -142,7 +157,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     }
 
 
-    const onFormSubmit = (e: React.FormEvent) => {
+    const onFormSubmit = async (e: React.FormEvent) => {
         const projectForm = document.getElementById("newProjectForm");
         if (!(projectForm && projectForm instanceof HTMLFormElement)) {
             return;
@@ -150,10 +165,26 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
         e.preventDefault();
 
         const formData = new FormData(projectForm);
+        
+        // Generate icon from project name if not provided
+        const projectName = formData.get("name") as string;
+        const generateIcon = (name: string): string => {
+            if (!name || name.trim().length === 0) return "PR";
+            
+            // Split name into words and take first letter of each word
+            const words = name.trim().split(/\s+/);
+            if (words.length >= 2) {
+                return (words[0][0] + words[1][0]).toUpperCase();
+            } else {
+                // If single word, take first two letters
+                return name.trim().substring(0, 2).toUpperCase();
+            }
+        };
+        
         const ProjectData: IProject = {
-            icon: formData.get("icon") as string,
-            color: formData.get("color") as string,
-            name: formData.get("name") as string,
+            icon: formData.get("icon") as string || generateIcon(projectName), // Generate icon from name
+            color: formData.get("color") as string || undefined, // Allow undefined so Project constructor generates random color
+            name: projectName,
             description: formData.get("description") as string,
             userRole: formData.get("userRole") as userRole,
             location: formData.get("location") as string,
@@ -166,7 +197,30 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
         };
 
         try {
+            // First create the project locally (this will generate random color if needed)
             const project = projectManager.newProject(ProjectData);
+            
+            // Then save the complete project data (including generated color and icon) to Firebase
+            const completeProjectData = {
+                icon: project.icon, // This will have the generated icon
+                color: project.color, // This will have the generated random color
+                name: project.name,
+                description: project.description,
+                userRole: project.userRole,
+                location: project.location,
+                progress: project.progress,
+                cost: project.cost,
+                status: project.status,
+                phase: project.phase,
+                startDate: project.startDate,
+                finishDate: project.finishDate,
+                PUsers: project.PUsers || [],
+                assignedUsers: project.assignedUsers || [],
+                toDos: project.toDos || []
+            };
+            
+            await Firestore.addDoc(projectsCollection, completeProjectData);
+            
             projectForm.reset(); // Reset the form
             setIsModalOpen(false);
         } catch (error) {
