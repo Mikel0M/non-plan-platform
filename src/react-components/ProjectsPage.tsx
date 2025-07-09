@@ -27,8 +27,8 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     // Set up callbacks
     React.useEffect(() => {
         projectManager.onProjectCreated = () => { forceUpdate(); };
-        projectManager.onProjectDeleted = () => { forceUpdate(); };
         projectManager.onProjectUpdated = () => { forceUpdate(); };
+        projectManager.onProjectDeleted = () => { forceUpdate(); };
         projectManager.onProjectsImported = () => { forceUpdate(); }; // Add this callback
         projectManager.onProjectError = (error: string) => {
             setErrorMessage(error);
@@ -103,9 +103,9 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                     const existingProject = projectManager.findProjectById(doc.id);
                     
                     if (existingProject) {
-                        // Update existing project
+                        // Update existing project using Firebase sync
                         console.log(`Updating existing project: ${existingProject.name}`);
-                        projectManager.updateProject(doc.id, projectData);
+                        await projectManager.updateProjectInFirebase(doc.id, projectData);
                     } else {
                         // Create new project
                         console.log(`Creating new project: ${projectData.name}`);

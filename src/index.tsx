@@ -5,14 +5,11 @@ import {Sidebar} from './react-components/Sidebar';
 import { ProjectsPage } from './react-components/ProjectsPage';
 import {Banner} from './react-components/Banner';
 import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
-import { ProjectsManager } from './classes/ProjectsManager';
+import { projectsManagerInstance } from './classes/ProjectsManager';
 import { ToDoPage } from "./react-components/toDoPage";
 import { UsersPage } from './react-components/UsersPage';
 import { LanguageProvider } from "./react-components/LanguageContext";
 import { usersManagerInstance } from "./classes/UsersManager";
-
-// Initialize managers
-const projectsManager = new ProjectsManager();
 
 // Global state
 export let currentProjectId: string | null = null;
@@ -28,10 +25,10 @@ appRoot.render(
             <div id="main-content">
                 <Banner customStyle={{ zIndex: 3, position: "relative" }} />
                 <Router.Routes>
-                    <Router.Route path="/" element={<ProjectsPage projectManager={projectsManager} />} />
-                    <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} />} />
-                    <Router.Route path="/toDo" element={<ToDoPage projectsManager={projectsManager} />} />
-                    <Router.Route path="/users" element={<UsersPage usersManager={usersManagerInstance} projectsManager={projectsManager} />} />
+                    <Router.Route path="/" element={<ProjectsPage projectManager={projectsManagerInstance} />} />
+                    <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManagerInstance} />} />
+                    <Router.Route path="/toDo" element={<ToDoPage projectsManager={projectsManagerInstance} />} />
+                    <Router.Route path="/users" element={<UsersPage usersManager={usersManagerInstance} projectsManager={projectsManagerInstance} />} />
                 </Router.Routes>
             </div>
         </Router.BrowserRouter>
@@ -64,8 +61,8 @@ export function closeModal(id: string) {
 (window as any).closeModal = closeModal;
 
 export function setCurrentProjectId(projectId: string | null) {
-    if (projectsManager?.currentProject?.id != null) {
-        currentProjectId = projectsManager.currentProject.id;
+    if (projectsManagerInstance?.currentProject?.id != null) {
+        currentProjectId = projectsManagerInstance.currentProject.id;
     }
 }
 

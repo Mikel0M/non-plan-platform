@@ -3,13 +3,15 @@ import { toDoManagerInstance, toDos } from "./toDoManager"; // Import toDos arra
 import { IUser, User } from "./User";
 import { users } from "./UsersManager";
 import { companiesManagerInstance } from "./CompaniesManager";
+import { ItoDo } from "./toDo"; // Import ItoDo type
+
 
 export let currentProject: Project | null = null; // Ensure it's globally accessible
 
 export class ProjectsManager {
     list: Project[] = [];
     onProjectCreated = (_project: Project) => {}; // Callback for when a project is created
-    onProjectDeleted = () => {}; 
+    onProjectDeleted = (id: string) => {}; 
     onProjectUpdated = (_project: Project) => {}; // Callback for when a project is updated
     onProjectsImported?: () => void; // Callback for when projects are imported
     onProjectError?: (errorMessage: string) => void; // Callback for error handling
@@ -37,6 +39,42 @@ export class ProjectsManager {
         this.onProjectUpdated(updatedProject);
 
         return updatedProject;
+    }
+
+    // Method to update project with Firebase synchronization
+    async updateProjectInFirebase(id: string, updates: Partial<IProject>): Promise<Project> {
+        try {
+            const existingProject = this.getProject(id);
+            if (!existingProject) {
+                const errorMessage = `Project with ID ${id} not found`;
+                if (this.onProjectError) {
+                    this.onProjectError(errorMessage);
+                }
+                throw new Error(errorMessage);
+            }
+
+            // First, update in Firebase
+            const { updateDocument } = await import("../firebase");
+            await updateDocument<Partial<IProject>>("/projects", id, updates);
+
+            // Then update local state with merged data
+            const updatedData = { ...existingProject, ...updates };
+            const updatedProject = new Project(updatedData);
+            
+            const existingProjectIndex = this.list.findIndex(project => project.id === id);
+            this.list[existingProjectIndex] = updatedProject;
+
+            // Trigger update callback
+            this.onProjectUpdated(updatedProject);
+
+            return updatedProject;
+        } catch (error) {
+            const errorMessage = `Failed to update project: ${error instanceof Error ? error.message : String(error)}`;
+            if (this.onProjectError) {
+                this.onProjectError(errorMessage);
+            }
+            throw error;
+        }
     }
 
     newProject(data: IProject, id?: string) {
@@ -190,14 +228,33 @@ export class ProjectsManager {
         return project;
     }
 
-    deleteProject(id: string) {
-        const project = this.getProject(id);
-        if (!project) { return }
-        const remaining = this.list.filter((project) => {
-            return project.id !== id;
-        })
-        this.list = remaining
-        this.onProjectDeleted();
+    async deleteProject(id: string): Promise<void> {
+        try {
+            const project = this.getProject(id);
+            if (!project) {
+                const errorMessage = `Project with ID ${id} not found`;
+                if (this.onProjectError) {
+                    this.onProjectError(errorMessage);
+                }
+                throw new Error(errorMessage);
+            }
+
+            // First, remove from Firebase
+            const { deleteDocument } = await import("../firebase");
+            await deleteDocument("projects", id);
+
+            // Then remove from local state
+            this.list = this.list.filter((project) => project.id !== id);
+            
+            // Trigger callback
+            this.onProjectDeleted(id);
+        } catch (error) {
+            const errorMessage = `Failed to delete project: ${error instanceof Error ? error.message : String(error)}`;
+            if (this.onProjectError) {
+                this.onProjectError(errorMessage);
+            }
+            throw error;
+        }
     }
 
     getProjectbyName(name: string) {
@@ -445,4 +502,64 @@ export class ProjectsManager {
             project.name.toLowerCase().includes(query.toLowerCase())
         );
     }
+
+    // Helper methods for updating specific project properties
+    async updateProjectName(id: string, name: string): Promise<Project> {
+        return this.updateProjectInFirebase(id, { name });
+    }
+
+    async updateProjectDescription(id: string, description: string): Promise<Project> {
+        return this.updateProjectInFirebase(id, { description });
+    }
+
+    async updateProjectStatus(id: string, status: status): Promise<Project> {
+        return this.updateProjectInFirebase(id, { status });
+    }
+
+    async updateProjectProgress(id: string, progress: number): Promise<Project> {
+        return this.updateProjectInFirebase(id, { progress });
+    }
+
+    async updateProjectCost(id: string, cost: number): Promise<Project> {
+        return this.updateProjectInFirebase(id, { cost });
+    }
+
+    async updateProjectLocation(id: string, location: string): Promise<Project> {
+        return this.updateProjectInFirebase(id, { location });
+    }
+
+    async updateProjectUserRole(id: string, userRole: userRole): Promise<Project> {
+        return this.updateProjectInFirebase(id, { userRole });
+    }
+
+    async updateProjectPhase(id: string, phase: phase): Promise<Project> {
+        return this.updateProjectInFirebase(id, { phase });
+    }
+
+    async updateProjectDates(id: string, startDate?: string, finishDate?: string): Promise<Project> {
+        const updates: Partial<IProject> = {};
+        if (startDate !== undefined) updates.startDate = startDate;
+        if (finishDate !== undefined) updates.finishDate = finishDate;
+        return this.updateProjectInFirebase(id, updates);
+    }
+
+    async updateProjectToDos(id: string, toDos: ItoDo[]): Promise<Project> {
+        return this.updateProjectInFirebase(id, { toDos });
+    }
+
+    async updateProjectAssignedUsers(id: string, assignedUsers: Array<{ userId: string, role: string }>): Promise<Project> {
+        return this.updateProjectInFirebase(id, { assignedUsers });
+    }
+
+    async updateProjectPUsers(id: string, PUsers: IUser[]): Promise<Project> {
+        return this.updateProjectInFirebase(id, { PUsers });
+    }
+
+    // Method to update multiple project properties at once
+    async updateProjectMultiple(id: string, updates: Partial<IProject>): Promise<Project> {
+        return this.updateProjectInFirebase(id, updates);
+    }
 }
+
+// Export singleton instance
+export const projectsManagerInstance = new ProjectsManager();

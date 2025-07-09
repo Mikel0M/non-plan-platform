@@ -9,6 +9,7 @@ import UserCard from "./UserCard";
 import { SearchBox } from './SearchBox';
 import { ThreeViewer } from './ThreeViewer';
 
+
 interface Props {
     projectsManager: ProjectsManager
 }
@@ -22,6 +23,11 @@ export function ProjectDetailsPage(props: Props) {
         // Normalize role key: lowercase and replace spaces with underscores
         const normalizedRole = role?.toLowerCase().replace(/\s+/g, '_');
         return t(`projects_role_${normalizedRole}`) || role;
+    };
+
+    props.projectsManager.onProjectDeleted = () => {
+        // Project deletion handling is now managed by ProjectsManager
+        // UI updates will be handled by the onProjectDeleted callback
     };
 
     // Helper to close modals by id
@@ -270,7 +276,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
     const [assignError, setAssignError] = React.useState('');
 
     // Handler for assigning user
-    const handleAssignUser = (e: React.FormEvent) => {
+    const handleAssignUser = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!projectState) return;
       if (!selectedUserId || !customRole) {
@@ -281,32 +287,58 @@ const [editToDoFields, setEditToDoFields] = React.useState({
         setAssignError('This user is already assigned to this project.');
         return;
       }
-      projectState.assignedUsers.push({ userId: selectedUserId, role: customRole });
-      // Create a new Project instance to trigger React re-render and preserve methods
-      const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
-        ...projectState,
-        assignedUsers: [...projectState.assignedUsers],
-      });
-      setProjectState(updated);
-      setAssignUserModalOpen(false);
-      setSelectedUserId('');
-      setCustomRole('');
-      setAssignError('');
+      
+      try {
+        const newAssignedUsers = [...projectState.assignedUsers, { userId: selectedUserId, role: customRole }];
+        
+        // Update in Firebase
+        await props.projectsManager.updateProjectAssignedUsers(projectState.id || '', newAssignedUsers);
+        
+        // Update local state
+        const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
+          ...projectState,
+          assignedUsers: newAssignedUsers,
+        });
+        setProjectState(updated);
+        
+        setAssignUserModalOpen(false);
+        setSelectedUserId('');
+        setCustomRole('');
+        setAssignError('');
+        
+        console.log("User assigned successfully");
+      } catch (error) {
+        console.error("Failed to assign user:", error);
+        setAssignError('Failed to assign user. Please try again.');
+      }
     };
 
     // State for user to delete
     const [userToDelete, setUserToDelete] = React.useState<{userId: string, name: string} | null>(null);
     // Handler for confirming user removal
-    const handleConfirmDeleteUser = () => {
+    const handleConfirmDeleteUser = async () => {
       if (!userToDelete || !projectState) return;
-      const updatedAssigned = projectState.assignedUsers.filter(u => u.userId !== userToDelete.userId);
-      const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
-        ...projectState,
-        assignedUsers: updatedAssigned,
-      });
-      setProjectState(updated);
-      setUserToDelete(null);
-      closeModal('DeleteUserModal');
+      
+      try {
+        const updatedAssigned = projectState.assignedUsers.filter(u => u.userId !== userToDelete.userId);
+        
+        // Update in Firebase
+        await props.projectsManager.updateProjectAssignedUsers(projectState.id || '', updatedAssigned);
+        
+        // Update local state
+        const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
+          ...projectState,
+          assignedUsers: updatedAssigned,
+        });
+        setProjectState(updated);
+        
+        setUserToDelete(null);
+        closeModal('DeleteUserModal');
+        
+        console.log("User removed successfully");
+      } catch (error) {
+        console.error("Failed to remove user:", error);
+      }
     };
 
     // Helper to get assigned users for dropdowns
@@ -318,11 +350,16 @@ const assignedUsers = projectState.assignedUsers
 const navigate = Router.useNavigate();
 
     // --- HANDLE DELETE PROJECT CONFIRMATION ---
-const handleConfirmDeleteProject = () => {
+const handleConfirmDeleteProject = async () => {
   if (projectState && projectState.id) {
-    props.projectsManager.deleteProject(projectState.id);
-    closeModal('DeleteProjectModal');
-    navigate('/'); // or navigate('/projects') if that's your route
+    try {
+      await props.projectsManager.deleteProject(projectState.id);
+      closeModal('DeleteProjectModal');
+      navigate('/'); // or navigate('/projects') if that's your route
+    } catch (error) {
+      console.error('Failed to delete project:', error);
+      // The error will be handled by the ProjectsManager's onProjectError callback
+    }
   }
 };
 
@@ -634,29 +671,37 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
             </form>
         </dialog>
         <dialog id="editProjectModal">
-            <form className="userForm form-wide" id="editProjectForm" onSubmit={e => {
+            <form className="userForm form-wide" id="editProjectForm" onSubmit={async e => {
                 e.preventDefault();
                 if (projectState) {
-                  projectState.name = editName;
-                  projectState.description = editDescription;
-                  projectState.location = editLocation;
-                  projectState.progress = parseFloat(editProgress) || 0;
-                  projectState.cost = parseFloat(editCost) || 0;
-                  projectState.userRole = editUserRole as any;
-                  projectState.status = editStatus as any;
-                  projectState.phase = editPhase as any;
-                  projectState.startDate = editStartDate;
-                  projectState.finishDate = editFinishDate;
-                  setProjectState(projectState); // trigger re-render
-                  // Create a new instance to trigger React re-render
-                  const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), projectState);
-                  setProjectState(updated);
-                  
-                  // Update the project in the manager
                   try {
-                    props.projectsManager.updateProject(projectState.id || '', projectState);
+                    // Update project using Firebase sync method
+                    const updates = {
+                      name: editName,
+                      description: editDescription,
+                      location: editLocation,
+                      progress: parseFloat(editProgress) || 0,
+                      cost: parseFloat(editCost) || 0,
+                      userRole: editUserRole as any,
+                      status: editStatus as any,
+                      phase: editPhase as any,
+                      startDate: editStartDate,
+                      finishDate: editFinishDate
+                    };
+                    
+                    await props.projectsManager.updateProjectInFirebase(projectState.id || '', updates);
+                    
+                    // Update local state to reflect changes
+                    const updatedProject = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
+                      ...projectState,
+                      ...updates
+                    });
+                    setProjectState(updatedProject);
+                    
+                    console.log("Project updated successfully in Firebase");
                   } catch (error) {
-                    console.warn("Failed to update project:", error);
+                    console.error("Failed to update project:", error);
+                    // Error handling is done in ProjectsManager
                   }
                 }
                 closeModal('editProjectModal');

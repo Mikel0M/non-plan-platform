@@ -163,6 +163,10 @@ export class Project implements IProject {
     addToDo(data: ItoDo): toDo {
         const newToDo = new toDo(data);
         this.toDos.push(newToDo);
+        
+        // Sync with Firebase if possible
+        this.syncToFirebase();
+        
         return newToDo;
     }
 
@@ -171,6 +175,10 @@ export class Project implements IProject {
         const toDoInstance = this.toDos.find(toDo => toDo.id === data.id);
         if (toDoInstance) {
             toDoInstance.update(data);
+            
+            // Sync with Firebase if possible
+            this.syncToFirebase();
+            
             return toDoInstance;
         } else {
             throw new Error("To-Do item not found(project)");
@@ -183,8 +191,26 @@ export class Project implements IProject {
         if (toDoIndex !== -1) {
             this.toDos.splice(toDoIndex, 1);
             console.log(`To-do with ID ${id} deleted`); // Debugging statement
+            
+            // Sync with Firebase if possible
+            this.syncToFirebase();
         } else {
             console.warn(`To-do with ID ${id} not found(project)`); // Debugging statement
+        }
+    }
+
+    // Method to sync current project state with Firebase
+    private async syncToFirebase(): Promise<void> {
+        if (!this.id) return;
+        
+        try {
+            // Dynamic import to avoid circular dependency
+            const { projectsManagerInstance } = await import('./ProjectsManager');
+            if (projectsManagerInstance) {
+                await projectsManagerInstance.updateProjectToDos(this.id, this.toDos);
+            }
+        } catch (error) {
+            console.warn('Failed to sync project with Firebase:', error);
         }
     }
 
