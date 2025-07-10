@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { useTranslation } from "./LanguageContext";
 import { Calendar } from './Calendar';
-import { Modal, ConfirmModal } from '../components/Modal';
-import { TodoForm } from '../components/TodoForm';
+import { Modal, ConfirmModal } from './Modal';
+import { TodoForm } from './TodoForm';
 import { useTodos, useModal } from '../hooks/useTodos';
 import { ItoDo } from '../classes/toDo';
 

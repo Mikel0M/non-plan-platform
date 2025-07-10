@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
+import * as Firestore from "firebase/firestore";
 import { IUser, User, usersRole, access } from "../classes/User";
+import { ICompany } from "../classes/Company";
 import { UsersManager } from '../classes/UsersManager';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { companiesManagerInstance } from '../classes/CompaniesManager';
@@ -8,6 +10,7 @@ import { useTranslation } from "./LanguageContext";
 import UserCard from "./UserCard";
 import CompanyCard from "./CompanyCard";
 import { SearchBox } from './SearchBox';
+import { getCollection } from '../firebase';
 
 interface Props {
 
@@ -21,20 +24,188 @@ declare global {
   }
 }
 
+const usersCollection = getCollection<IUser>("/users");
+const companiesCollection = getCollection<ICompany>("/companies");
+
 export function UsersPage(props: Props) {
     const { t } = useTranslation();
     // State to control which modal is open
     const [openModal, setOpenModal] = React.useState<null | 'newUser' | 'changeUser' | 'newCompany' | 'changeCompany'>(null);
-    const [users, setUsers] = React.useState<IUser[]>(props.usersManager.getUsers());
+    const [users, setUsers] = React.useState<IUser[]>([]);
     const [companies, setCompanies] = React.useState(companiesManagerInstance.getCompanies());
+    
+    const getFirestoreUsers = async () => {
+            try {
+                const firebaseUsers = await Firestore.getDocs(usersCollection);
+
+                for (const doc of firebaseUsers.docs) {
+                    const data = doc.data();
+                    console.log("Raw Firestore data:", data);
+    
+                    // Helper function to convert Firestore Timestamp to date string
+                    const convertTimestampToDate = (timestamp: any): string | Date | undefined => {
+                        if (timestamp && timestamp.toDate) {
+                            return timestamp.toDate();
+                        }
+                        return timestamp || undefined;
+                    };
+                    
+                    // Convert user data properly, ensuring IUser interface compliance
+                    const userData: IUser = {
+                        id: doc.id,
+                        color: data.color || "#4B561A",
+                        companyId: data.companyId || "",
+                        companyRole: data.companyRole || "user",
+                        createdAt: convertTimestampToDate(data.createdAt),
+                        displayName: data.displayName || "",
+                        email: data.email || "",
+                        icon: data.icon || "DP",
+                        invitedAt: convertTimestampToDate(data.invitedAt),
+                        invitedBy: data.invitedBy || "",
+                        isActive: data.isActive !== undefined ? data.isActive : true,
+                        joinedAt: convertTimestampToDate(data.joinedAt),
+                        lastLogin: convertTimestampToDate(data.lastLogin),
+                        name: data.name || "Untitled User",
+                        notifications: data.notifications !== undefined ? data.notifications : true,
+                        permissions: data.permissions || "create_projects",
+                        phone: data.phone || "",
+                        preferences: data.preferences || {
+                            language: "english",
+                            timezone: "europe"
+                        },
+                        role: data.role || "architect",
+                        surname: data.surname || ""
+                    };
+                    
+                    try {
+                        // Check if user already exists by ID
+                        const existingUsers = props.usersManager.getUsers();
+                        const existingUser = existingUsers.find(u => u.id === doc.id);
+
+                        if (existingUser) {
+                            // Update existing user
+                            console.log(`Updating existing user: ${existingUser.name}`);
+                            props.usersManager.editUser(userData);
+                        } else {
+                            // Create new user
+                            console.log(`Creating new user: ${userData.name}`);
+                            props.usersManager.newUser(userData);
+                        }
+                    } catch (error) {
+                        console.warn("Skipping user due to error:", error);
+                    }
+                }
+                
+                // Update local state after processing all users
+                const updatedUsers = props.usersManager.getUsers();
+                setUsers(updatedUsers);
+                
+            } catch (error) {
+                console.error("Error fetching users:", error);
+                // Add error state handling
+                console.error("Failed to load users from database");
+            }
+        }
+
+        const getFirestoreCompanies = async () => {
+            try {
+                const firebaseCompanies = await Firestore.getDocs(companiesCollection);
+
+                for (const doc of firebaseCompanies.docs) {
+                    const data = doc.data();
+                    console.log("Raw Firestore company data:", data);
+    
+                    // Helper function to convert Firestore Timestamp to date string
+                    const convertTimestampToDate = (timestamp: any): string | Date | undefined => {
+                        if (timestamp && timestamp.toDate) {
+                            return timestamp.toDate();
+                        }
+                        return timestamp || undefined;
+                    };
+                    
+                    // Convert company data properly, ensuring ICompany interface compliance
+                    const companyData: ICompany = {
+                        id: doc.id,
+                        backgroundColor: data.backgroundColor || "#FFFFFF",
+                        bankAccount: data.bankAccount || "",
+                        billingAddress: data.billingAddress || {
+                            city: "",
+                            country: "",
+                            state: "",
+                            street: "",
+                            zipCode: ""
+                        },
+                        createdAt: convertTimestampToDate(data.createdAt),
+                        email: data.email || "",
+                        features: data.features || [],
+                        name: data.name || "Untitled Company",
+                        phone: data.phone || "",
+                        primaryColor: data.primaryColor || "#3F51B5",
+                        settings: data.settings || {
+                            allowExternalCollaboration: false,
+                            allowUserInvites: true,
+                            customRoles: [],
+                            defaultProjectRole: "contributor",
+                            defaultUserPermissions: "create_projects",
+                            language: "english",
+                            requireInviteApproval: true,
+                            timezone: "europe"
+                        },
+                        subscription: data.subscription || {
+                            isActive: true,
+                            maxProjects: 5,
+                            maxUsers: 5,
+                            plan: "free",
+                            planExpiresAt: convertTimestampToDate(data.subscription?.planExpiresAt) || new Date()
+                        }
+                    };
+                    
+                    try {
+                        // Check if company already exists by ID
+                        const existingCompanies = companiesManagerInstance.getCompanies();
+                        const existingCompany = existingCompanies.find(c => c.id === doc.id);
+
+                        if (existingCompany) {
+                            // Update existing company
+                            console.log(`Updating existing company: ${existingCompany.name}`);
+                            companiesManagerInstance.editCompany(companyData);
+                        } else {
+                            // Create new company
+                            console.log(`Creating new company: ${companyData.name}`);
+                            companiesManagerInstance.addCompany(companyData);
+                        }
+                    } catch (error) {
+                        console.warn("Skipping company due to error:", error);
+                    }
+                }
+                
+                // Update local state after processing all companies
+                const updatedCompanies = companiesManagerInstance.getCompanies();
+                setCompanies(updatedCompanies);
+                
+            } catch (error) {
+                console.error("Error fetching companies:", error);
+                console.error("Failed to load companies from database");
+            }
+        }
+    
+        React.useEffect(() => {
+            getFirestoreUsers();
+            getFirestoreCompanies();
+        }, []);
+    
+    
+    
     const [newUserForm, setNewUserForm] = React.useState({
         name: '',
         surname: '',
         email: '',
         phone: '',
-        usersRole: 'Architect',
-        access: 'Administrator',
-        company: '',
+        role: 'architect',
+        permissions: 'create_projects',
+        companyId: '',
+        companyRole: 'user',
+        invitedBy: '',
         icon: '',
         color: '#1CFFCA',
     });
@@ -44,9 +215,11 @@ export function UsersPage(props: Props) {
         surname: '',
         email: '',
         phone: '',
-        usersRole: 'Architect',
-        access: 'Administrator',
-        company: '',
+        role: 'architect',
+        permissions: 'create_projects',
+        companyId: '',
+        companyRole: 'user',
+        invitedBy: '',
         icon: '',
         color: '#1CFFCA',
     });
@@ -54,14 +227,30 @@ export function UsersPage(props: Props) {
     const [activeTab, setActiveTab] = React.useState<'users' | 'companies'>('users');
     const [newCompanyForm, setNewCompanyForm] = React.useState({
         name: '',
-        address: '',
+        backgroundColor: '#FFFFFF',
+        primaryColor: '#3F51B5',
+        billingAddress: {
+            street: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            country: ''
+        },
         email: '',
         phone: '',
     });
     const [editCompanyForm, setEditCompanyForm] = React.useState({
         id: '',
         name: '',
-        address: '',
+        backgroundColor: '#FFFFFF',
+        primaryColor: '#3F51B5',
+        billingAddress: {
+            street: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            country: ''
+        },
         email: '',
         phone: '',
     });
@@ -69,15 +258,39 @@ export function UsersPage(props: Props) {
     // Add state for search query
     const [searchQuery, setSearchQuery] = React.useState("");
 
-    // Sync users state with UsersManager
-    React.useEffect(() => {
-        setUsers(props.usersManager.getUsers());
-    }, [props.usersManager]);
+    // Load users and companies from Firebase
 
-    // Update companies state when manager changes (add effect if needed)
+    
+
+    // Load users and companies when component mounts
     React.useEffect(() => {
-      setCompanies(companiesManagerInstance.getCompanies());
-    }, []);
+        const loadInitialData = async () => {
+            try {
+                console.log('[UsersPage] Loading initial data...');
+                
+                // Load users from Firestore first
+                await getFirestoreUsers();
+                
+                // Load companies from Firestore
+                await getFirestoreCompanies();
+                
+                console.log('[UsersPage] Initial data load complete');
+            } catch (error) {
+                console.error('Failed to load initial data:', error);
+                
+                // Fallback to manager data if Firestore fails
+                try {
+                    const loadedUsers = props.usersManager.getUsers();
+                    setUsers(loadedUsers);
+                    console.log(`[UsersPage] Fallback: Loaded ${loadedUsers.length} users from manager`);
+                } catch (fallbackError) {
+                    console.error('Failed to load users from manager:', fallbackError);
+                }
+            }
+        };
+        
+        loadInitialData();
+    }, [props.usersManager]);
 
     // Handle form input changes
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -85,23 +298,41 @@ export function UsersPage(props: Props) {
     };
 
     // Handle new user form submit
-    const handleNewUserSubmit = (e: React.FormEvent) => {
+    const handleNewUserSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         props.usersManager.newUser({
-            ...newUserForm,
-            role: newUserForm.usersRole as usersRole,
-            access: newUserForm.access as access,
+            name: newUserForm.name,
+            surname: newUserForm.surname,
+            email: newUserForm.email,
+            phone: newUserForm.phone,
+            role: newUserForm.role,
+            permissions: newUserForm.permissions,
+            companyId: newUserForm.companyId,
+            companyRole: newUserForm.companyRole,
+            invitedBy: newUserForm.invitedBy,
+            icon: newUserForm.icon,
+            color: newUserForm.color,
         });
-        setUsers(props.usersManager.getUsers()); // update state from manager
+        
+        // Reload users from manager
+        try {
+            const updatedUsers = props.usersManager.getUsers();
+            setUsers(updatedUsers);
+        } catch (error) {
+            console.error('Failed to reload users:', error);
+        }
+        
         setOpenModal(null);
         setNewUserForm({
             name: '',
             surname: '',
             email: '',
             phone: '',
-            usersRole: 'Architect',
-            access: 'Administrator',
-            company: '',
+            role: 'architect',
+            permissions: 'create_projects',
+            companyId: '',
+            companyRole: 'user',
+            invitedBy: '',
             icon: '',
             color: '#1CFFCA',
         });
@@ -110,28 +341,35 @@ export function UsersPage(props: Props) {
     // Expose global function to open edit modal
     React.useEffect(() => {
         window.openEditUserModal = (userId: string) => {
-            const user = props.usersManager.getUsers().find(u => u.id === userId);
-            if (user) {
-                setEditUserForm({
-                    id: user.id,
-                    name: user.name,
-                    surname: user.surname,
-                    email: user.email,
-                    phone: user.phone,
-                    usersRole: user.role || 'Architect',
-                    access: user.access || 'Administrator',
-                    company: user.company || '',
-                    icon: user.icon || '',
-                    color: user.color || '#1CFFCA',
-                });
-                setOpenModal('changeUser');
+            try {
+                const currentUsers = props.usersManager.getUsers();
+                const user = currentUsers.find(u => u.id === userId);
+                if (user) {
+                    setEditUserForm({
+                        id: user.id || '',
+                        name: user.name,
+                        surname: user.surname,
+                        email: user.email,
+                        phone: user.phone,
+                        role: user.role || 'architect',
+                        permissions: user.permissions || 'create_projects',
+                        companyId: user.companyId || '',
+                        companyRole: user.companyRole || 'user',
+                        invitedBy: user.invitedBy || '',
+                        icon: user.icon || '',
+                        color: user.color || '#1CFFCA',
+                    });
+                    setOpenModal('changeUser');
+                }
+            } catch (error) {
+                console.error('Failed to load user for editing:', error);
             }
         };
         return () => { delete window.openEditUserModal; };
     }, [props.usersManager]);
 
     // Change user form submit
-    const handleEditUserSubmit = (e: React.FormEvent) => {
+    const handleEditUserSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         props.usersManager.editUser({
             id: editUserForm.id,
@@ -139,21 +377,39 @@ export function UsersPage(props: Props) {
             surname: editUserForm.surname,
             email: editUserForm.email,
             phone: editUserForm.phone,
-            role: editUserForm.usersRole as usersRole,
-            access: editUserForm.access as access,
-            company: editUserForm.company,
+            role: editUserForm.role,
+            permissions: editUserForm.permissions,
+            companyId: editUserForm.companyId,
+            companyRole: editUserForm.companyRole,
+            invitedBy: editUserForm.invitedBy,
             icon: editUserForm.icon,
             color: editUserForm.color,
         });
-        setUsers(props.usersManager.getUsers());
+        
+        // Reload users from manager
+        try {
+            const updatedUsers = props.usersManager.getUsers();
+            setUsers(updatedUsers);
+        } catch (error) {
+            console.error('Failed to reload users after edit:', error);
+        }
+        
         setOpenModal(null);
     };
 
     // Handler for confirming user deletion
-    const handleConfirmDeleteUser = () => {
+    const handleConfirmDeleteUser = async () => {
         if (!userToDelete) return;
         props.usersManager.deleteUser(userToDelete.id);
-        setUsers(props.usersManager.getUsers());
+        
+        // Reload users from manager
+        try {
+            const updatedUsers = props.usersManager.getUsers();
+            setUsers(updatedUsers);
+        } catch (error) {
+            console.error('Failed to reload users after deletion:', error);
+        }
+        
         setUserToDelete(null);
         const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
         if (modal) modal.close();
@@ -161,29 +417,64 @@ export function UsersPage(props: Props) {
 
     // Handle new company form input changes
     const handleCompanyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewCompanyForm({ ...newCompanyForm, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        if (name.startsWith('billingAddress.')) {
+            const field = name.split('.')[1];
+            setNewCompanyForm(prev => ({
+                ...prev,
+                billingAddress: {
+                    ...prev.billingAddress,
+                    [field]: value
+                }
+            }));
+        } else {
+            setNewCompanyForm({ ...newCompanyForm, [name]: value });
+        }
     };
     // Handle new company form submit
     const handleNewCompanySubmit = (e: React.FormEvent) => {
         e.preventDefault();
         companiesManagerInstance.addCompany({
             name: newCompanyForm.name,
-            address: newCompanyForm.address,
+            backgroundColor: newCompanyForm.backgroundColor,
+            primaryColor: newCompanyForm.primaryColor,
+            billingAddress: newCompanyForm.billingAddress,
             email: newCompanyForm.email,
             phone: newCompanyForm.phone,
         });
         setCompanies([...companiesManagerInstance.getCompanies()]);
         setOpenModal(null);
-        setNewCompanyForm({ name: '', address: '', email: '', phone: '' });
+        setNewCompanyForm({ 
+            name: '', 
+            backgroundColor: '#FFFFFF',
+            primaryColor: '#3F51B5',
+            billingAddress: {
+                street: '',
+                city: '',
+                state: '',
+                zipCode: '',
+                country: ''
+            },
+            email: '', 
+            phone: '' 
+        });
     };
     // Handle edit company modal open
     const openEditCompanyModal = (companyId: string) => {
         const company = companies.find(c => c.id === companyId);
         if (company) {
             setEditCompanyForm({
-                id: company.id,
+                id: company.id || '',
                 name: company.name,
-                address: company.address || '',
+                backgroundColor: company.backgroundColor || '#FFFFFF',
+                primaryColor: company.primaryColor || '#3F51B5',
+                billingAddress: company.billingAddress || {
+                    street: '',
+                    city: '',
+                    state: '',
+                    zipCode: '',
+                    country: ''
+                },
                 email: company.email || '',
                 phone: company.phone || '',
             });
@@ -193,14 +484,18 @@ export function UsersPage(props: Props) {
     // Handle edit company form submit
     const handleEditCompanySubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const idx = companies.findIndex(c => c.id === editCompanyForm.id);
-        if (idx !== -1) {
-            companies[idx].name = editCompanyForm.name;
-            companies[idx].address = editCompanyForm.address;
-            companies[idx].email = editCompanyForm.email;
-            companies[idx].phone = editCompanyForm.phone;
-            setCompanies([...companies]);
-        }
+        companiesManagerInstance.editCompany({
+            id: editCompanyForm.id,
+            name: editCompanyForm.name,
+            backgroundColor: editCompanyForm.backgroundColor,
+            primaryColor: editCompanyForm.primaryColor,
+            billingAddress: editCompanyForm.billingAddress,
+            email: editCompanyForm.email,
+            phone: editCompanyForm.phone,
+        });
+        
+        // Reload companies from manager
+        setCompanies([...companiesManagerInstance.getCompanies()]);
         setOpenModal(null);
     };
     // Handle confirm delete company
@@ -296,30 +591,30 @@ export function UsersPage(props: Props) {
                             <label>
                                 <span className="material-icons-round">account_circle</span>{t("users_role") || "Role"}
                             </label>
-                            <select name="usersRole" value={newUserForm.usersRole} onChange={handleInputChange}>
-                                <option>{t("projects_role_architect") || "Architect"}</option>
-                                <option>{t("projects_role_engineer") || "Engineer"}</option>
-                                <option>{t("projects_role_developer") || "Developer"}</option>
+                            <select name="role" value={newUserForm.role} onChange={handleInputChange}>
+                                <option value="architect">{t("projects_role_architect") || "Architect"}</option>
+                                <option value="engineer">{t("projects_role_engineer") || "Engineer"}</option>
+                                <option value="developer">{t("projects_role_developer") || "Developer"}</option>
                             </select>
                         </div>
                         <div className="formFieldContainer">
                             <label>
                                 <span className="material-icons-round">vpn_key</span>{t("users_access") || "Access rights"}
                             </label>
-                            <select name="access" value={newUserForm.access} onChange={handleInputChange}>
-                                <option>{t("users_access_admin") || "Administrator"}</option>
-                                <option>{t("users_access_editor") || "Editor"}</option>
-                                <option>{t("users_access_guest") || "Guest"}</option>
+                            <select name="permissions" value={newUserForm.permissions} onChange={handleInputChange}>
+                                <option value="create_projects">{t("users_access_admin") || "Administrator"}</option>
+                                <option value="edit_projects">{t("users_access_editor") || "Editor"}</option>
+                                <option value="view_projects">{t("users_access_guest") || "Guest"}</option>
                             </select>
                         </div>
                         <div className="formFieldContainer">
                             <label>
                                 <span className="material-icons-round">business</span>{t("users_company") || "Company"}
                             </label>
-                            <select name="company" value={newUserForm.company} onChange={handleInputChange}>
+                            <select name="companyId" value={newUserForm.companyId} onChange={handleInputChange}>
                                 <option value="">{t("users_select_company") || "Select company"}</option>
                                 {companies.map(company => (
-                                    <option key={company.id} value={company.name}>{company.name}</option>
+                                    <option key={company.id} value={company.id || ''}>{company.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -370,30 +665,30 @@ export function UsersPage(props: Props) {
                             <label>
                                 <span className="material-icons-round">account_circle</span>{t("users_role") || "Role"}
                             </label>
-                            <select name="CH_usersRole" value={editUserForm.usersRole} onChange={e => setEditUserForm(f => ({...f, usersRole: e.target.value}))}>
-                                <option>{t("projects_role_architect") || "Architect"}</option>
-                                <option>{t("projects_role_engineer") || "Engineer"}</option>
-                                <option>{t("projects_role_developer") || "Developer"}</option>
+                            <select name="CH_role" value={editUserForm.role} onChange={e => setEditUserForm(f => ({...f, role: e.target.value}))}>
+                                <option value="architect">{t("projects_role_architect") || "Architect"}</option>
+                                <option value="engineer">{t("projects_role_engineer") || "Engineer"}</option>
+                                <option value="developer">{t("projects_role_developer") || "Developer"}</option>
                             </select>
                         </div>
                         <div className="formFieldContainer">
                             <label>
                                 <span className="material-icons-round">vpn_key</span>{t("users_access") || "Access rights"}
                             </label>
-                            <select name="CH_access" value={editUserForm.access} onChange={e => setEditUserForm(f => ({...f, access: e.target.value}))}>
-                                <option>{t("users_access_admin") || "Administrator"}</option>
-                                <option>{t("users_access_editor") || "Editor"}</option>
-                                <option>{t("users_access_guest") || "Guest"}</option>
+                            <select name="CH_permissions" value={editUserForm.permissions} onChange={e => setEditUserForm(f => ({...f, permissions: e.target.value}))}>
+                                <option value="create_projects">{t("users_access_admin") || "Administrator"}</option>
+                                <option value="edit_projects">{t("users_access_editor") || "Editor"}</option>
+                                <option value="view_projects">{t("users_access_guest") || "Guest"}</option>
                             </select>
                         </div>
                         <div className="formFieldContainer">
                             <label>
                                 <span className="material-icons-round">business</span>{t("users_company") || "Company"}
                             </label>
-                            <select name="CH_company" value={editUserForm.company} onChange={e => setEditUserForm(f => ({...f, company: e.target.value}))}>
+                            <select name="CH_companyId" value={editUserForm.companyId} onChange={e => setEditUserForm(f => ({...f, companyId: e.target.value}))}>
                                 <option value="">{t("users_select_company") || "Select company"}</option>
                                 {companies.map(company => (
-                                    <option key={company.id} value={company.name}>{company.name}</option>
+                                    <option key={company.id} value={company.id || ''}>{company.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -418,7 +713,7 @@ export function UsersPage(props: Props) {
                             <label>
                                 <span className="material-icons-round">subject</span>{t("users_company_address") || "Company Address"}
                             </label>
-                            <input type="text" name="address" value={newCompanyForm.address} onChange={handleCompanyInputChange} />
+                            <input type="text" name="billingAddress.street" value={newCompanyForm.billingAddress.street} onChange={handleCompanyInputChange} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
@@ -461,7 +756,7 @@ export function UsersPage(props: Props) {
                             <label>
                                 <span className="material-icons-round">subject</span>{t("users_company_address") || "Company Address"}
                             </label>
-                            <input type="text" name="address" value={editCompanyForm.address} onChange={e => setEditCompanyForm(f => ({...f, address: e.target.value}))} />
+                            <input type="text" name="billingAddress.street" value={editCompanyForm.billingAddress.street} onChange={e => setEditCompanyForm(f => ({...f, billingAddress: {...f.billingAddress, street: e.target.value}}))} />
                         </div>
                         <div className="formFieldContainer">
                             <label>
@@ -596,9 +891,15 @@ export function UsersPage(props: Props) {
           filteredCompanies.map(company => (
             <CompanyCard
               key={company.id}
-              company={company}
-              onEdit={id => setOpenModal('changeCompany')}
-              onDelete={id => setCompanyToDelete(company)}
+              company={{
+                id: company.id || '',
+                name: company.name,
+                address: `${company.billingAddress?.street || ''}, ${company.billingAddress?.city || ''}, ${company.billingAddress?.state || ''} ${company.billingAddress?.zipCode || ''}, ${company.billingAddress?.country || ''}`.trim(),
+                email: company.email,
+                phone: company.phone
+              }}
+              onEdit={id => openEditCompanyModal(id)}
+              onDelete={id => setCompanyToDelete({ id: company.id || '', name: company.name })}
             />
           ))
         ) : (

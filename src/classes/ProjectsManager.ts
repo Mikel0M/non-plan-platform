@@ -470,7 +470,7 @@ export class ProjectsManager {
 
     // Method to gather and return all users
     exportUsers(): IUser[] {
-        return users;
+        return users.map(user => user.toJSON());
     }
 
     // Method to import users from JSON data

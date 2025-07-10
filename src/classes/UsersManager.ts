@@ -43,9 +43,9 @@ export class UsersManager {
         if (surnameInput) user.surname = surnameInput.value;
         if (emailInput) user.email = emailInput.value;
         if (phoneInput) user.phone = phoneInput.value;
-        if (roleSelect) user.role = roleSelect.value as usersRole; // Cast to usersRole
-        if (accessSelect) user.access = accessSelect.value as access; // Cast to access
-        if (companyInput) user.company = companyInput.value;
+        if (roleSelect) user.role = roleSelect.value as string; // Changed from usersRole to string
+        if (accessSelect) user.permissions = accessSelect.value as string; // Changed from access to permissions
+        if (companyInput) user.companyId = companyInput.value; // Changed from company to companyId
 
         const setInputValue = (id: string, value: string | number) => {
             const input = document.getElementById(id) as HTMLInputElement;
@@ -62,8 +62,8 @@ export class UsersManager {
         setInputValue("userEmailInput", user.email);
         setInputValue("userPhoneInput", user.phone);
         setInputValue("userRoleInput", user.role);
-        setInputValue("userAccessInput", user.access);
-        setInputValue("userCompanyInput", user.company);
+        setInputValue("userAccessInput", user.permissions); // Changed from access to permissions
+        setInputValue("userCompanyInput", user.companyId); // Changed from company to companyId
 
         console.log(`User data updated for user ID ${userId}:`, user);
     }
@@ -92,8 +92,8 @@ export class UsersManager {
         setText("emailUD", user.email);
         setText("phoneUD", user.phone);
         setText("roleUD", user.role);
-        setText("accessUD", user.access);
-        setText("companyUD", user.company);
+        setText("accessUD", user.permissions); // Changed from access to permissions
+        setText("companyUD", user.companyId); // Changed from company to companyId
 
         // Helper function to set input values for form fields
         const setInputValue = (id: string, value: string | number) => {
@@ -111,8 +111,8 @@ export class UsersManager {
         setInputValue("userEmailInput", user.email);
         setInputValue("userPhoneInput", user.phone);
         setInputValue("userRoleInput", user.role);
-        setInputValue("userAccessInput", user.access);
-        setInputValue("userCompanyInput", user.company);
+        setInputValue("userAccessInput", user.permissions); // Changed from access to permissions
+        setInputValue("userCompanyInput", user.companyId); // Changed from company to companyId
 
         // Update the icon's background color
         const iconElement = document.getElementById("iconUD");
@@ -181,8 +181,8 @@ export class UsersManager {
             user.email = data.email;
             user.phone = data.phone;
             user.role = data.role;
-            user.access = data.access;
-            user.company = data.company;
+            user.permissions = data.permissions; // Changed from access to permissions
+            user.companyId = data.companyId; // Changed from company to companyId
             // Optionally update icon/color if needed
             // user.icon = data.icon;
             // user.color = data.color;
@@ -194,8 +194,8 @@ export class UsersManager {
             user2.email = data.email;
             user2.phone = data.phone;
             user2.role = data.role;
-            user2.access = data.access;
-            user2.company = data.company;
+            user2.permissions = data.permissions; // Changed from access to permissions
+            user2.companyId = data.companyId; // Changed from company to companyId
         }
     }
 
@@ -207,6 +207,13 @@ export class UsersManager {
         if (idx !== -1) users.splice(idx, 1);
         const idx2 = this.list.findIndex(u => u.id === userId);
         if (idx2 !== -1) this.list.splice(idx2, 1);
+    }
+
+    /**
+     * Export all users as JSON
+     */
+    exportUsers(): IUser[] {
+        return users.map(user => user.toJSON());
     }
 }
 

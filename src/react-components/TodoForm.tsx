@@ -3,7 +3,7 @@ import { ItoDo, toDoStatus, toDoPriority, toDoPercentage } from '../classes/toDo
 import { IProject } from '../classes/Project';
 import { usersManagerInstance } from '../classes/UsersManager';
 import { User } from '../classes/User';
-import { useTranslation } from '../react-components/LanguageContext';
+import { useTranslation } from './LanguageContext';
 
 interface TodoFormProps {
   onSubmit: (data: Omit<ItoDo, 'id' | 'created_at' | 'updated_at'>) => void;
