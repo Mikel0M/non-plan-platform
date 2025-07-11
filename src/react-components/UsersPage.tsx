@@ -10,7 +10,7 @@ import { useTranslation } from "./LanguageContext";
 import UserCard from "./UserCard";
 import CompanyCard from "./CompanyCard";
 import { SearchBox } from './SearchBox';
-import { getCollection } from '../firebase';
+import { getCollection, deleteDocument } from '../firebase';
 
 interface Props {
 
@@ -33,7 +33,8 @@ export function UsersPage(props: Props) {
     const [openModal, setOpenModal] = React.useState<null | 'newUser' | 'changeUser' | 'newCompany' | 'changeCompany'>(null);
     const [users, setUsers] = React.useState<IUser[]>([]);
     const [companies, setCompanies] = React.useState(companiesManagerInstance.getCompanies());
-    
+
+
     const getFirestoreUsers = async () => {
             try {
                 const firebaseUsers = await Firestore.getDocs(usersCollection);
@@ -90,6 +91,9 @@ export function UsersPage(props: Props) {
                             // Create new user
                             console.log(`Creating new user: ${userData.name}`);
                             props.usersManager.newUser(userData);
+
+                            // ❌ DELETE THIS LINE - IT'S CAUSING THE SPIKE!
+                            // await Firestore.addDoc(usersCollection, userData);
                         }
                     } catch (error) {
                         console.warn("Skipping user due to error:", error);
@@ -173,6 +177,9 @@ export function UsersPage(props: Props) {
                             // Create new company
                             console.log(`Creating new company: ${companyData.name}`);
                             companiesManagerInstance.addCompany(companyData);
+                            
+                            // ❌ REMOVE THIS LINE TOO (if it exists)
+                            // await Firestore.addDoc(companiesCollection, companyData);
                         }
                     } catch (error) {
                         console.warn("Skipping company due to error:", error);
@@ -190,8 +197,9 @@ export function UsersPage(props: Props) {
         }
     
         React.useEffect(() => {
-            getFirestoreUsers();
-            getFirestoreCompanies();
+            // Remove this duplicate useEffect - it's causing duplicate data loading
+            // getFirestoreUsers();
+            // getFirestoreCompanies();
         }, []);
     
     
@@ -300,42 +308,83 @@ export function UsersPage(props: Props) {
     // Handle new user form submit
     const handleNewUserSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        props.usersManager.newUser({
-            name: newUserForm.name,
-            surname: newUserForm.surname,
-            email: newUserForm.email,
-            phone: newUserForm.phone,
-            role: newUserForm.role,
-            permissions: newUserForm.permissions,
-            companyId: newUserForm.companyId,
-            companyRole: newUserForm.companyRole,
-            invitedBy: newUserForm.invitedBy,
-            icon: newUserForm.icon,
-            color: newUserForm.color,
-        });
         
-        // Reload users from manager
         try {
+            // STEP 1: Create user locally first (generates missing fields)
+            const user = props.usersManager.newUser({
+                name: newUserForm.name,
+                surname: newUserForm.surname,
+                email: newUserForm.email,
+                phone: newUserForm.phone,
+                role: newUserForm.role,
+                permissions: newUserForm.permissions,
+                companyId: newUserForm.companyId,
+                companyRole: newUserForm.companyRole,
+                invitedBy: newUserForm.invitedBy,
+                icon: newUserForm.icon,
+                color: newUserForm.color,
+            });
+            
+            // STEP 2: Save complete user data to Firestore with proper defaults
+            const completeUserData = {
+                name: user.name || '',
+                surname: user.surname || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                role: user.role || 'architect',
+                permissions: user.permissions || 'create_projects',
+                companyId: user.companyId || '',
+                companyRole: user.companyRole || 'user',
+                invitedBy: user.invitedBy || '',
+                icon: user.icon || '',
+                color: user.color || '#1CFFCA',
+                displayName: user.displayName || `${user.name} ${user.surname}`,
+                
+                // ✅ FIX: Provide defaults for potentially undefined fields
+                isActive: user.isActive !== undefined ? user.isActive : true,
+                notifications: user.notifications !== undefined ? user.notifications : true,
+                preferences: user.preferences || {
+                    language: "english",
+                    timezone: "europe"
+                },
+                createdAt: user.createdAt || new Date(),
+                
+                // ✅ ADD: Other fields that might be undefined
+                invitedAt: user.invitedAt || null,
+                joinedAt: user.joinedAt || null,
+                lastLogin: user.lastLogin || null,
+            };
+            
+            // Remove any undefined values before sending to Firestore
+            const cleanedData = Object.fromEntries(
+                Object.entries(completeUserData).filter(([_, value]) => value !== undefined)
+            ) as Partial<IUser>;
+            
+            // 🔥 FIREBASE WRITE
+            await Firestore.addDoc(usersCollection, cleanedData);
+            
+            // Update local state
             const updatedUsers = props.usersManager.getUsers();
             setUsers(updatedUsers);
+            
+            setOpenModal(null);
+            setNewUserForm({
+                name: '',
+                surname: '',
+                email: '',
+                phone: '',
+                role: 'architect',
+                permissions: 'create_projects',
+                companyId: '',
+                companyRole: 'user',
+                invitedBy: '',
+                icon: '',
+                color: '#1CFFCA',
+            });
+            
         } catch (error) {
-            console.error('Failed to reload users:', error);
+            console.error('Failed to create user:', error);
         }
-        
-        setOpenModal(null);
-        setNewUserForm({
-            name: '',
-            surname: '',
-            email: '',
-            phone: '',
-            role: 'architect',
-            permissions: 'create_projects',
-            companyId: '',
-            companyRole: 'user',
-            invitedBy: '',
-            icon: '',
-            color: '#1CFFCA',
-        });
     };
 
     // Expose global function to open edit modal
@@ -371,48 +420,92 @@ export function UsersPage(props: Props) {
     // Change user form submit
     const handleEditUserSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        props.usersManager.editUser({
-            id: editUserForm.id,
-            name: editUserForm.name,
-            surname: editUserForm.surname,
-            email: editUserForm.email,
-            phone: editUserForm.phone,
-            role: editUserForm.role,
-            permissions: editUserForm.permissions,
-            companyId: editUserForm.companyId,
-            companyRole: editUserForm.companyRole,
-            invitedBy: editUserForm.invitedBy,
-            icon: editUserForm.icon,
-            color: editUserForm.color,
-        });
         
-        // Reload users from manager
         try {
+            // STEP 1: Update locally first
+            props.usersManager.editUser({
+                id: editUserForm.id,
+                name: editUserForm.name,
+                surname: editUserForm.surname,
+                email: editUserForm.email,
+                phone: editUserForm.phone,
+                role: editUserForm.role,
+                permissions: editUserForm.permissions,
+                companyId: editUserForm.companyId,
+                companyRole: editUserForm.companyRole,
+                invitedBy: editUserForm.invitedBy,
+                icon: editUserForm.icon,
+                color: editUserForm.color,
+            });
+            
+            // STEP 2: Update in Firebase
+            const updatedUserData = {
+                name: editUserForm.name,
+                surname: editUserForm.surname,
+                email: editUserForm.email,
+                phone: editUserForm.phone,
+                role: editUserForm.role,
+                permissions: editUserForm.permissions,
+                companyId: editUserForm.companyId,
+                companyRole: editUserForm.companyRole,
+                invitedBy: editUserForm.invitedBy,
+                icon: editUserForm.icon,
+                color: editUserForm.color,
+                displayName: `${editUserForm.name} ${editUserForm.surname}`,
+                updatedAt: new Date(),
+            };
+            
+            // Clean undefined values
+            const cleanedData = Object.fromEntries(
+                Object.entries(updatedUserData).filter(([_, value]) => value !== undefined)
+            ) as Partial<IUser>;
+            
+            // 🔥 FIREBASE WRITE
+            await Firestore.updateDoc(Firestore.doc(usersCollection, editUserForm.id), cleanedData);
+            
+            // STEP 3: Update UI state
             const updatedUsers = props.usersManager.getUsers();
             setUsers(updatedUsers);
+            
+            setOpenModal(null);
+            
         } catch (error) {
-            console.error('Failed to reload users after edit:', error);
+            console.error('Failed to update user:', error);
+            alert('Failed to update user. Please try again.');
         }
-        
-        setOpenModal(null);
     };
 
     // Handler for confirming user deletion
     const handleConfirmDeleteUser = async () => {
         if (!userToDelete) return;
-        props.usersManager.deleteUser(userToDelete.id);
         
-        // Reload users from manager
         try {
+            console.log(`🗑️ Deleting user: ${userToDelete.name} (ID: ${userToDelete.id})`);
+            
+            // STEP 1: Delete from Firebase first
+            await deleteDocument("/users", userToDelete.id);
+            console.log('✅ User deleted from Firebase');
+            
+            // STEP 2: Delete from local state
+            props.usersManager.deleteUser(userToDelete.id);
+            console.log('✅ User deleted from local state');
+            
+            // STEP 3: Update UI state
             const updatedUsers = props.usersManager.getUsers();
             setUsers(updatedUsers);
+            console.log('✅ UI state updated');
+            
+            // STEP 4: Close modal
+            setUserToDelete(null);
+            const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
+            if (modal) modal.close();
+            
+            console.log('✅ User deletion completed successfully');
+            
         } catch (error) {
-            console.error('Failed to reload users after deletion:', error);
+            console.error('❌ Failed to delete user:', error);
+            alert('Failed to delete user. Please try again.');
         }
-        
-        setUserToDelete(null);
-        const modal = document.getElementById('DeleteUserModal') as HTMLDialogElement | null;
-        if (modal) modal.close();
     };
 
     // Handle new company form input changes
@@ -432,32 +525,75 @@ export function UsersPage(props: Props) {
         }
     };
     // Handle new company form submit
-    const handleNewCompanySubmit = (e: React.FormEvent) => {
+    const handleNewCompanySubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        companiesManagerInstance.addCompany({
-            name: newCompanyForm.name,
-            backgroundColor: newCompanyForm.backgroundColor,
-            primaryColor: newCompanyForm.primaryColor,
-            billingAddress: newCompanyForm.billingAddress,
-            email: newCompanyForm.email,
-            phone: newCompanyForm.phone,
-        });
-        setCompanies([...companiesManagerInstance.getCompanies()]);
-        setOpenModal(null);
-        setNewCompanyForm({ 
-            name: '', 
-            backgroundColor: '#FFFFFF',
-            primaryColor: '#3F51B5',
-            billingAddress: {
-                street: '',
-                city: '',
-                state: '',
-                zipCode: '',
-                country: ''
-            },
-            email: '', 
-            phone: '' 
-        });
+        
+        try {
+            // STEP 1: Create company locally first
+            const company = companiesManagerInstance.addCompany({
+                name: newCompanyForm.name,
+                backgroundColor: newCompanyForm.backgroundColor,
+                primaryColor: newCompanyForm.primaryColor,
+                billingAddress: newCompanyForm.billingAddress,
+                email: newCompanyForm.email,
+                phone: newCompanyForm.phone,
+            });
+            
+            // STEP 2: Save complete company data to Firestore
+            const completeCompanyData = {
+                name: company.name,
+                backgroundColor: company.backgroundColor,
+                primaryColor: company.primaryColor,
+                billingAddress: company.billingAddress,
+                email: company.email,
+                phone: company.phone,
+                bankAccount: company.bankAccount || "",
+                features: company.features || [],
+                settings: company.settings || {
+                    allowExternalCollaboration: false,
+                    allowUserInvites: true,
+                    customRoles: [],
+                    defaultProjectRole: "contributor",
+                    defaultUserPermissions: "create_projects",
+                    language: "english",
+                    requireInviteApproval: true,
+                    timezone: "europe"
+                },
+                subscription: company.subscription || {
+                    isActive: true,
+                    maxProjects: 5,
+                    maxUsers: 5,
+                    plan: "free",
+                    planExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year from now
+                },
+                createdAt: company.createdAt || new Date(),
+                // Don't include ID - Firestore generates it
+            };
+            
+            // 🔥 FIREBASE WRITE - This was missing!
+            await Firestore.addDoc(companiesCollection, completeCompanyData);
+            
+            setCompanies([...companiesManagerInstance.getCompanies()]);
+            setOpenModal(null);
+            setNewCompanyForm({ 
+                name: '', 
+                backgroundColor: '#FFFFFF',
+                primaryColor: '#3F51B5',
+                billingAddress: {
+                    street: '',
+                    city: '',
+                    state: '',
+                    zipCode: '',
+                    country: ''
+                },
+                email: '', 
+                phone: '' 
+            });
+            
+        } catch (error) {
+            console.error('Failed to create company:', error);
+            // Handle error - show error message to user
+        }
     };
     // Handle edit company modal open
     const openEditCompanyModal = (companyId: string) => {
@@ -482,33 +618,78 @@ export function UsersPage(props: Props) {
         }
     };
     // Handle edit company form submit
-    const handleEditCompanySubmit = (e: React.FormEvent) => {
+    const handleEditCompanySubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        companiesManagerInstance.editCompany({
-            id: editCompanyForm.id,
-            name: editCompanyForm.name,
-            backgroundColor: editCompanyForm.backgroundColor,
-            primaryColor: editCompanyForm.primaryColor,
-            billingAddress: editCompanyForm.billingAddress,
-            email: editCompanyForm.email,
-            phone: editCompanyForm.phone,
-        });
         
-        // Reload companies from manager
-        setCompanies([...companiesManagerInstance.getCompanies()]);
-        setOpenModal(null);
+        try {
+            // STEP 1: Update locally first
+            companiesManagerInstance.editCompany({
+                id: editCompanyForm.id,
+                name: editCompanyForm.name,
+                backgroundColor: editCompanyForm.backgroundColor,
+                primaryColor: editCompanyForm.primaryColor,
+                billingAddress: editCompanyForm.billingAddress,
+                email: editCompanyForm.email,
+                phone: editCompanyForm.phone,
+            });
+            
+            // STEP 2: Update in Firebase
+            const updatedCompanyData = {
+                name: editCompanyForm.name,
+                backgroundColor: editCompanyForm.backgroundColor,
+                primaryColor: editCompanyForm.primaryColor,
+                billingAddress: editCompanyForm.billingAddress,
+                email: editCompanyForm.email,
+                phone: editCompanyForm.phone,
+                updatedAt: new Date(),
+            };
+            
+            // 🔥 FIREBASE WRITE
+            await Firestore.updateDoc(Firestore.doc(companiesCollection, editCompanyForm.id), updatedCompanyData);
+            
+            // STEP 3: Update UI state
+            setCompanies([...companiesManagerInstance.getCompanies()]);
+            
+            setOpenModal(null);
+            
+        } catch (error) {
+            console.error('Failed to update company:', error);
+            alert('Failed to update company. Please try again.');
+        }
     };
     // Handle confirm delete company
-    const handleConfirmDeleteCompany = () => {
+    const handleConfirmDeleteCompany = async () => {
         if (!companyToDelete) return;
-        companiesManagerInstance.deleteCompany(companyToDelete.id);
-        setCompanies([...companiesManagerInstance.getCompanies()]);
-        setCompanyToDelete(null);
-        const modal = document.getElementById('DeleteCompanyModal') as HTMLDialogElement | null;
-        if (modal) modal.close();
+        
+        try {
+            console.log(`🗑️ Deleting company: ${companyToDelete.name} (ID: ${companyToDelete.id})`);
+            
+            // STEP 1: Delete from Firebase first
+            await deleteDocument("/companies", companyToDelete.id);
+            console.log('✅ Company deleted from Firebase');
+            
+            // STEP 2: Delete from local state
+            companiesManagerInstance.deleteCompany(companyToDelete.id);
+            console.log('✅ Company deleted from local state');
+            
+            // STEP 3: Update UI state
+            setCompanies([...companiesManagerInstance.getCompanies()]);
+            console.log('✅ UI state updated');
+            
+            // STEP 4: Close modal
+            setCompanyToDelete(null);
+            const modal = document.getElementById('DeleteCompanyModal') as HTMLDialogElement | null;
+            if (modal) modal.close();
+            
+            console.log('✅ Company deletion completed successfully');
+            
+        } catch (error) {
+            console.error('❌ Failed to delete company:', error);
+            alert('Failed to delete company. Please try again.');
+        }
     };
 
-    // Filter users and companies by search query
+    // Filter users and companies to only those that match the search query
     const filteredUsers = users.filter(user =>
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.surname.toLowerCase().includes(searchQuery.toLowerCase())
@@ -899,7 +1080,11 @@ export function UsersPage(props: Props) {
                 phone: company.phone
               }}
               onEdit={id => openEditCompanyModal(id)}
-              onDelete={id => setCompanyToDelete({ id: company.id || '', name: company.name })}
+              onDelete={id => {
+                setCompanyToDelete({ id: company.id || '', name: company.name });
+                const modal = document.getElementById('DeleteCompanyModal') as HTMLDialogElement | null;
+                if (modal) modal.showModal();
+              }}
             />
           ))
         ) : (

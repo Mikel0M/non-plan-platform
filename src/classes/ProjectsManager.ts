@@ -23,60 +23,6 @@ export class ProjectsManager {
         return this.list.find(project => project.id === id);
     }
 
-    // Method to update an existing project with provided data
-    updateProject(id: string, data: IProject): Project {
-        const existingProjectIndex = this.list.findIndex(project => project.id === id);
-        
-        if (existingProjectIndex === -1) {
-            throw new Error(`Project with ID ${id} not found`);
-        }
-
-        // Update the existing project with new data
-        const updatedProject = new Project(data);
-        this.list[existingProjectIndex] = updatedProject;
-
-        // Trigger update callback
-        this.onProjectUpdated(updatedProject);
-
-        return updatedProject;
-    }
-
-    // Method to update project with Firebase synchronization
-    async updateProjectInFirebase(id: string, updates: Partial<IProject>): Promise<Project> {
-        try {
-            const existingProject = this.getProject(id);
-            if (!existingProject) {
-                const errorMessage = `Project with ID ${id} not found`;
-                if (this.onProjectError) {
-                    this.onProjectError(errorMessage);
-                }
-                throw new Error(errorMessage);
-            }
-
-            // First, update in Firebase
-            const { updateDocument } = await import("../firebase");
-            await updateDocument<Partial<IProject>>("/projects", id, updates);
-
-            // Then update local state with merged data
-            const updatedData = { ...existingProject, ...updates };
-            const updatedProject = new Project(updatedData);
-            
-            const existingProjectIndex = this.list.findIndex(project => project.id === id);
-            this.list[existingProjectIndex] = updatedProject;
-
-            // Trigger update callback
-            this.onProjectUpdated(updatedProject);
-
-            return updatedProject;
-        } catch (error) {
-            const errorMessage = `Failed to update project: ${error instanceof Error ? error.message : String(error)}`;
-            if (this.onProjectError) {
-                this.onProjectError(errorMessage);
-            }
-            throw error;
-        }
-    }
-
     newProject(data: IProject, id?: string) {
         // Check for duplicate names first
         const projectNames = this.list.map((project) => project.name);
@@ -304,7 +250,10 @@ export class ProjectsManager {
                 finishDate: project.finishDate,
                 color: project.color,
                 icon: project.icon,
-                PUsers: project.PUsers || [],
+                companyId: project.companyId,
+                createdBy: project.createdBy,
+                createdAt: project.createdAt,
+                updatedAt: project.updatedAt,
                 assignedUsers: project.assignedUsers || [],
                 toDos: project.toDos || []
             }));
@@ -503,61 +452,75 @@ export class ProjectsManager {
         );
     }
 
-    // Helper methods for updating specific project properties
-    async updateProjectName(id: string, name: string): Promise<Project> {
-        return this.updateProjectInFirebase(id, { name });
+    // ✅ SIMPLE: One method to update projects (immediate Firebase save)
+    async updateProject(id: string, updates: Partial<IProject>): Promise<Project> {
+        try {
+            const existingProject = this.getProject(id);
+            if (!existingProject) {
+                const errorMessage = `Project with ID ${id} not found`;
+                if (this.onProjectError) {
+                    this.onProjectError(errorMessage);
+                }
+                throw new Error(errorMessage);
+            }
+
+            // Validate and clean the updates
+            const validatedUpdates = this.validateUpdates(updates);
+            
+            // Single Firebase call
+            const { updateDocument } = await import("../firebase");
+            await updateDocument<Partial<IProject>>("/projects", id, validatedUpdates);
+
+            // Update local state
+            const updatedData = { ...existingProject, ...validatedUpdates };
+            const updatedProject = new Project(updatedData);
+            
+            const existingProjectIndex = this.list.findIndex(project => project.id === id);
+            this.list[existingProjectIndex] = updatedProject;
+
+            // Trigger callback
+            this.onProjectUpdated(updatedProject);
+
+            return updatedProject;
+        } catch (error) {
+            const errorMessage = `Failed to update project: ${error instanceof Error ? error.message : String(error)}`;
+            if (this.onProjectError) {
+                this.onProjectError(errorMessage);
+            }
+            throw error;
+        }
     }
 
-    async updateProjectDescription(id: string, description: string): Promise<Project> {
-        return this.updateProjectInFirebase(id, { description });
-    }
-
-    async updateProjectStatus(id: string, status: status): Promise<Project> {
-        return this.updateProjectInFirebase(id, { status });
-    }
-
-    async updateProjectProgress(id: string, progress: number): Promise<Project> {
-        return this.updateProjectInFirebase(id, { progress });
-    }
-
-    async updateProjectCost(id: string, cost: number): Promise<Project> {
-        return this.updateProjectInFirebase(id, { cost });
-    }
-
-    async updateProjectLocation(id: string, location: string): Promise<Project> {
-        return this.updateProjectInFirebase(id, { location });
-    }
-
-    async updateProjectUserRole(id: string, userRole: userRole): Promise<Project> {
-        return this.updateProjectInFirebase(id, { userRole });
-    }
-
-    async updateProjectPhase(id: string, phase: phase): Promise<Project> {
-        return this.updateProjectInFirebase(id, { phase });
-    }
-
-    async updateProjectDates(id: string, startDate?: string, finishDate?: string): Promise<Project> {
-        const updates: Partial<IProject> = {};
-        if (startDate !== undefined) updates.startDate = startDate;
-        if (finishDate !== undefined) updates.finishDate = finishDate;
-        return this.updateProjectInFirebase(id, updates);
-    }
-
-    async updateProjectToDos(id: string, toDos: ItoDo[]): Promise<Project> {
-        return this.updateProjectInFirebase(id, { toDos });
-    }
-
-    async updateProjectAssignedUsers(id: string, assignedUsers: Array<{ userId: string, role: string }>): Promise<Project> {
-        return this.updateProjectInFirebase(id, { assignedUsers });
-    }
-
-    async updateProjectPUsers(id: string, PUsers: IUser[]): Promise<Project> {
-        return this.updateProjectInFirebase(id, { PUsers });
-    }
-
-    // Method to update multiple project properties at once
-    async updateProjectMultiple(id: string, updates: Partial<IProject>): Promise<Project> {
-        return this.updateProjectInFirebase(id, updates);
+    // Helper method to validate updates before sending to Firebase
+    private validateUpdates(updates: Partial<IProject>): Partial<IProject> {
+        const validated: Partial<IProject> = {};
+        
+        // Only include valid fields that exist in IProject interface
+        if (updates.name !== undefined) validated.name = updates.name;
+        if (updates.description !== undefined) validated.description = updates.description;
+        if (updates.status !== undefined) validated.status = updates.status;
+        if (updates.progress !== undefined) validated.progress = updates.progress;
+        if (updates.cost !== undefined) validated.cost = updates.cost;
+        if (updates.location !== undefined) validated.location = updates.location;
+        if (updates.userRole !== undefined) validated.userRole = updates.userRole;
+        if (updates.phase !== undefined) validated.phase = updates.phase;
+        if (updates.startDate !== undefined) validated.startDate = updates.startDate;
+        if (updates.finishDate !== undefined) validated.finishDate = updates.finishDate;
+        if (updates.toDos !== undefined) validated.toDos = updates.toDos;
+        if (updates.assignedUsers !== undefined) validated.assignedUsers = updates.assignedUsers;
+        if (updates.icon !== undefined) validated.icon = updates.icon;
+        if (updates.color !== undefined) validated.color = updates.color;
+        if (updates.companyId !== undefined) validated.companyId = updates.companyId;
+        if (updates.createdBy !== undefined) validated.createdBy = updates.createdBy;
+        if (updates.createdAt !== undefined) validated.createdAt = updates.createdAt;
+        if (updates.updatedAt !== undefined) validated.updatedAt = updates.updatedAt;
+        
+        // Always update the timestamp when making changes
+        if (Object.keys(validated).length > 0) {
+            validated.updatedAt = new Date().toISOString();
+        }
+        
+        return validated;
     }
 }
 

@@ -40,6 +40,9 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
 
     const getFirestoreProject = async () => {
         try {
+            // Clear the local project list first to avoid duplicates when reimporting
+            projectManager.list = [];
+            
             const firebaseProjects = await Firestore.getDocs(projectsCollection);
             
             for (const doc of firebaseProjects.docs) {
@@ -69,23 +72,9 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                     phase: data.phase || "Design",
                     startDate: convertTimestampToDateString(data.startDate),
                     finishDate: convertTimestampToDateString(data.finishDate),
-                    PUsers: data.PUsers && Array.isArray(data.PUsers) ? 
-                        data.PUsers.filter((user: any) => {
-                            if (typeof user === 'string') {
-                                return user && user.trim() !== "";
-                            } else if (typeof user === 'object' && user !== null) {
-                                return user.userId || user.id;
-                            }
-                            return false;
-                        }) : [],
                     assignedUsers: data.assignedUsers && Array.isArray(data.assignedUsers) ? 
-                        data.assignedUsers.filter((user: any) => {
-                            if (typeof user === 'string') {
-                                return user && user.trim() !== "";
-                            } else if (typeof user === 'object' && user !== null) {
-                                return user.userId || user.id;
-                            }
-                            return false;
+                        data.assignedUsers.filter((assignment: any) => {
+                            return assignment && assignment.userId && assignment.userId.trim() !== "";
                         }) : [],
                     toDos: data.toDos && Array.isArray(data.toDos) ? 
                         data.toDos.map((todo: any) => ({
@@ -105,7 +94,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                     if (existingProject) {
                         // Update existing project using Firebase sync
                         console.log(`Updating existing project: ${existingProject.name}`);
-                        await projectManager.updateProjectInFirebase(doc.id, projectData);
+                        await projectManager.updateProject(doc.id, projectData);
                     } else {
                         // Create new project
                         console.log(`Creating new project: ${projectData.name}`);
@@ -214,7 +203,6 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                 phase: project.phase,
                 startDate: project.startDate,
                 finishDate: project.finishDate,
-                PUsers: project.PUsers || [],
                 assignedUsers: project.assignedUsers || [],
                 toDos: project.toDos || []
             };

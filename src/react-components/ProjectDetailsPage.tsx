@@ -292,7 +292,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
         const newAssignedUsers = [...projectState.assignedUsers, { userId: selectedUserId, role: customRole }];
         
         // Update in Firebase
-        await props.projectsManager.updateProjectAssignedUsers(projectState.id || '', newAssignedUsers);
+        await props.projectsManager.updateProject(projectState.id || '', { assignedUsers: newAssignedUsers });
         
         // Update local state
         const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
@@ -323,7 +323,7 @@ const [editToDoFields, setEditToDoFields] = React.useState({
         const updatedAssigned = projectState.assignedUsers.filter(u => u.userId !== userToDelete.userId);
         
         // Update in Firebase
-        await props.projectsManager.updateProjectAssignedUsers(projectState.id || '', updatedAssigned);
+        await props.projectsManager.updateProject(projectState.id || '', { assignedUsers: updatedAssigned });
         
         // Update local state
         const updated = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
@@ -689,7 +689,7 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
                       finishDate: editFinishDate
                     };
                     
-                    await props.projectsManager.updateProjectInFirebase(projectState.id || '', updates);
+                    await props.projectsManager.updateProject(projectState.id || '', updates);
                     
                     // Update local state to reflect changes
                     const updatedProject = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {

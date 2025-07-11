@@ -20,9 +20,19 @@ export interface IProject {
     phase: phase;
     startDate: string;
     finishDate: string;
+    companyId?: string;  // Reference to company
+    createdBy?: string;  // User ID who created the project
+    createdAt?: string | Date;  // Creation timestamp
+    updatedAt?: string | Date;  // Last update timestamp
+    
+    // ✅ KEEP: Embedded todos (as confirmed they're embedded in Firestore)
     toDos?: ItoDo[];
-    PUsers?: IUser[];
-    assignedUsers?: Array<{ userId: string, role: string }>; // userId and custom role per project
+    
+    // ✅ KEEP: User references only (not full user objects)
+    assignedUsers?: Array<{ userId: string, role: string }>;
+    
+    // ❌ REMOVE: Don't embed full users since you have /users collection
+    // PUsers?: IUser[];  // This conflicts with separate /users collection
 }
 
 // Function to generate random color
@@ -71,9 +81,12 @@ export class Project implements IProject {
     phase!: phase;
     startDate!: string;
     finishDate!: string;
-    toDos: toDo[]; // Add toDos property
-    PUsers: User[]; // Add users property
-    assignedUsers: Array<{ userId: string, role: string }> = [];
+    companyId?: string;  // Add new fields from interface
+    createdBy?: string;
+    createdAt?: string | Date;
+    updatedAt?: string | Date;
+    toDos: toDo[]; // Embedded toDos
+    assignedUsers: Array<{ userId: string, role: string }> = []; // User references only
 
     constructor(data: IProject) {
         // Allow existing id, otherwise generate a new one
@@ -106,10 +119,15 @@ export class Project implements IProject {
         this.phase = data.phase || defaults.phase;
         this.startDate = data.startDate || defaults.startDate;
         this.finishDate = data.finishDate || defaults.finishDate;
+        
+        // Initialize new fields
+        this.companyId = data.companyId;
+        this.createdBy = data.createdBy;
+        this.createdAt = data.createdAt;
+        this.updatedAt = data.updatedAt;
 
-        // Initialize toDos and users
+        // Initialize toDos and assignedUsers
         this.toDos = data.toDos?.map(toDoData => new toDo(toDoData)) || [];
-        this.PUsers = data.PUsers?.map(userData => new User(userData)) || [];
         this.assignedUsers = data.assignedUsers || [];
 
         // Generate icon and use provided color or generate random color
@@ -153,8 +171,11 @@ export class Project implements IProject {
             phase: this.phase,
             startDate: this.startDate,
             finishDate: this.finishDate,
+            companyId: this.companyId,
+            createdBy: this.createdBy,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt,
             toDos: this.toDos.map(todo => todo.toJSON()),
-            PUsers: this.PUsers.map(user => user.toJSON()),
             assignedUsers: this.assignedUsers
         };
     }
@@ -199,6 +220,46 @@ export class Project implements IProject {
         }
     }
 
+    // ✅ NEW: User reference management methods (replaces embedded user methods)
+    
+    // Method to add a user to the project (by reference)
+    addUserToProject(userId: string, role: string): void {
+        // Check if user is already assigned
+        const existingAssignment = this.assignedUsers.find(assignment => assignment.userId === userId);
+        if (!existingAssignment) {
+            this.assignedUsers.push({ userId, role });
+            this.syncToFirebase();
+        }
+    }
+
+    // Method to update a user's role in the project
+    updateUserRole(userId: string, newRole: string): void {
+        const assignment = this.assignedUsers.find(assignment => assignment.userId === userId);
+        if (assignment) {
+            assignment.role = newRole;
+            this.syncToFirebase();
+        } else {
+            throw new Error("User not assigned to this project");
+        }
+    }
+
+    // Method to remove a user from the project
+    removeUserFromProject(userId: string): void {
+        const index = this.assignedUsers.findIndex(assignment => assignment.userId === userId);
+        if (index !== -1) {
+            this.assignedUsers.splice(index, 1);
+            console.log(`User with ID ${userId} removed from project`);
+            this.syncToFirebase();
+        } else {
+            console.warn(`User with ID ${userId} not found in project`);
+        }
+    }
+
+    // Method to get user IDs assigned to this project
+    getAssignedUserIds(): string[] {
+        return this.assignedUsers.map(assignment => assignment.userId);
+    }
+
     // Method to sync current project state with Firebase
     private async syncToFirebase(): Promise<void> {
         if (!this.id) return;
@@ -207,39 +268,10 @@ export class Project implements IProject {
             // Dynamic import to avoid circular dependency
             const { projectsManagerInstance } = await import('./ProjectsManager');
             if (projectsManagerInstance) {
-                await projectsManagerInstance.updateProjectToDos(this.id, this.toDos);
+                await projectsManagerInstance.updateProject(this.id, this.toJSON());
             }
         } catch (error) {
             console.warn('Failed to sync project with Firebase:', error);
-        }
-    }
-
-    // Method to add a new user
-    addUser(data: IUser): User {
-        const newUser = new User(data);
-        this.PUsers.push(newUser);
-        return newUser;
-    }
-
-    // Method to update an existing user
-    updateUser(data: IUser): User | undefined {
-        const userInstance = this.PUsers.find(user => user.id === data.id);
-        if (userInstance) {
-            userInstance.update(data);
-            return userInstance;
-        } else {
-            throw new Error("User not found(project)");
-        }
-    }
-
-    // Method to delete a user by their ID
-    deleteUserById(id: string): void {
-        const userIndex = this.PUsers.findIndex(user => user.id === id);
-        if (userIndex !== -1) {
-            this.PUsers.splice(userIndex, 1);
-            console.log(`User with ID ${id} deleted`); // Debugging statement
-        } else {
-            console.warn(`User with ID ${id} not found(project)`); // Debugging statement
         }
     }
 }
