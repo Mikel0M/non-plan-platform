@@ -4,7 +4,9 @@ export let users: User[] = []; // Global users array
 
 export class UsersManager {
     list: User[] = [];
-    currentUser: User | null = null; // Add currentUser as a property of the class
+    currentUser: User | null = null;
+    private hasLoadedFromFirebase = false; // Track if users have been loaded
+    private isLoading = false; // Prevent multiple simultaneous loads
 
     constructor() {
     }
@@ -214,6 +216,155 @@ export class UsersManager {
      */
     exportUsers(): IUser[] {
         return users.map(user => user.toJSON());
+    }
+
+    // Add method to ensure users are loaded once at app startup
+    async ensureUsersLoaded(): Promise<void> {
+        if (this.hasLoadedFromFirebase || this.isLoading) {
+            return;
+        }
+        
+        try {
+            this.isLoading = true;
+            console.log('[UsersManager] Loading users from Firebase at app startup...');
+            
+            const { getCollection } = await import("../firebase/index");
+            const usersCollection = getCollection<IUser>("/users");
+            const { getDocs } = await import("firebase/firestore");
+            
+            const firebaseUsers = await getDocs(usersCollection);
+            console.log(`[UsersManager] Found ${firebaseUsers.docs.length} users in Firebase`);
+            
+            // Clear existing users
+            this.list = [];
+            users.length = 0;
+            
+            for (const doc of firebaseUsers.docs) {
+                const data = doc.data();
+                
+                // Convert Firestore timestamps
+                const convertTimestampToDate = (timestamp: any): string | Date | undefined => {
+                    if (timestamp && timestamp.toDate) {
+                        return timestamp.toDate();
+                    }
+                    return timestamp || undefined;
+                };
+                
+                const userData: IUser = {
+                    id: doc.id,
+                    color: data.color || "#4B561A",
+                    companyId: data.companyId || "",
+                    companyRole: data.companyRole || "user",
+                    createdAt: convertTimestampToDate(data.createdAt),
+                    displayName: data.displayName || `${data.name} ${data.surname}`,
+                    email: data.email || "",
+                    icon: data.icon || "DP",
+                    invitedAt: convertTimestampToDate(data.invitedAt),
+                    invitedBy: data.invitedBy || "",
+                    isActive: data.isActive !== undefined ? data.isActive : true,
+                    joinedAt: convertTimestampToDate(data.joinedAt),
+                    lastLogin: convertTimestampToDate(data.lastLogin),
+                    name: data.name || "Untitled User",
+                    notifications: data.notifications !== undefined ? data.notifications : true,
+                    permissions: data.permissions || "create_projects",
+                    phone: data.phone || "",
+                    preferences: data.preferences || {
+                        language: "english",
+                        timezone: "europe"
+                    },
+                    role: data.role || "architect",
+                    surname: data.surname || ""
+                };
+                
+                const user = new User(userData);
+                this.list.push(user);
+                users.push(user);
+            }
+            
+            this.hasLoadedFromFirebase = true;
+            console.log(`[UsersManager] Users loaded successfully at app startup. Total: ${this.list.length}`);
+            
+        } catch (error) {
+            console.error("[UsersManager] Failed to load users at app startup:", error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    // Check if users have been loaded
+    isUsersLoaded(): boolean {
+        return this.hasLoadedFromFirebase;
+    }
+
+    // Manual refresh method - force reload users from Firebase
+    async refreshUsersFromFirebase(): Promise<void> {
+        try {
+            this.isLoading = true;
+            this.hasLoadedFromFirebase = false; // Reset flag to force reload
+            console.log('[UsersManager] Manually refreshing users from Firebase...');
+            
+            const { getCollection } = await import("../firebase/index");
+            const usersCollection = getCollection<IUser>("/users");
+            const { getDocs } = await import("firebase/firestore");
+            
+            const firebaseUsers = await getDocs(usersCollection);
+            console.log(`[UsersManager] Found ${firebaseUsers.docs.length} users in Firebase (refresh)`);
+            
+            // Clear existing users
+            this.list = [];
+            users.length = 0;
+            
+            for (const doc of firebaseUsers.docs) {
+                const data = doc.data();
+                
+                // Convert Firestore timestamps
+                const convertTimestampToDate = (timestamp: any): string | Date | undefined => {
+                    if (timestamp && timestamp.toDate) {
+                        return timestamp.toDate();
+                    }
+                    return timestamp || undefined;
+                };
+                
+                const userData: IUser = {
+                    id: doc.id,
+                    color: data.color || "#4B561A",
+                    companyId: data.companyId || "",
+                    companyRole: data.companyRole || "user",
+                    createdAt: convertTimestampToDate(data.createdAt),
+                    displayName: data.displayName || `${data.name} ${data.surname}`,
+                    email: data.email || "",
+                    icon: data.icon || "DP",
+                    invitedAt: convertTimestampToDate(data.invitedAt),
+                    invitedBy: data.invitedBy || "",
+                    isActive: data.isActive !== undefined ? data.isActive : true,
+                    joinedAt: convertTimestampToDate(data.joinedAt),
+                    lastLogin: convertTimestampToDate(data.lastLogin),
+                    name: data.name || "Untitled User",
+                    notifications: data.notifications !== undefined ? data.notifications : true,
+                    permissions: data.permissions || "create_projects",
+                    phone: data.phone || "",
+                    preferences: data.preferences || {
+                        language: "english",
+                        timezone: "europe"
+                    },
+                    role: data.role || "architect",
+                    surname: data.surname || ""
+                };
+                
+                const user = new User(userData);
+                this.list.push(user);
+                users.push(user);
+            }
+            
+            this.hasLoadedFromFirebase = true;
+            console.log(`[UsersManager] Users refreshed successfully. Total: ${this.list.length}`);
+            
+        } catch (error) {
+            console.error("[UsersManager] Failed to refresh users from Firebase:", error);
+            throw error;
+        } finally {
+            this.isLoading = false;
+        }
     }
 }
 

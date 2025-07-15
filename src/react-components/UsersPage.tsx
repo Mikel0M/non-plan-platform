@@ -34,176 +34,6 @@ export function UsersPage(props: Props) {
     const [users, setUsers] = React.useState<IUser[]>([]);
     const [companies, setCompanies] = React.useState(companiesManagerInstance.getCompanies());
 
-
-    const getFirestoreUsers = async () => {
-            try {
-                const firebaseUsers = await Firestore.getDocs(usersCollection);
-
-                for (const doc of firebaseUsers.docs) {
-                    const data = doc.data();
-                    console.log("Raw Firestore data:", data);
-    
-                    // Helper function to convert Firestore Timestamp to date string
-                    const convertTimestampToDate = (timestamp: any): string | Date | undefined => {
-                        if (timestamp && timestamp.toDate) {
-                            return timestamp.toDate();
-                        }
-                        return timestamp || undefined;
-                    };
-                    
-                    // Convert user data properly, ensuring IUser interface compliance
-                    const userData: IUser = {
-                        id: doc.id,
-                        color: data.color || "#4B561A",
-                        companyId: data.companyId || "",
-                        companyRole: data.companyRole || "user",
-                        createdAt: convertTimestampToDate(data.createdAt),
-                        displayName: data.displayName || "",
-                        email: data.email || "",
-                        icon: data.icon || "DP",
-                        invitedAt: convertTimestampToDate(data.invitedAt),
-                        invitedBy: data.invitedBy || "",
-                        isActive: data.isActive !== undefined ? data.isActive : true,
-                        joinedAt: convertTimestampToDate(data.joinedAt),
-                        lastLogin: convertTimestampToDate(data.lastLogin),
-                        name: data.name || "Untitled User",
-                        notifications: data.notifications !== undefined ? data.notifications : true,
-                        permissions: data.permissions || "create_projects",
-                        phone: data.phone || "",
-                        preferences: data.preferences || {
-                            language: "english",
-                            timezone: "europe"
-                        },
-                        role: data.role || "architect",
-                        surname: data.surname || ""
-                    };
-                    
-                    try {
-                        // Check if user already exists by ID
-                        const existingUsers = props.usersManager.getUsers();
-                        const existingUser = existingUsers.find(u => u.id === doc.id);
-
-                        if (existingUser) {
-                            // Update existing user
-                            console.log(`Updating existing user: ${existingUser.name}`);
-                            props.usersManager.editUser(userData);
-                        } else {
-                            // Create new user
-                            console.log(`Creating new user: ${userData.name}`);
-                            props.usersManager.newUser(userData);
-
-                            // ❌ DELETE THIS LINE - IT'S CAUSING THE SPIKE!
-                            // await Firestore.addDoc(usersCollection, userData);
-                        }
-                    } catch (error) {
-                        console.warn("Skipping user due to error:", error);
-                    }
-                }
-                
-                // Update local state after processing all users
-                const updatedUsers = props.usersManager.getUsers();
-                setUsers(updatedUsers);
-                
-            } catch (error) {
-                console.error("Error fetching users:", error);
-                // Add error state handling
-                console.error("Failed to load users from database");
-            }
-        }
-
-        const getFirestoreCompanies = async () => {
-            try {
-                const firebaseCompanies = await Firestore.getDocs(companiesCollection);
-
-                for (const doc of firebaseCompanies.docs) {
-                    const data = doc.data();
-                    console.log("Raw Firestore company data:", data);
-    
-                    // Helper function to convert Firestore Timestamp to date string
-                    const convertTimestampToDate = (timestamp: any): string | Date | undefined => {
-                        if (timestamp && timestamp.toDate) {
-                            return timestamp.toDate();
-                        }
-                        return timestamp || undefined;
-                    };
-                    
-                    // Convert company data properly, ensuring ICompany interface compliance
-                    const companyData: ICompany = {
-                        id: doc.id,
-                        backgroundColor: data.backgroundColor || "#FFFFFF",
-                        bankAccount: data.bankAccount || "",
-                        billingAddress: data.billingAddress || {
-                            city: "",
-                            country: "",
-                            state: "",
-                            street: "",
-                            zipCode: ""
-                        },
-                        createdAt: convertTimestampToDate(data.createdAt),
-                        email: data.email || "",
-                        features: data.features || [],
-                        name: data.name || "Untitled Company",
-                        phone: data.phone || "",
-                        primaryColor: data.primaryColor || "#3F51B5",
-                        settings: data.settings || {
-                            allowExternalCollaboration: false,
-                            allowUserInvites: true,
-                            customRoles: [],
-                            defaultProjectRole: "contributor",
-                            defaultUserPermissions: "create_projects",
-                            language: "english",
-                            requireInviteApproval: true,
-                            timezone: "europe"
-                        },
-                        subscription: data.subscription || {
-                            isActive: true,
-                            maxProjects: 5,
-                            maxUsers: 5,
-                            plan: "free",
-                            planExpiresAt: convertTimestampToDate(data.subscription?.planExpiresAt) || new Date()
-                        }
-                    };
-                    
-                    try {
-                        // Check if company already exists by ID
-                        const existingCompanies = companiesManagerInstance.getCompanies();
-                        const existingCompany = existingCompanies.find(c => c.id === doc.id);
-
-                        if (existingCompany) {
-                            // Update existing company
-                            console.log(`Updating existing company: ${existingCompany.name}`);
-                            companiesManagerInstance.editCompany(companyData);
-                        } else {
-                            // Create new company
-                            console.log(`Creating new company: ${companyData.name}`);
-                            companiesManagerInstance.addCompany(companyData);
-                            
-                            // ❌ REMOVE THIS LINE TOO (if it exists)
-                            // await Firestore.addDoc(companiesCollection, companyData);
-                        }
-                    } catch (error) {
-                        console.warn("Skipping company due to error:", error);
-                    }
-                }
-                
-                // Update local state after processing all companies
-                const updatedCompanies = companiesManagerInstance.getCompanies();
-                setCompanies(updatedCompanies);
-                
-            } catch (error) {
-                console.error("Error fetching companies:", error);
-                console.error("Failed to load companies from database");
-            }
-        }
-    
-        React.useEffect(() => {
-            // Remove this duplicate useEffect - it's causing duplicate data loading
-            // getFirestoreUsers();
-            // getFirestoreCompanies();
-        }, []);
-    
-    
-    
     const [newUserForm, setNewUserForm] = React.useState({
         name: '',
         surname: '',
@@ -263,8 +93,43 @@ export function UsersPage(props: Props) {
         phone: '',
     });
     const [companyToDelete, setCompanyToDelete] = React.useState<{id: string, name: string} | null>(null);
-    // Add state for search query
     const [searchQuery, setSearchQuery] = React.useState("");
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
+    const [isRefreshingCompanies, setIsRefreshingCompanies] = React.useState(false);
+
+    // Manual refresh function
+    const handleRefreshUsers = async () => {
+        setIsRefreshing(true);
+        try {
+            console.log('[UsersPage] Manually refreshing users...');
+            await props.usersManager.refreshUsersFromFirebase();
+            const refreshedUsers = props.usersManager.getUsers();
+            setUsers(refreshedUsers);
+            console.log(`[UsersPage] Users refreshed. Total: ${refreshedUsers.length}`);
+        } catch (error) {
+            console.error('Failed to refresh users:', error);
+            alert('Failed to refresh users. Please try again.');
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
+
+    // Manual refresh function for companies
+    const handleRefreshCompanies = async () => {
+        setIsRefreshingCompanies(true);
+        try {
+            console.log('[UsersPage] Manually refreshing companies...');
+            await companiesManagerInstance.refreshCompaniesFromFirebase();
+            const refreshedCompanies = companiesManagerInstance.getCompanies();
+            setCompanies(refreshedCompanies);
+            console.log(`[UsersPage] Companies refreshed. Total: ${refreshedCompanies.length}`);
+        } catch (error) {
+            console.error('Failed to refresh companies:', error);
+            alert('Failed to refresh companies. Please try again.');
+        } finally {
+            setIsRefreshingCompanies(false);
+        }
+    };
 
     // Load users and companies from Firebase
 
@@ -276,23 +141,31 @@ export function UsersPage(props: Props) {
             try {
                 console.log('[UsersPage] Loading initial data...');
                 
-                // Load users from Firestore first
-                await getFirestoreUsers();
+                // Users are already loaded at app level - just get them from the manager
+                const loadedUsers = props.usersManager.getUsers();
+                setUsers(loadedUsers);
+                console.log(`[UsersPage] Loaded ${loadedUsers.length} users from manager`);
                 
-                // Load companies from Firestore
-                await getFirestoreCompanies();
+                // Companies are already loaded at app level - just get them from the manager
+                const loadedCompanies = companiesManagerInstance.getCompanies();
+                setCompanies(loadedCompanies);
+                console.log(`[UsersPage] Loaded ${loadedCompanies.length} companies from manager`);
                 
                 console.log('[UsersPage] Initial data load complete');
             } catch (error) {
                 console.error('Failed to load initial data:', error);
                 
-                // Fallback to manager data if Firestore fails
+                // Fallback to manager data if something fails
                 try {
                     const loadedUsers = props.usersManager.getUsers();
                     setUsers(loadedUsers);
                     console.log(`[UsersPage] Fallback: Loaded ${loadedUsers.length} users from manager`);
+                    
+                    const loadedCompanies = companiesManagerInstance.getCompanies();
+                    setCompanies(loadedCompanies);
+                    console.log(`[UsersPage] Fallback: Loaded ${loadedCompanies.length} companies from manager`);
                 } catch (fallbackError) {
-                    console.error('Failed to load users from manager:', fallbackError);
+                    console.error('Failed to load data from managers:', fallbackError);
                 }
             }
         };
@@ -700,6 +573,12 @@ export function UsersPage(props: Props) {
 
     return (
         <div className="page page-flex" id="usersPage">
+            <style>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
             <header>
   <div className="tabs-row" style={{margin: '15px 0', display: 'flex', alignItems: 'center', gap: 8}}>
     {activeTab === 'users' && (
@@ -726,6 +605,38 @@ export function UsersPage(props: Props) {
     <div style={{ minWidth: 180, flex: 1 }}>
       <SearchBox value={searchQuery} onValueChange={setSearchQuery} placeholder={activeTab === 'users' ? t("search_users") || "Search for users" : t("search_companies") || "Search for companies"} />
     </div>
+    {/* Refresh button for users */}
+    {activeTab === 'users' && (
+      <button 
+        className="buttonTertiary" 
+        onClick={handleRefreshUsers}
+        disabled={isRefreshing}
+        title={t("users_refresh") || "Refresh users from database"}
+        style={{ opacity: isRefreshing ? 0.6 : 1 }}
+      >
+        <span className="material-icons-round" style={{ 
+          animation: isRefreshing ? 'spin 1s linear infinite' : 'none' 
+        }}>
+          refresh
+        </span>
+      </button>
+    )}
+    {/* Refresh button for companies */}
+    {activeTab === 'companies' && (
+      <button 
+        className="buttonTertiary" 
+        onClick={handleRefreshCompanies}
+        disabled={isRefreshingCompanies}
+        title={t("companies_refresh") || "Refresh companies from database"}
+        style={{ opacity: isRefreshingCompanies ? 0.6 : 1 }}
+      >
+        <span className="material-icons-round" style={{ 
+          animation: isRefreshingCompanies ? 'spin 1s linear infinite' : 'none' 
+        }}>
+          refresh
+        </span>
+      </button>
+    )}
     {activeTab === 'users' && (
       <button id="newUserBtn" className="buttonTertiary" onClick={() => setOpenModal('newUser')}>
         <span className="material-icons-round">add</span>

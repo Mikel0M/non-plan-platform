@@ -10,6 +10,7 @@ import { ToDoPage } from "./react-components/toDoPage";
 import { UsersPage } from './react-components/UsersPage';
 import { LanguageProvider } from "./react-components/LanguageContext";
 import { usersManagerInstance } from "./classes/UsersManager";
+import { AppWrapper } from './components/AppWrapper';
 
 // Global state
 export let currentProjectId: string | null = null;
@@ -20,18 +21,20 @@ const rootElement = document.getElementById('app') as HTMLDivElement;
 const appRoot = ReactDOM.createRoot(rootElement)
 appRoot.render(
     <LanguageProvider>
-        <Router.BrowserRouter>
-            <Sidebar customStyle={{ zIndex: 1, position: "fixed" }} />
-            <div id="main-content">
-                <Banner customStyle={{ zIndex: 3, position: "relative" }} />
-                <Router.Routes>
-                    <Router.Route path="/" element={<ProjectsPage projectManager={projectsManagerInstance} />} />
-                    <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManagerInstance} />} />
-                    <Router.Route path="/toDo" element={<ToDoPage projectsManager={projectsManagerInstance} />} />
-                    <Router.Route path="/users" element={<UsersPage usersManager={usersManagerInstance} projectsManager={projectsManagerInstance} />} />
-                </Router.Routes>
-            </div>
-        </Router.BrowserRouter>
+        <AppWrapper>
+            <Router.BrowserRouter>
+                <Sidebar customStyle={{ zIndex: 1, position: "fixed" }} />
+                <div id="main-content">
+                    <Banner customStyle={{ zIndex: 3, position: "relative" }} />
+                    <Router.Routes>
+                        <Router.Route path="/" element={<ProjectsPage projectManager={projectsManagerInstance} />} />
+                        <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManagerInstance} />} />
+                        <Router.Route path="/toDo" element={<ToDoPage projectsManager={projectsManagerInstance} />} />
+                        <Router.Route path="/users" element={<UsersPage usersManager={usersManagerInstance} projectsManager={projectsManagerInstance} />} />
+                    </Router.Routes>
+                </div>
+            </Router.BrowserRouter>
+        </AppWrapper>
     </LanguageProvider>
 );
 
