@@ -48,7 +48,7 @@ export interface ItoDo {
     created_by: string;
     created_at: string;
     updated_at: string;
-    updatedAt?: string;  // Firebase structure also has this field
+
     due_date: string;
     start_date: string;
     completion_date: string;
@@ -77,7 +77,7 @@ export class toDo {
     created_by: string;
     created_at: string;
     updated_at: string;
-    updatedAt?: string;  // Firebase structure also has this field
+
     due_date: string;
     start_date: string;
     completion_date: string;
@@ -105,7 +105,7 @@ export class toDo {
         this.created_by = data.created_by;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
-        this.updatedAt = data.updatedAt;  // Firebase structure field
+
         this.due_date = data.due_date;
         this.start_date = data.start_date;
         this.completion_date = data.completion_date;
@@ -177,7 +177,7 @@ export class toDo {
             created_by: this.created_by,
             created_at: this.created_at,
             updated_at: this.updated_at,
-            updatedAt: this.updatedAt,  // Firebase structure field
+
             due_date: this.due_date,
             start_date: this.start_date,
             completion_date: this.completion_date,

@@ -23,7 +23,6 @@ export interface IProject {
     companyId?: string;  // Reference to company
     createdBy?: string;  // User ID who created the project
     createdAt?: string | Date;  // Creation timestamp
-    updatedAt?: string | Date;  // Last update timestamp
     modifiedAt?: string | Date;  // Modified timestamp (Firebase structure)
     modifiedBy?: string;  // User ID who modified the project
     
@@ -113,7 +112,6 @@ export class Project implements IProject {
     companyId?: string;  // Add new fields from interface
     createdBy?: string;
     createdAt?: string | Date;
-    updatedAt?: string | Date;
     modifiedAt?: string | Date;  // New field for Firebase structure
     modifiedBy?: string;  // New field for Firebase structure
     toDos: toDo[]; // Embedded toDos
@@ -155,7 +153,6 @@ export class Project implements IProject {
         this.companyId = data.companyId || undefined;
         this.createdBy = data.createdBy || undefined;
         this.createdAt = data.createdAt || new Date().toISOString();
-        this.updatedAt = data.updatedAt || new Date().toISOString();
         this.modifiedAt = data.modifiedAt || new Date().toISOString();
         this.modifiedBy = data.modifiedBy || undefined;
 
@@ -187,7 +184,6 @@ export class Project implements IProject {
         if (data.modifiedBy !== undefined) this.modifiedBy = data.modifiedBy;
         
         // Update timestamps
-        this.updatedAt = new Date().toISOString();
         this.modifiedAt = new Date().toISOString();
         
         // Regenerate icon if name changed
@@ -216,7 +212,6 @@ export class Project implements IProject {
         data.startDate = this.startDate || new Date().toISOString().split('T')[0];
         data.finishDate = this.finishDate || new Date().toISOString().split('T')[0];
         data.createdAt = this.createdAt || new Date().toISOString();
-        data.updatedAt = this.updatedAt || new Date().toISOString();
         data.modifiedAt = this.modifiedAt || new Date().toISOString();
         data.toDos = this.toDos?.map(todo => todo.toJSON()) || [];
         data.assignedUsers = this.assignedUsers || [];
@@ -235,7 +230,6 @@ export class Project implements IProject {
         this.toDos.push(newToDo);
         
         // Update modification timestamps
-        this.updatedAt = new Date().toISOString();
         this.modifiedAt = new Date().toISOString();
         
         // Sync with Firebase if possible
@@ -251,7 +245,7 @@ export class Project implements IProject {
             toDoInstance.update(data);
             
             // Update modification timestamps
-            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
             this.modifiedAt = new Date().toISOString();
             
             // Sync with Firebase if possible
@@ -271,7 +265,7 @@ export class Project implements IProject {
             console.log(`To-do with ID ${id} deleted`); // Debugging statement
             
             // Update modification timestamps
-            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
             this.modifiedAt = new Date().toISOString();
             
             // Sync with Firebase if possible
@@ -291,7 +285,7 @@ export class Project implements IProject {
             this.assignedUsers.push({ userId, role });
             
             // Update modification timestamps
-            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
             this.modifiedAt = new Date().toISOString();
             
             this.syncToFirebase();
@@ -305,7 +299,7 @@ export class Project implements IProject {
             assignment.role = newRole;
             
             // Update modification timestamps
-            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
             this.modifiedAt = new Date().toISOString();
             
             this.syncToFirebase();
@@ -322,7 +316,7 @@ export class Project implements IProject {
             console.log(`User with ID ${userId} removed from project`);
             
             // Update modification timestamps
-            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
             this.modifiedAt = new Date().toISOString();
             
             this.syncToFirebase();
