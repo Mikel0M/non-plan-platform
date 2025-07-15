@@ -26,7 +26,7 @@ export class ProjectsManager {
         return this.list.find(project => project.id === id);
     }
 
-    newProject(data: IProject, id?: string) {
+    async newProject(data: IProject, id?: string): Promise<Project> {
         // Check for duplicate names first
         const projectNames = this.list.map((project) => project.name);
         const nameInUse = projectNames.includes(data.name);
@@ -48,15 +48,29 @@ export class ProjectsManager {
             throw new Error(errorMessage);
         }
 
-        // Create and add the project
+        // Create the project
         const project = new Project(data);
-        this.list.push(project);
-        this.onProjectCreated(project);
+        
+        try {
+            // Save to Firestore first
+            const { addDocument } = await import("../firebase");
+            await addDocument<IProject>("/projects", project.toJSON(), project.id);
+            
+            // Then add to local list
+            this.list.push(project);
+            this.onProjectCreated(project);
 
-        // Handle modal setup only if DOM elements exist (legacy support)
-        this.setupToDoModalIfExists(data);
+            // Handle modal setup only if DOM elements exist (legacy support)
+            this.setupToDoModalIfExists(data);
 
-        return project;
+            return project;
+        } catch (error) {
+            const errorMessage = `Failed to create project: ${error instanceof Error ? error.message : String(error)}`;
+            if (this.onProjectError) {
+                this.onProjectError(errorMessage);
+            }
+            throw error;
+        }
     }
 
     private setupToDoModalIfExists(data: IProject) {
@@ -517,10 +531,13 @@ export class ProjectsManager {
         if (updates.createdBy !== undefined) validated.createdBy = updates.createdBy;
         if (updates.createdAt !== undefined) validated.createdAt = updates.createdAt;
         if (updates.updatedAt !== undefined) validated.updatedAt = updates.updatedAt;
+        if (updates.modifiedAt !== undefined) validated.modifiedAt = updates.modifiedAt;
+        if (updates.modifiedBy !== undefined) validated.modifiedBy = updates.modifiedBy;
         
         // Always update the timestamp when making changes
         if (Object.keys(validated).length > 0) {
             validated.updatedAt = new Date().toISOString();
+            validated.modifiedAt = new Date().toISOString();
         }
         
         return validated;

@@ -10,7 +10,7 @@ import { ToDoPage } from "./react-components/toDoPage";
 import { UsersPage } from './react-components/UsersPage';
 import { LanguageProvider } from "./react-components/LanguageContext";
 import { usersManagerInstance } from "./classes/UsersManager";
-import { AppWrapper } from './components/AppWrapper';
+import { AppWrapper } from './react-components/AppWrapper';
 
 // Global state
 export let currentProjectId: string | null = null;

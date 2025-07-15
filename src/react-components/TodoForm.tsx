@@ -47,6 +47,7 @@ export const TodoForm: React.FC<TodoFormProps> = ({
     project_id: selectedProjectId || initialData?.project_id || '',
     completion_date: initialData?.completion_date || '',
     progress_percentage: (initialData?.progress_percentage || '25%') as toDoPercentage,
+    isComplete: initialData?.isComplete || false,
   });
 
   // Get project users for dropdowns
@@ -72,10 +73,10 @@ export const TodoForm: React.FC<TodoFormProps> = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target as HTMLInputElement;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'estimated_hours' || name === 'actual_hours' ? Number(value) : value
+      [name]: type === 'checkbox' ? checked : (name === 'estimated_hours' || name === 'actual_hours' ? Number(value) : value)
     }));
   };
 
@@ -205,6 +206,22 @@ export const TodoForm: React.FC<TodoFormProps> = ({
           </select>
           <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
             {t("projects_progress_tip") || "Current progress percentage"}
+          </label>
+        </div>
+        
+        <div className="formFieldContainer">
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="material-icons-round">check_circle</span>
+            <input
+              type="checkbox"
+              name="isComplete"
+              checked={formData.isComplete}
+              onChange={handleChange}
+            />
+            {t("projects_is_complete") || "Mark as Complete"}
+          </label>
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>
+            {t("projects_is_complete_tip") || "Check if this task is completed"}
           </label>
         </div>
         

@@ -73,6 +73,15 @@ export function ToDoPage(props: Props) {
     }
   };
 
+  // Handle todo completion toggle
+  const handleToggleComplete = async (todo: ItoDo) => {
+    try {
+      await updateTodo(todo.id, { ...todo, isComplete: !todo.isComplete });
+    } catch (err) {
+      console.error('Failed to toggle todo completion:', err);
+    }
+  };
+
   // Handle todo deletion
   const handleDeleteTodo = async () => {
     if (!todoToDelete) return;
@@ -201,7 +210,7 @@ export function ToDoPage(props: Props) {
                         title: todo.title,
                         startDate: todo.start_date,
                         dueDate: todo.due_date,
-                        completed: todo.status === 'Completed',
+                        completed: todo.status === 'Completed' || todo.isComplete,
                         projectId: todo.project_id,
                         assignedTo: todo.assigned_to,
                         color: project?.color || 'var(--primary)',
@@ -264,6 +273,7 @@ export function ToDoPage(props: Props) {
                       <div className="todo-header-label">Status</div>
                       <div className="todo-header-label">Priority</div>
                       <div className="todo-header-label">Due Date</div>
+                      <div className="todo-header-label">Complete</div>
                       <div className="todo-task-delete"></div>
                     </div>
 
@@ -273,7 +283,7 @@ export function ToDoPage(props: Props) {
                       .map((todo) => (
                       <div 
                         key={todo.id}
-                        className={`todoItem user-card-hover ${getStatusClass(todo.status)}`}
+                        className={`todoItem user-card-hover ${getStatusClass(todo.status)} ${todo.isComplete ? 'completed' : ''}`}
                         onClick={() => openEditModal(todo)}
                       >
                         <div className="todo-task-icon">
@@ -281,7 +291,9 @@ export function ToDoPage(props: Props) {
                         </div>
                         <div className="todo-task-value">
                           <div className="todo-item-title-row">
-                            <h5 className="todo-item-title">{todo.title}</h5>
+                            <h5 className={`todo-item-title ${todo.isComplete ? 'completed-text' : ''}`}>
+                              {todo.title}
+                            </h5>
                           </div>
                           {todo.description && (
                             <div className="todo-item-desc">{todo.description}</div>
@@ -290,6 +302,19 @@ export function ToDoPage(props: Props) {
                         <div className="todo-task-value">{todo.status}</div>
                         <div className="todo-task-value">{todo.priority}</div>
                         <div className="todo-task-value">{formatDate(todo.due_date)}</div>
+                        <div className="todo-task-value">
+                          <label className="checkbox-container">
+                            <input
+                              type="checkbox"
+                              checked={todo.isComplete || false}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                handleToggleComplete(todo);
+                              }}
+                            />
+                            <span className="checkmark"></span>
+                          </label>
+                        </div>
                         <div className="todo-task-delete">
                           <button
                             type="button"

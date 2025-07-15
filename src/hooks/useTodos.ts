@@ -46,6 +46,7 @@ export const useTodos = (projectsManager: ProjectsManager, projectId?: string) =
             created_by: todo.created_by,
             created_at: todo.created_at,
             updated_at: todo.updated_at,
+            updatedAt: todo.updatedAt,
             due_date: todo.due_date,
             start_date: todo.start_date,
             completion_date: todo.completion_date,
@@ -54,6 +55,11 @@ export const useTodos = (projectsManager: ProjectsManager, projectId?: string) =
             dependencies: todo.dependencies,
             progress_percentage: todo.progress_percentage,
             comments: todo.comments,
+            isComplete: todo.isComplete,
+            subToDo: todo.subToDo,
+            modifiedAt: todo.modifiedAt,
+            modifiedBy: todo.modifiedBy,
+            phase: todo.phase,
           } as ItoDo));
           setTodos(todoData);
         } else {
@@ -77,6 +83,7 @@ export const useTodos = (projectsManager: ProjectsManager, projectId?: string) =
           created_by: todo.created_by,
           created_at: todo.created_at,
           updated_at: todo.updated_at,
+          updatedAt: todo.updatedAt,
           due_date: todo.due_date,
           start_date: todo.start_date,
           completion_date: todo.completion_date,
@@ -85,6 +92,11 @@ export const useTodos = (projectsManager: ProjectsManager, projectId?: string) =
           dependencies: todo.dependencies,
           progress_percentage: todo.progress_percentage,
           comments: todo.comments,
+          isComplete: todo.isComplete,
+          subToDo: todo.subToDo,
+          modifiedAt: todo.modifiedAt,
+          modifiedBy: todo.modifiedBy,
+          phase: todo.phase,
         } as ItoDo))
       );
       setTodos(allTodos);

@@ -569,6 +569,76 @@ header {
 .todoItem.status-completed { background: var(--green); }
 .todoItem.status-onhold { background: var(--red); }
 
+/* Todo completion styles */
+.todoItem.completed {
+    opacity: 0.7;
+}
+
+.completed-text {
+    text-decoration: line-through;
+    opacity: 0.8;
+}
+
+/* Checkbox styles */
+.checkbox-container {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #333;
+    border: 2px solid var(--primary);
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+    background-color: #555;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.todoItem.status-onhold { background: var(--red); }
+
 /* ===== MODAL SYSTEM ===== */
 dialog {
     background-color: transparent;

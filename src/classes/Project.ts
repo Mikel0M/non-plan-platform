@@ -4,7 +4,7 @@ import { IUser, User } from './User';
 
 export type userRole = "not defined" | "Architect" | "Engineer" | "Developer";
 export type status = "Pending" | "Active" | "Finished";
-export type phase = "Design" | "Construction Project" | "Execution" | "Construction";
+export type phase = "Design" | "Construction project" | "Execution" | "Construction";  // Updated to match Firestore
 
 export interface IProject {
     id?: string;
@@ -24,6 +24,8 @@ export interface IProject {
     createdBy?: string;  // User ID who created the project
     createdAt?: string | Date;  // Creation timestamp
     updatedAt?: string | Date;  // Last update timestamp
+    modifiedAt?: string | Date;  // Modified timestamp (Firebase structure)
+    modifiedBy?: string;  // User ID who modified the project
     
     // ✅ KEEP: Embedded todos (as confirmed they're embedded in Firestore)
     toDos?: ItoDo[];
@@ -59,6 +61,33 @@ function sliceTwoEachWord(input: string): string {
     return result.join("");
 }
 
+// Function to clean undefined values for Firebase - More aggressive version
+function cleanForFirebase(obj: any): any {
+    if (obj === null || obj === undefined) {
+        return null;
+    }
+    
+    if (Array.isArray(obj)) {
+        return obj.map(item => cleanForFirebase(item)).filter(item => item !== null && item !== undefined);
+    }
+    
+    if (typeof obj === 'object') {
+        const cleaned: any = {};
+        for (const key in obj) {
+            const value = obj[key];
+            if (value !== undefined && value !== null) {
+                const cleanedValue = cleanForFirebase(value);
+                if (cleanedValue !== null && cleanedValue !== undefined) {
+                    cleaned[key] = cleanedValue;
+                }
+            }
+        }
+        return cleaned;
+    }
+    
+    return obj;
+}
+
 // Function to format a date to YYYY-MM-DD
 function formatDate(date: Date): string {
     const year = date.getFullYear();
@@ -85,6 +114,8 @@ export class Project implements IProject {
     createdBy?: string;
     createdAt?: string | Date;
     updatedAt?: string | Date;
+    modifiedAt?: string | Date;  // New field for Firebase structure
+    modifiedBy?: string;  // New field for Firebase structure
     toDos: toDo[]; // Embedded toDos
     assignedUsers: Array<{ userId: string, role: string }> = []; // User references only
 
@@ -103,7 +134,7 @@ export class Project implements IProject {
             progress: 0,
             cost: 0,
             status: "Pending" as status,
-            phase: "Design" as phase,
+            phase: "Design" as phase,  // Updated to match Firestore
             startDate: formatDate(new Date()), // default to today's date
             finishDate: formatDate(nextYear)  // default to next year
         };
@@ -120,18 +151,20 @@ export class Project implements IProject {
         this.startDate = data.startDate || defaults.startDate;
         this.finishDate = data.finishDate || defaults.finishDate;
         
-        // Initialize new fields
-        this.companyId = data.companyId;
-        this.createdBy = data.createdBy;
-        this.createdAt = data.createdAt;
-        this.updatedAt = data.updatedAt;
+        // Initialize new fields with proper defaults
+        this.companyId = data.companyId || undefined;
+        this.createdBy = data.createdBy || undefined;
+        this.createdAt = data.createdAt || new Date().toISOString();
+        this.updatedAt = data.updatedAt || new Date().toISOString();
+        this.modifiedAt = data.modifiedAt || new Date().toISOString();
+        this.modifiedBy = data.modifiedBy || undefined;
 
         // Initialize toDos and assignedUsers
         this.toDos = data.toDos?.map(toDoData => new toDo(toDoData)) || [];
         this.assignedUsers = data.assignedUsers || [];
 
         // Generate icon and use provided color or generate random color
-        this.icon = data.icon || sliceTwoEachWord(this.name);
+        this.icon = data.icon || sliceTwoEachWord(this.name) || "DP"; // Default to "DP" if sliceTwoEachWord returns empty
         this.color = data.color || getRandomColor();
         
     }
@@ -148,6 +181,14 @@ export class Project implements IProject {
         if (data.phase !== undefined) this.phase = data.phase;
         if (data.startDate !== undefined) this.startDate = data.startDate;
         if (data.finishDate !== undefined) this.finishDate = data.finishDate;
+        if (data.companyId !== undefined) this.companyId = data.companyId;
+        if (data.createdBy !== undefined) this.createdBy = data.createdBy;
+        if (data.createdAt !== undefined) this.createdAt = data.createdAt;
+        if (data.modifiedBy !== undefined) this.modifiedBy = data.modifiedBy;
+        
+        // Update timestamps
+        this.updatedAt = new Date().toISOString();
+        this.modifiedAt = new Date().toISOString();
         
         // Regenerate icon if name changed
         if (data.name !== undefined) {
@@ -155,35 +196,47 @@ export class Project implements IProject {
         }
     }
 
-    // Convert to JSON for serialization
+    // Convert to JSON for serialization (clean undefined values for Firebase)
     toJSON(): IProject {
-        return {
-            id: this.id,
-            icon: this.icon,
-            color: this.color,
-            name: this.name,
-            description: this.description,
-            location: this.location,
-            userRole: this.userRole,
-            progress: this.progress,
-            cost: this.cost,
-            status: this.status,
-            phase: this.phase,
-            startDate: this.startDate,
-            finishDate: this.finishDate,
-            companyId: this.companyId,
-            createdBy: this.createdBy,
-            createdAt: this.createdAt,
-            updatedAt: this.updatedAt,
-            toDos: this.toDos.map(todo => todo.toJSON()),
-            assignedUsers: this.assignedUsers
-        };
+        // Create a safe object with explicit null checks
+        const data: any = {};
+        
+        // Required fields with fallbacks
+        data.id = this.id || uuidv4();
+        data.icon = this.icon || "DP";
+        data.color = this.color || "#FFFFFF";
+        data.name = this.name || "Untitled Project";
+        data.description = this.description || "";
+        data.location = this.location || "";
+        data.userRole = this.userRole || "not defined";
+        data.progress = this.progress || 0;
+        data.cost = this.cost || 0;
+        data.status = this.status || "Pending";
+        data.phase = this.phase || "Design";
+        data.startDate = this.startDate || new Date().toISOString().split('T')[0];
+        data.finishDate = this.finishDate || new Date().toISOString().split('T')[0];
+        data.createdAt = this.createdAt || new Date().toISOString();
+        data.updatedAt = this.updatedAt || new Date().toISOString();
+        data.modifiedAt = this.modifiedAt || new Date().toISOString();
+        data.toDos = this.toDos?.map(todo => todo.toJSON()) || [];
+        data.assignedUsers = this.assignedUsers || [];
+        
+        // Optional fields - only include if they have values
+        if (this.companyId) data.companyId = this.companyId;
+        if (this.createdBy) data.createdBy = this.createdBy;
+        if (this.modifiedBy) data.modifiedBy = this.modifiedBy;
+        
+        return data;
     }
 
     // Method to add a new to-do
     addToDo(data: ItoDo): toDo {
         const newToDo = new toDo(data);
         this.toDos.push(newToDo);
+        
+        // Update modification timestamps
+        this.updatedAt = new Date().toISOString();
+        this.modifiedAt = new Date().toISOString();
         
         // Sync with Firebase if possible
         this.syncToFirebase();
@@ -196,6 +249,10 @@ export class Project implements IProject {
         const toDoInstance = this.toDos.find(toDo => toDo.id === data.id);
         if (toDoInstance) {
             toDoInstance.update(data);
+            
+            // Update modification timestamps
+            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
             
             // Sync with Firebase if possible
             this.syncToFirebase();
@@ -213,6 +270,10 @@ export class Project implements IProject {
             this.toDos.splice(toDoIndex, 1);
             console.log(`To-do with ID ${id} deleted`); // Debugging statement
             
+            // Update modification timestamps
+            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
+            
             // Sync with Firebase if possible
             this.syncToFirebase();
         } else {
@@ -228,6 +289,11 @@ export class Project implements IProject {
         const existingAssignment = this.assignedUsers.find(assignment => assignment.userId === userId);
         if (!existingAssignment) {
             this.assignedUsers.push({ userId, role });
+            
+            // Update modification timestamps
+            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
+            
             this.syncToFirebase();
         }
     }
@@ -237,6 +303,11 @@ export class Project implements IProject {
         const assignment = this.assignedUsers.find(assignment => assignment.userId === userId);
         if (assignment) {
             assignment.role = newRole;
+            
+            // Update modification timestamps
+            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
+            
             this.syncToFirebase();
         } else {
             throw new Error("User not assigned to this project");
@@ -249,6 +320,11 @@ export class Project implements IProject {
         if (index !== -1) {
             this.assignedUsers.splice(index, 1);
             console.log(`User with ID ${userId} removed from project`);
+            
+            // Update modification timestamps
+            this.updatedAt = new Date().toISOString();
+            this.modifiedAt = new Date().toISOString();
+            
             this.syncToFirebase();
         } else {
             console.warn(`User with ID ${userId} not found in project`);
@@ -266,9 +342,20 @@ export class Project implements IProject {
         
         try {
             // Dynamic import to avoid circular dependency
-            const { projectsManagerInstance } = await import('./ProjectsManager');
-            if (projectsManagerInstance) {
-                await projectsManagerInstance.updateProject(this.id, this.toJSON());
+            const { updateDocument, getCollection } = await import('../firebase');
+            const { doc, getDoc } = await import('firebase/firestore');
+            
+            // Check if the project exists in Firebase first
+            const projectRef = doc(getCollection<IProject>("/projects"), this.id);
+            const projectSnapshot = await getDoc(projectRef);
+            
+            if (projectSnapshot.exists()) {
+                // Project exists, so we can update it
+                await updateDocument<Partial<IProject>>("/projects", this.id, cleanForFirebase(this.toJSON()));
+            } else {
+                // Project doesn't exist in Firebase yet, skip the sync
+                // This can happen during project creation process
+                console.debug(`Project ${this.id} doesn't exist in Firebase yet, skipping sync`);
             }
         } catch (error) {
             console.warn('Failed to sync project with Firebase:', error);

@@ -148,28 +148,8 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
         };
 
         try {
-            // First create the project locally (this will generate random color if needed)
-            const project = projectManager.newProject(ProjectData);
-            
-            // Then save the complete project data (including generated color and icon) to Firebase
-            const completeProjectData = {
-                icon: project.icon, // This will have the generated icon
-                color: project.color, // This will have the generated random color
-                name: project.name,
-                description: project.description,
-                userRole: project.userRole,
-                location: project.location,
-                progress: project.progress,
-                cost: project.cost,
-                status: project.status,
-                phase: project.phase,
-                startDate: project.startDate,
-                finishDate: project.finishDate,
-                assignedUsers: project.assignedUsers || [],
-                toDos: project.toDos || []
-            };
-            
-            await Firestore.addDoc(projectsCollection, completeProjectData);
+            // Create the project (this will save it to Firebase automatically)
+            const project = await projectManager.newProject(ProjectData);
             
             projectForm.reset(); // Reset the form
             setIsModalOpen(false);
@@ -296,10 +276,10 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                             <span className="material-icons-round">account_circle</span>{t("projects_role") || "Role"}
                         </label>
                         <select name="userRole">
-                            <option>{t("projects_role_not_defined") || "not defined"}</option>
-                            <option>{t("projects_role_architect") || "Architect"}</option>
-                            <option>{t("projects_role_engineer") || "Engineer"}</option>
-                            <option>{t("projects_role_developer") || "Developer"}</option>
+                            <option value="not defined">{t("projects_role_not_defined") || "not defined"}</option>
+                            <option value="Architect">{t("projects_role_architect") || "Architect"}</option>
+                            <option value="Engineer">{t("projects_role_engineer") || "Engineer"}</option>
+                            <option value="Developer">{t("projects_role_developer") || "Developer"}</option>
                         </select>
                         </div>
                         <div className="formFieldContainer">
@@ -308,9 +288,9 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                             {t("projects_status") || "Status"}
                         </label>
                         <select name="status">
-                            <option>{t("projects_status_pending") || "Pending"}</option>
-                            <option>{t("projects_status_active") || "Active"}</option>
-                            <option>{t("projects_status_finished") || "Finished"}</option>
+                            <option value="Pending">{t("projects_status_pending") || "Pending"}</option>
+                            <option value="Active">{t("projects_status_active") || "Active"}</option>
+                            <option value="Finished">{t("projects_status_finished") || "Finished"}</option>
                         </select>
                         </div>
                         <div className="formFieldContainer">
@@ -319,10 +299,10 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                             {t("projects_phase") || "Design Phase"}
                         </label>
                         <select name="phase">
-                            <option>{t("projects_phase_design") || "Design"}</option>
-                            <option>{t("projects_phase_construction_project") || "Construction project"}</option>
-                            <option>{t("projects_phase_execution") || "Execution"}</option>
-                            <option>{t("projects_phase_construction") || "Construction"}</option>
+                            <option value="Design">{t("projects_phase_design") || "Design"}</option>
+                            <option value="Construction project">{t("projects_phase_construction_project") || "Construction project"}</option>
+                            <option value="Execution">{t("projects_phase_execution") || "Execution"}</option>
+                            <option value="Construction">{t("projects_phase_construction") || "Construction"}</option>
                         </select>
                         </div>
                         <div className="formFieldContainer">
