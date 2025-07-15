@@ -10,6 +10,9 @@ export let currentProject: Project | null = null; // Ensure it's globally access
 
 export class ProjectsManager {
     list: Project[] = [];
+    private hasLoadedFromFirebase = false; // Track if projects have been loaded
+    private isLoading = false; // Prevent multiple simultaneous loads
+    
     onProjectCreated = (_project: Project) => {}; // Callback for when a project is created
     onProjectDeleted = (id: string) => {}; 
     onProjectUpdated = (_project: Project) => {}; // Callback for when a project is updated
@@ -521,6 +524,164 @@ export class ProjectsManager {
         }
         
         return validated;
+    }
+
+    // Add method to ensure projects are loaded once at app startup
+    async ensureProjectsLoaded(): Promise<void> {
+        if (this.hasLoadedFromFirebase || this.isLoading) {
+            return;
+        }
+        
+        try {
+            this.isLoading = true;
+            console.log('[ProjectsManager] Loading projects from Firebase at app startup...');
+            
+            const { getCollection } = await import("../firebase/index");
+            const projectsCollection = getCollection<IProject>("/projects");
+            const { getDocs } = await import("firebase/firestore");
+            
+            const firebaseProjects = await getDocs(projectsCollection);
+            console.log(`[ProjectsManager] Found ${firebaseProjects.docs.length} projects in Firebase`);
+            
+            // Clear existing projects
+            this.list = [];
+            
+            for (const doc of firebaseProjects.docs) {
+                const data = doc.data();
+                
+                // Helper function to convert Firestore Timestamp to date string
+                const convertTimestampToDateString = (timestamp: any): string => {
+                    if (timestamp && timestamp.toDate) {
+                        return timestamp.toDate().toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+                    }
+                    return timestamp || ""; // Fallback if it's already a string or null
+                };
+                
+                // Convert ALL the data properly, ensuring IProject interface compliance
+                const projectData: IProject = {
+                    id: doc.id,
+                    icon: data.icon || "DP",
+                    color: data.color || "#FFFFFF",
+                    name: data.name || "Untitled Project",
+                    description: data.description || "",
+                    userRole: data.userRole || "not defined",
+                    location: data.location || "",
+                    progress: data.progress || 0,
+                    cost: data.cost || 0,
+                    status: data.status || "Pending",
+                    phase: data.phase || "Design",
+                    startDate: convertTimestampToDateString(data.startDate),
+                    finishDate: convertTimestampToDateString(data.finishDate),
+                    assignedUsers: data.assignedUsers && Array.isArray(data.assignedUsers) ? 
+                        data.assignedUsers.filter((assignment: any) => {
+                            return assignment && assignment.userId && assignment.userId.trim() !== "";
+                        }) : [],
+                    toDos: data.toDos && Array.isArray(data.toDos) ? 
+                        data.toDos.map((todo: any) => ({
+                            ...todo,
+                            // Convert timestamps in toDos as well
+                            due_date: convertTimestampToDateString(todo.due_date),
+                            start_date: convertTimestampToDateString(todo.start_date),
+                            created_at: convertTimestampToDateString(todo.created_at),
+                            updated_at: convertTimestampToDateString(todo.updated_at)
+                        })) : []
+                };
+                
+                const project = new Project(projectData);
+                this.list.push(project);
+            }
+            
+            this.hasLoadedFromFirebase = true;
+            console.log(`[ProjectsManager] Projects loaded successfully at app startup. Total: ${this.list.length}`);
+            
+        } catch (error) {
+            console.error("[ProjectsManager] Failed to load projects at app startup:", error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    // Manual refresh method - force reload projects from Firebase
+    async refreshProjectsFromFirebase(): Promise<void> {
+        try {
+            this.isLoading = true;
+            this.hasLoadedFromFirebase = false; // Reset flag to force reload
+            console.log('[ProjectsManager] Manually refreshing projects from Firebase...');
+            
+            const { getCollection } = await import("../firebase/index");
+            const projectsCollection = getCollection<IProject>("/projects");
+            const { getDocs } = await import("firebase/firestore");
+            
+            const firebaseProjects = await getDocs(projectsCollection);
+            console.log(`[ProjectsManager] Found ${firebaseProjects.docs.length} projects in Firebase (refresh)`);
+            
+            // Clear existing projects
+            this.list = [];
+            
+            for (const doc of firebaseProjects.docs) {
+                const data = doc.data();
+                
+                // Helper function to convert Firestore Timestamp to date string
+                const convertTimestampToDateString = (timestamp: any): string => {
+                    if (timestamp && timestamp.toDate) {
+                        return timestamp.toDate().toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+                    }
+                    return timestamp || ""; // Fallback if it's already a string or null
+                };
+                
+                // Convert ALL the data properly, ensuring IProject interface compliance
+                const projectData: IProject = {
+                    id: doc.id,
+                    icon: data.icon || "DP",
+                    color: data.color || "#FFFFFF",
+                    name: data.name || "Untitled Project",
+                    description: data.description || "",
+                    userRole: data.userRole || "not defined",
+                    location: data.location || "",
+                    progress: data.progress || 0,
+                    cost: data.cost || 0,
+                    status: data.status || "Pending",
+                    phase: data.phase || "Design",
+                    startDate: convertTimestampToDateString(data.startDate),
+                    finishDate: convertTimestampToDateString(data.finishDate),
+                    assignedUsers: data.assignedUsers && Array.isArray(data.assignedUsers) ? 
+                        data.assignedUsers.filter((assignment: any) => {
+                            return assignment && assignment.userId && assignment.userId.trim() !== "";
+                        }) : [],
+                    toDos: data.toDos && Array.isArray(data.toDos) ? 
+                        data.toDos.map((todo: any) => ({
+                            ...todo,
+                            // Convert timestamps in toDos as well
+                            due_date: convertTimestampToDateString(todo.due_date),
+                            start_date: convertTimestampToDateString(todo.start_date),
+                            created_at: convertTimestampToDateString(todo.created_at),
+                            updated_at: convertTimestampToDateString(todo.updated_at)
+                        })) : []
+                };
+                
+                const project = new Project(projectData);
+                this.list.push(project);
+            }
+            
+            this.hasLoadedFromFirebase = true;
+            console.log(`[ProjectsManager] Projects refreshed successfully. Total: ${this.list.length}`);
+            
+        } catch (error) {
+            console.error("[ProjectsManager] Failed to refresh projects from Firebase:", error);
+            throw error;
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    // Check if projects have been loaded
+    isProjectsLoaded(): boolean {
+        return this.hasLoadedFromFirebase;
+    }
+
+    // Get projects (now uses cached data)
+    getProjects(): Project[] {
+        return this.list;
     }
 }
 

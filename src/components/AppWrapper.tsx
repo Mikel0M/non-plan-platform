@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { usersManagerInstance } from '../classes/UsersManager';
 import { companiesManagerInstance } from '../classes/CompaniesManager';
+import { projectsManagerInstance } from '../classes/ProjectsManager';
 
 interface AppWrapperProps {
     children: React.ReactNode;
@@ -16,9 +17,10 @@ export const AppWrapper: React.FC<AppWrapperProps> = ({ children }) => {
             try {
                 console.log('[AppWrapper] Initializing app data...');
                 
-                // Load users and companies at app startup
+                // Load users, companies, and projects at app startup
                 await usersManagerInstance.ensureUsersLoaded();
                 await companiesManagerInstance.ensureCompaniesLoaded();
+                await projectsManagerInstance.ensureProjectsLoaded();
                 
                 setIsInitialized(true);
                 console.log('[AppWrapper] App initialization complete');
@@ -39,12 +41,13 @@ export const AppWrapper: React.FC<AppWrapperProps> = ({ children }) => {
         const handleVisibilityChange = async () => {
             if (document.visibilityState === 'visible' && isInitialized) {
                 try {
-                    console.log('[AppWrapper] Window focused - refreshing users and companies...');
+                    console.log('[AppWrapper] Window focused - refreshing users, companies, and projects...');
                     await Promise.all([
                         usersManagerInstance.refreshUsersFromFirebase(),
-                        companiesManagerInstance.refreshCompaniesFromFirebase()
+                        companiesManagerInstance.refreshCompaniesFromFirebase(),
+                        projectsManagerInstance.refreshProjectsFromFirebase()
                     ]);
-                    console.log('[AppWrapper] Users and companies refreshed on focus');
+                    console.log('[AppWrapper] Users, companies, and projects refreshed on focus');
                 } catch (error) {
                     console.error('[AppWrapper] Failed to refresh data on focus:', error);
                 }

@@ -21,6 +21,8 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState('');
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
+    
     // Update UI when projects are created or deleted
     const [, forceUpdate] = React.useReducer(x => x + 1, 0);
     
@@ -38,82 +40,42 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
 
     const filteredProjects = projectManager.filterByName(searchQuery);
 
-    const getFirestoreProject = async () => {
+    // Manual refresh function for projects
+    const handleRefreshProjects = async () => {
+        setIsRefreshing(true);
         try {
-            // Clear the local project list first to avoid duplicates when reimporting
-            projectManager.list = [];
-            
-            const firebaseProjects = await Firestore.getDocs(projectsCollection);
-            
-            for (const doc of firebaseProjects.docs) {
-                const data = doc.data();
-                console.log("Raw Firestore data:", data);
-
-                // Helper function to convert Firestore Timestamp to date string
-                const convertTimestampToDateString = (timestamp: any): string => {
-                    if (timestamp && timestamp.toDate) {
-                        return timestamp.toDate().toISOString().split('T')[0]; // Returns YYYY-MM-DD format
-                    }
-                    return timestamp || ""; // Fallback if it's already a string or null
-                };
-                
-                // Convert ALL the data properly, ensuring IProject interface compliance
-                const projectData: IProject = {
-                    id: doc.id,
-                    icon: data.icon || "DP",
-                    color: data.color || "#FFFFFF",
-                    name: data.name || "Untitled Project",
-                    description: data.description || "",
-                    userRole: data.userRole || "not defined",
-                    location: data.location || "",
-                    progress: data.progress || 0,
-                    cost: data.cost || 0,
-                    status: data.status || "Pending",
-                    phase: data.phase || "Design",
-                    startDate: convertTimestampToDateString(data.startDate),
-                    finishDate: convertTimestampToDateString(data.finishDate),
-                    assignedUsers: data.assignedUsers && Array.isArray(data.assignedUsers) ? 
-                        data.assignedUsers.filter((assignment: any) => {
-                            return assignment && assignment.userId && assignment.userId.trim() !== "";
-                        }) : [],
-                    toDos: data.toDos && Array.isArray(data.toDos) ? 
-                        data.toDos.map((todo: any) => ({
-                            ...todo,
-                            // Convert timestamps in toDos as well
-                            due_date: convertTimestampToDateString(todo.due_date),
-                            start_date: convertTimestampToDateString(todo.start_date),
-                            created_at: convertTimestampToDateString(todo.created_at),
-                            updated_at: convertTimestampToDateString(todo.updated_at)
-                        })) : []
-                };
-                
-                try {
-                    // Check if project already exists by ID
-                    const existingProject = projectManager.findProjectById(doc.id);
-                    
-                    if (existingProject) {
-                        // Update existing project using Firebase sync
-                        console.log(`Updating existing project: ${existingProject.name}`);
-                        await projectManager.updateProject(doc.id, projectData);
-                    } else {
-                        // Create new project
-                        console.log(`Creating new project: ${projectData.name}`);
-                        projectManager.newProject(projectData);
-                    }
-                } catch (error) {
-                    console.warn("Skipping project due to error:", error);
-                }
-            }
+            console.log('[ProjectsPage] Manually refreshing projects...');
+            await projectManager.refreshProjectsFromFirebase();
+            forceUpdate(); // Force UI update
+            console.log(`[ProjectsPage] Projects refreshed. Total: ${projectManager.list.length}`);
         } catch (error) {
-            console.error("Error fetching projects:", error);
-            setErrorMessage("Failed to load projects from database");
+            console.error('Failed to refresh projects:', error);
+            setErrorMessage('Failed to refresh projects. Please try again.');
             setIsErrorModalOpen(true);
+        } finally {
+            setIsRefreshing(false);
         }
-    }
+    };
 
+    // Load projects when component mounts - now uses cached data
     React.useEffect(() => {
-        getFirestoreProject();
-    }, []);
+        const loadInitialData = async () => {
+            try {
+                console.log('[ProjectsPage] Loading initial project data...');
+                
+                // Projects are already loaded at app level - just force UI update
+                forceUpdate();
+                console.log(`[ProjectsPage] Loaded ${projectManager.list.length} projects from manager`);
+                
+            } catch (error) {
+                console.error('Failed to load initial project data:', error);
+                setErrorMessage('Failed to load project data. Please refresh the page.');
+                setIsErrorModalOpen(true);
+            }
+        };
+        
+        loadInitialData();
+    }, [projectManager]);
     
     const projectCards = filteredProjects.map((project) => {
         return (
@@ -219,10 +181,29 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
 
     return (
         <div className="page" id="projectsPage">
+            <style>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
             <div className="projects-content">
                 <header className="projects-content-header">
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "15px 0" }}>
                         <SearchBox onValueChange={setSearchQuery} placeholder={t("search_projects") || "Search for projects"} style={{ width: '100%', maxWidth: 350 }} />
+                        <button 
+                            className="buttonTertiary" 
+                            onClick={handleRefreshProjects}
+                            disabled={isRefreshing}
+                            title={t("projects_refresh") || "Refresh projects from database"}
+                            style={{ opacity: isRefreshing ? 0.6 : 1 }}
+                        >
+                            <span className="material-icons-round" style={{ 
+                                animation: isRefreshing ? 'spin 1s linear infinite' : 'none' 
+                            }}>
+                                refresh
+                            </span>
+                        </button>
                         <button id="importProjectsBtn" className="buttonTertiary" onClick={onImportClick} title={t("projects_import") || "Import projects"}>
                             <span className="material-icons-round">file_download</span>
                         </button>
