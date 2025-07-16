@@ -252,12 +252,12 @@ button:hover {
 
 /* ===== BUTTON VARIANTS ===== */
 .acceptButton {
-    background-color: var(--complementary-200);
+    background-color: var(--primary-200);
     margin-bottom: var(--gap-standard);
 }
 
 .acceptButton:hover {
-    background-color: var(--complementary-300);
+    background-color: var(--primary);
 }
 
 .loginButton {
@@ -270,12 +270,12 @@ button:hover {
 }
 
 .cancelButton {
-    background-color: transparent;
+    background-color: var(--complementary-300);
     margin-bottom: var(--gap-standard);
 }
 
 .cancelButton:hover {
-    background-color: var(--complementary-300);
+    background-color: var(--red);
 }
 
 .buttonSecondary {
@@ -1461,3 +1461,363 @@ input:focus, textarea:focus, select:focus {
     display: none;
   }
 }
+
+#newProjectModal {
+                    background-color: transparent;
+                    border: none;
+                    margin: auto;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    max-width: 100vw;
+                    height: 100vh;
+                    max-height: 100vh;
+                    padding: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    overflow: hidden; /* Prevent horizontal scroll */
+                }
+
+                #newProjectModal .userForm {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 24px;
+                    width: 100vw;
+                    max-width: 70vw;   /* Prevent overflow */
+                    height: auto;
+                    max-height: 90vh;
+                    margin: 0;
+                    padding: 32px;
+                    background-color: var(--background-100);
+                    color: white;
+                    border-radius: var(--gap-small);
+                    overflow-y: auto;
+                    overflow-x: hidden; /* Prevent horizontal scroll */
+                    box-sizing: border-box;
+                }
+
+                #newProjectModal .userForm h2 {
+                    padding: 0;
+                    margin: 0 0 0px 0;
+                    grid-column: 1 / -1;
+                }
+
+                #newProjectModal .userCard {
+                    flex: 1;
+                    display: grid;
+                    grid-template-columns: 1fr 1fr; /* Always two columns */
+                    gap: 24px;
+                    padding: 0;
+                    background: transparent;
+                    margin-bottom: 16px;    
+                    overflow-y: auto;
+                }
+
+                #newProjectModal .formFieldContainer {
+                    display: flex;
+                    flex-direction: column;
+                    row-gap: 10px;
+                    margin-bottom: 8px;
+                }
+
+                #newProjectModal .locationFieldContainer .mapContainer {
+                    margin-top: 12px;
+                    border: 2px solid var(--complementary200);
+                    border-radius: 4px;
+                    overflow: hidden;
+                    width: 100%;
+                    min-height: 400px;
+                    height: 400px;
+                    max-height: 500px;
+                }
+
+                #newProjectModal .coordinatesDisplay {
+                    font-size: 12px;
+                    color: var(--complementary200);
+                    margin-top: 4px;
+                }
+
+                #newProjectModal .cancelAccept {
+                    grid-column: 1 / -1;         /* Span both columns */
+                    display: flex;
+                    justify-content: flex-end;   /* Align buttons to the right */
+                    gap: 16px;
+                    margin-top: 24px;
+                }
+
+                #newProjectModal .cancelButton, #newProjectModal .acceptButton {
+                    min-width: 120px;
+                    padding: 10px 24px;
+                    font-size: 16px;
+                }
+
+                @media (max-width: 1400px) {
+                    #newProjectModal .userCard {
+                        grid-template-columns: 1fr 1fr; /* Two columns on medium screens */
+                    }
+                }
+
+                @media (max-width: 900px) {
+                    #newProjectModal .userForm {
+                        grid-template-columns: 1fr !important;
+                        max-width: 98vw;
+                        padding: 16px;
+                        gap: 16px;
+                      }
+                    #newProjectModal .userCard {
+                        grid-template-columns: 1fr; /* Removed single column on small screens */
+                    }
+                    #newProjectModal .locationFieldContainer .mapContainer {
+                        min-height: 250px;
+                        height: 250px;
+                    }
+                }
+
+                /* Custom styles for multi-select dropdown */
+                #newProjectModal select[multiple] {
+                    min-height: 120px;
+                    border: 1px solid var(--complementary200);
+                    border-radius: 4px;
+                    padding: 8px;
+                    background-color: var(--background-200);
+                    color: white;
+                }
+
+                #newProjectModal select[multiple] option {
+                    padding: 4px 8px;
+                    margin: 2px 0;
+                    background-color: var(--background-200);
+                    color: white;
+                }
+
+                #newProjectModal select[multiple] option:checked {
+                    background-color: var(--complementary100);
+                    color: var(--background-100);
+                }
+
+                #newProjectModal select[multiple] option:hover {
+                    background-color: var(--complementary200);
+                }
+
+                /* User selection modal styles */
+                #userSelectionModal {
+                    background-color: transparent;
+                    border: none;
+                    margin: auto;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    padding: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1100;
+                }
+
+                #userSelectionModal::backdrop {
+                    background-color: rgba(0, 0, 0, 0.7);
+                    backdrop-filter: blur(3px);
+                }
+
+                #userSelectionModal .userForm {
+                    width: calc(100vw - 300px);
+                    max-width: 800px;
+                    height: calc(100vh - 200px);
+                    max-height: 70vh;
+                    margin: 0;
+                    padding: 24px;
+                    background-color: var(--background-100);
+                    color: white;
+                    border-radius: var(--gap-small);
+                    overflow-y: auto;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .userSelectionGrid {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                    flex: 1;
+                    overflow-y: auto;
+                    margin: 12px 0;
+                }
+
+                .userSelectionCard {
+                    background-color: var(--background-200);
+                    border: 2px solid var(--complementary200);
+                    border-radius: 6px;
+                    padding: 8px 12px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    position: relative;
+                    min-height: auto;
+                    width: 100%;
+                }
+
+                .userSelectionCard:hover {
+                    background-color: var(--background-300);
+                    border-color: var(--complementary100);
+                }
+
+                .userSelectionCard.selected {
+                    background-color: var(--complementary100);
+                    border-color: var(--complementary100);
+                    color: var(--background-100);
+                }
+
+                .userSelectionCard .userIcon {
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    font-size: 11px;
+                    flex-shrink: 0;
+                }
+
+                .userSelectionCard .userInfo {
+                    flex: 1;
+                    min-width: 0;
+                }
+
+                .userSelectionCard .userName {
+                    font-weight: bold;
+                    font-size: 14px;
+                    margin-bottom: 0;
+                    color: white !important;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .userSelectionCard .checkMark {
+                    position: absolute;
+                    top: 4px;
+                    right: 4px;
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 50%;
+                    background-color: var(--complementary100);
+                    color: var(--background-100);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 10px;
+                    opacity: 0;
+                    transition: opacity 0.2s ease;
+                }
+
+                .userSelectionCard.selected .checkMark {
+                    opacity: 1;
+                }
+
+                .userSelectionButton {
+                    background-color: var(--background-200);
+                    border: 2px solid var(--complementary200);
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    justify-content: center;
+                }
+
+                .userSelectionButton:hover {
+                    background-color: var(--background-300);
+                    border-color: var(--complementary100);
+                }
+
+                /* Location field styling */
+                .locationFieldContainer {
+                    position: relative;
+                }
+
+                .locationInputWithMap {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+                }
+
+                .mapToggleButton {
+                    background-color: var(--background-200);
+                    border: 2px solid var(--complementary200);
+                    color: white;
+                    padding: 8px 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    flex-shrink: 0;
+                }
+
+                .mapToggleButton:hover {
+                    background-color: var(--background-300);
+                    border-color: var(--complementary100);
+                }
+
+
+
+                .coordinatesDisplay {
+                    font-size: 12px;
+                    color: var(--complementary200);
+                    margin-top: 4px;
+                }
+
+
+                .descriptionField {
+                    margin-bottom: 18px;
+                }
+
+                .locationInputAboveMap {
+                    background: var(--background-100);
+                    border-radius: 8px 8px 0 0;
+                    padding: 18px 18px 10px 18px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                    margin-bottom: 0;
+                }
+
+                .locationInputModalBg input, .locationInputModalBg {
+                    background: var(--background-100);
+                    color: white !important;
+                    border-radius: 6px;
+                    border: 1px solid var(--complementary200);
+                }
+
+                .mapFieldContainer {
+                    background: var(--background-200);
+                    border-radius: 0 0 8px 8px;
+                    margin-bottom: 18px;
+                    padding: 0 18px 18px 18px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                }
+
+                #newProjectModal textarea[name="description"] {
+                    height: 300px;
+                    min-height: 300px;
+                    max-height: 400px;
+                    resize: vertical; /* or 'none' to prevent resizing */
+                }
+
+                .dashboardCard.calendar-fixed-size {
+                  height: 600px;
+                  max-height: calc(100vh - 280px);
+                  overflow: visible; /* NOT hidden! */
+                }

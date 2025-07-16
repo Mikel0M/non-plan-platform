@@ -123,6 +123,37 @@ export function ToDoPage(props: Props) {
     return new Date(dateString).toLocaleDateString();
   };
 
+  // Prepare calendar tasks including project duration bars
+  const calendarTasks = React.useMemo(() => {
+    const tasks: any[] = [];
+    const visibleProjects = currentProject ? [currentProject] : props.projectsManager.list;
+
+    for (const project of visibleProjects) {
+      // Add project duration bar
+      tasks.push({
+        id: `project-duration-${project.id}`,
+        title: project.name || 'New Project',
+        startDate: project.startDate,
+        dueDate: project.finishDate,
+        completed: false,
+        color: project.color || 'var(--primary)',
+        projectId: project.id,
+        isProjectDuration: true
+      });
+      // Add all tasks for this project
+      tasks.push(...todos
+        .filter(todo => todo.project_id === project.id)
+        .map(todo => ({
+          ...todo,
+          color: project.color || 'var(--primary)',
+          projectName: project.name
+        }))
+      );
+    }
+
+    return tasks;
+  }, [todos, currentProject, props.projectsManager.list]);
+
   return (
     <div className="page" id="toDoPage">
       <div className="projects-content">
@@ -201,20 +232,26 @@ export function ToDoPage(props: Props) {
               </div>
               <div className="calendar-scroll-vertical">
                 <Calendar 
-                  tasks={todos
-                    .filter(todo => !selectedProjectForNewTodo || todo.project_id === selectedProjectForNewTodo)
+                  tasks={calendarTasks
+                    .filter(todo => {
+                      // If no project selected, show all
+                      if (!selectedProjectForNewTodo) return true;
+                      // Show project bar (projectId) or tasks (project_id)
+                      return (
+                        todo.projectId === selectedProjectForNewTodo ||
+                        todo.project_id === selectedProjectForNewTodo
+                      );
+                    })
                     .map(todo => {
-                      const project = props.projectsManager.getProject(todo.project_id);
+                      if (todo.isProjectDuration) return todo;
+                      const project = props.projectsManager.getProject(todo.projectId || todo.project_id);
                       return {
-                        id: todo.id,
+                        ...todo,
                         title: todo.title,
-                        startDate: todo.start_date,
-                        dueDate: todo.due_date,
-                        completed: todo.status === 'Completed' || todo.isComplete,
-                        projectId: todo.project_id,
-                        assignedTo: todo.assigned_to,
+                        startDate: todo.startDate || todo.start_date,
+                        dueDate: todo.dueDate || todo.due_date,
                         color: project?.color || 'var(--primary)',
-                        rawToDo: todo
+                        projectName: project?.name,
                       };
                     })}
                   start={new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}

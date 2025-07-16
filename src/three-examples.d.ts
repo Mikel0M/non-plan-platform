@@ -40,3 +40,43 @@ declare module 'three/examples/jsm/libs/lil-gui.module.min.js' {
     [key: string]: any;
   }
 }
+
+// Google Maps API type declarations
+declare global {
+  interface Window {
+    google: typeof google;
+  }
+}
+
+declare namespace google {
+  namespace maps {
+    class Map {
+      constructor(mapDiv: HTMLElement, options: any);
+      setCenter(latLng: any): void;
+      addListener(eventName: string, handler: Function): void;
+      [key: string]: any;
+    }
+
+    class Marker {
+      constructor(options: any);
+      setPosition(latLng: any): void;
+      addListener(eventName: string, handler: Function): void;
+      [key: string]: any;
+    }
+
+    class Geocoder {
+      constructor();
+      geocode(request: any, callback: Function): void;
+      [key: string]: any;
+    }
+
+    interface LatLng {
+      lat(): number;
+      lng(): number;
+    }
+
+    interface MapMouseEvent {
+      latLng: LatLng;
+    }
+  }
+}

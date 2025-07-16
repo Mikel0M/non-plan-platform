@@ -270,7 +270,7 @@ export class ProjectsManager {
                 companyId: project.companyId,
                 createdBy: project.createdBy,
                 createdAt: project.createdAt,
-                updatedAt: project.updatedAt,
+                modifiedAt: project.modifiedAt,
                 assignedUsers: project.assignedUsers || [],
                 toDos: project.toDos || []
             }));
@@ -530,13 +530,13 @@ export class ProjectsManager {
         if (updates.companyId !== undefined) validated.companyId = updates.companyId;
         if (updates.createdBy !== undefined) validated.createdBy = updates.createdBy;
         if (updates.createdAt !== undefined) validated.createdAt = updates.createdAt;
-        if (updates.updatedAt !== undefined) validated.updatedAt = updates.updatedAt;
+        if (updates.modifiedAt !== undefined) validated.modifiedAt = updates.modifiedAt;
         if (updates.modifiedAt !== undefined) validated.modifiedAt = updates.modifiedAt;
         if (updates.modifiedBy !== undefined) validated.modifiedBy = updates.modifiedBy;
         
         // Always update the timestamp when making changes
         if (Object.keys(validated).length > 0) {
-            validated.updatedAt = new Date().toISOString();
+            validated.modifiedAt = new Date().toISOString();
             validated.modifiedAt = new Date().toISOString();
         }
         

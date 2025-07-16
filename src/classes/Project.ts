@@ -13,6 +13,9 @@ export interface IProject {
     name: string;
     description: string;
     location: string;
+    plotNumber?: string;  // Plot/parcel number for construction projects
+    latitude?: number;  // Geographic coordinates for mapping
+    longitude?: number;
     userRole: userRole;
     progress: number;
     cost: number;
@@ -102,6 +105,9 @@ export class Project implements IProject {
     color!: string;
     description!: string;
     location!: string;
+    plotNumber?: string;  // Add new field
+    latitude?: number;    // Add new field
+    longitude?: number;   // Add new field
     progress!: number;
     cost!: number;
     userRole!: userRole;
@@ -109,11 +115,11 @@ export class Project implements IProject {
     phase!: phase;
     startDate!: string;
     finishDate!: string;
-    companyId?: string;  // Add new fields from interface
+    companyId?: string;
     createdBy?: string;
     createdAt?: string | Date;
-    modifiedAt?: string | Date;  // New field for Firebase structure
-    modifiedBy?: string;  // New field for Firebase structure
+    modifiedAt?: string | Date;
+    modifiedBy?: string;
     toDos: toDo[]; // Embedded toDos
     assignedUsers: Array<{ userId: string, role: string }> = []; // User references only
 
@@ -142,6 +148,9 @@ export class Project implements IProject {
         this.description = data.description || defaults.description;
         this.userRole = data.userRole || defaults.userRole;
         this.location = data.location || defaults.location;
+        this.plotNumber = data.plotNumber;  // Keep as optional
+        this.latitude = data.latitude;      // Keep as optional
+        this.longitude = data.longitude;    // Keep as optional
         this.progress = data.progress ?? defaults.progress;
         this.cost = data.cost ?? defaults.cost;
         this.status = data.status || defaults.status;
@@ -172,6 +181,9 @@ export class Project implements IProject {
         if (data.description !== undefined) this.description = data.description;
         if (data.userRole !== undefined) this.userRole = data.userRole;
         if (data.location !== undefined) this.location = data.location;
+        if (data.plotNumber !== undefined) this.plotNumber = data.plotNumber;
+        if (data.latitude !== undefined) this.latitude = data.latitude;
+        if (data.longitude !== undefined) this.longitude = data.longitude;
         if (data.progress !== undefined) this.progress = data.progress;
         if (data.cost !== undefined) this.cost = data.cost;
         if (data.status !== undefined) this.status = data.status;
@@ -220,6 +232,11 @@ export class Project implements IProject {
         if (this.companyId) data.companyId = this.companyId;
         if (this.createdBy) data.createdBy = this.createdBy;
         if (this.modifiedBy) data.modifiedBy = this.modifiedBy;
+        
+        // Include new location fields if they exist
+        if (this.plotNumber) data.plotNumber = this.plotNumber;
+        if (this.latitude !== undefined) data.latitude = this.latitude;
+        if (this.longitude !== undefined) data.longitude = this.longitude;
         
         return data;
     }
