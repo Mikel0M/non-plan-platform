@@ -50,6 +50,8 @@
     /* === Layout Constants === */
     --sidebar-width: 200px;
     --header-height: 70px;
+    --content-header-height: 120px;      /* Adjust to your actual content header height */
+    --calendar-toolbar-height: 40px;    /* Adjust to your actual toolbar/buttons height */
     --border-radius-sm: 8px;
     --border-radius-md: 12px;
     --border-radius-lg: 100px;
@@ -284,7 +286,7 @@ button:hover {
     width: 20%;
     text-align: center;
     color: var(--primary);
-    margin-bottom: var(--gap-standard);
+    margin-bottom: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1817,7 +1819,28 @@ input:focus, textarea:focus, select:focus {
                 }
 
                 .dashboardCard.calendar-fixed-size {
-                  height: 600px;
-                  max-height: calc(100vh - 280px);
-                  overflow: visible; /* NOT hidden! */
+                  height: calc(
+                    100vh
+                    - var(--header-height)
+                    - var(--content-header-height)
+                    - var(--calendar-toolbar-height)
+                    - 50px
+                  ) !important;
+                  max-height: calc(
+                    100vh
+                    - var(--header-height)
+                    - var(--content-header-height)
+                    - var(--calendar-toolbar-height)
+                    - 50px
+                  ) !important;
+                  margin-bottom: 15px !important;
+                  overflow: hidden;
+                  display: flex;
+                  flex-direction: column;
+                }
+
+                .calendar-scroll-vertical {
+                  height: 100%;
+                  min-height: 0;
+                  overflow: visible;  
                 }
