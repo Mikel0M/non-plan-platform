@@ -136,13 +136,12 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
     }, [tasks.length]);
 
     return (
-        <div className="dashboardCard calendar-fixed-size" style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div className="dashboardCard calendar-fixed-size" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
             {/* Scrollable area for both left column and grid, including sticky header */}
             <div
               style={{
                 flex: 1,
                 minHeight: 0,
-                height: '100%',
                 width: '100%',
                 overflowX: 'scroll', // force always show
                 overflowY: 'auto',
@@ -217,8 +216,7 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
                           style={{
                             marginBottom: rowGap,
                             padding: '8px 12px',
-                            borderLeft: `4px solid ${task.color || 'var(--primary)'}`,
-                            color: task.color || '#fff',
+                            color: task.isProjectDuration === true ? 'var(--background-200)' : (task.color || '#fff'),
                             fontWeight: task.isProjectDuration === true ? 700 : 500,
                             minHeight: rowHeight,
                             maxHeight: rowHeight,
@@ -226,14 +224,21 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
                             display: 'flex',
                             alignItems: 'center',
                             boxSizing: 'border-box',
-                            background: task.isProjectDuration === true ? 'rgba(0,0,0,0.04)' : 'var(--background-100)',
+                            background: task.isProjectDuration === true
+                              ? (task.color || 'var(--primary)')
+                              : 'var(--background-100)',
                             borderRadius: 4,
                             fontSize: task.isProjectDuration === true ? 16 : 14,
                             cursor: onEditTask ? 'pointer' : 'default',
                             outline: 'none',
                             transition: 'background 0.2s, color 0.2s, border 0.2s',
+                            border: !task.isProjectDuration && hoveredTaskIdx === idx
+                              ? '2px solid var(--primary)'
+                              : '2px solid transparent',
                           }}
-                          onClick={() => onEditTask && onEditTask(task)}
+                          onClick={() => {
+                            if (onEditTask) onEditTask(task);
+                          }}
                           onMouseEnter={e => {
                             setHoveredTaskIdx(idx);
                             const rect = e.currentTarget.getBoundingClientRect();
@@ -472,9 +477,11 @@ export const Calendar: React.FC<CalendarProps> = ({ tasks, start, end, onEditTas
                         }}
                     >
                         {tasks.map((task, idx) => {
+                            console.log('Task', task.id, 'rawToDo:', task.rawToDo);
                             if (!task.rawToDo || !Array.isArray(task.rawToDo.dependencies)) return null;
                             // Track used verticals for this target row to avoid overlap
                             const usedVerticals: Record<string, number> = {};
+                            console.log(`Task ${task.id} dependencies:`, task.rawToDo.dependencies);
                             return task.rawToDo.dependencies.map((depId: string, _depOrder: number) => {
                                 const depIdx = tasks.findIndex(t => t.id === depId);
                                 if (depIdx === -1) return null;

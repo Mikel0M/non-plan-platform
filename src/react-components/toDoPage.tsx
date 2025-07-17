@@ -146,7 +146,8 @@ export function ToDoPage(props: Props) {
         .map(todo => ({
           ...todo,
           color: project.color || 'var(--primary)',
-          projectName: project.name
+          projectName: project.name,
+          rawToDo: todo, // Keep the original todo for editing
         }))
       );
     }
