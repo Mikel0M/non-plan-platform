@@ -40,7 +40,7 @@ export interface IProject {
 }
 
 // Function to generate random color
-function getRandomColor(): string {
+export function getRandomColor(): string {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);

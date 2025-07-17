@@ -1877,3 +1877,15 @@ input:focus, textarea:focus, select:focus {
   overflow-x: auto;    /* horizontal scroll always visible if needed */
   overflow-y: visible; /* let vertical scroll bubble up to parent */
 }
+
+.acceptButton.color-picker {
+  background: var(--project-color, #007bff);
+  color: #fff;
+  transition: filter 0.2s, border 0.2s;
+  border: 2px solid transparent;
+  box-sizing: border-box; /* Add this line */
+}
+.acceptButton.color-picker:hover {
+  filter: brightness(1.1) contrast(1.2);
+  border: 2px solid var(--primary);
+}

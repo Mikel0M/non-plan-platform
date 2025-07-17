@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { IProject, userRole, status, phase } from '../classes/Project';
+import { IProject, userRole, status, phase, getRandomColor } from '../classes/Project';
 import { ICompany } from '../classes/Company';
 import { IUser } from '../classes/User';
 import { useTranslation } from './LanguageContext';
 import { OpenStreetMapComponent } from './OpenStreetMapComponent';
 import { AddressAutocompleteInput } from './AddressAutocompleteInput';
 import { Calendar } from './Calendar';
+import { ChromePicker } from 'react-color';
+import { HexColorPicker } from "react-colorful";
 
 interface ProjectFormProps {
     isVisible: boolean;
@@ -44,6 +46,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     const [formFinishDate, setFormFinishDate] = useState<string>(initialData?.finishDate || todayStr);
     const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [viewMode, setViewMode] = React.useState<'list' | 'calendar'>('list');
+    const [projectColor, setProjectColor] = useState<string>(
+        initialData?.color || getRandomColor()
+    );
+    const [showColorPicker, setShowColorPicker] = useState(false);
 
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,7 +84,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         const plotNumberToSave = (plotNumber && plotNumber !== 'DefaultPlotNumber') ? plotNumber : undefined;
         const ProjectData: Omit<IProject, 'id'> = {
             icon: formData.get("icon") as string || generateIcon(projectName),
-            color: formData.get("color") as string || undefined,
+            color: projectColor,
             name: projectName,
             description: formData.get("description") as string || "Default Project Description",
             userRole: formData.get("userRole") as userRole,
@@ -181,8 +187,49 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             <dialog id="newProjectModal" open>
                 <form className="userForm form-wide" id="newProjectForm"  onSubmit={handleFormSubmit}>
                     {/* Project Name at the very top, replacing the modal title */}
-                    <h2>
-                        {"New Project"}
+                    <h2 style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        {t("projects_new") || "New Project"}
+                        <span style={{ marginLeft: "auto", position: "relative", display: "inline-flex" }}>
+                            <button
+                                type="button"
+                                className="acceptButton color-picker"
+                                style={{
+                                    background: projectColor,
+                                    color: "#fff",
+                                    height: 40,
+                                    boxSizing: "border-box",
+                                    padding: "0 16px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    fontWeight: 600,
+                                    fontSize: 14
+                                }}
+                                onClick={() => setShowColorPicker(v => !v)}
+                            >
+                                Project color
+                            </button>
+                            {showColorPicker && (
+                                <div
+                                    style={{
+                                        position: "absolute",
+                                        right: "100%",
+                                        top: 0,
+                                        zIndex: 100,
+                                        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                                        background: "var(--background)",
+                                        borderRadius: 8,
+                                        padding: 8,
+                                        marginRight: 12 // a little gap between picker and button
+                                    }}
+                                >
+                                    <HexColorPicker
+                                        color={projectColor}
+                                        onChange={setProjectColor}
+                                        style={{ width: 180, height: 180 }}
+                                    />
+                                </div>
+                            )}
+                        </span>
                     </h2>
                     <div className="formFieldContainer" >
                         <label>
