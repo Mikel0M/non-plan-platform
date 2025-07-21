@@ -6,7 +6,7 @@ import { ProjectsPage } from './react-components/ProjectsPage';
 import {Banner} from './react-components/Banner';
 import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
 import { projectsManagerInstance } from './classes/ProjectsManager';
-import { ToDoPage } from "./react-components/toDoPage";
+import { ToDoPage } from "./react-components/ToDoPage";
 import { UsersPage } from './react-components/UsersPage';
 import { LanguageProvider } from "./react-components/LanguageContext";
 import { usersManagerInstance } from "./classes/UsersManager";

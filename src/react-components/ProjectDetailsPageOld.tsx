@@ -11,9 +11,6 @@ import { ThreeViewer } from './ThreeViewer';
 import { InfoProjectForm } from "./InfoProjectForm";
 import { EditProjectForm } from "./EditProjectForm";
 import { companiesManagerInstance } from '../classes/CompaniesManager';
-import { ToDoForm } from './ToDoForm';
-import { ItoDo } from '../classes/toDo';
-import { toDoManagerInstance } from '../classes/toDoManager';
 
 
 interface Props {
@@ -22,6 +19,7 @@ interface Props {
 
 export function ProjectDetailsPage(props: Props) {
     const { t } = useTranslation();
+    const [searchQuery, setSearchQuery] = React.useState("");
     const [isInfoModalOpen, setIsInfoModalOpen] = React.useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
 
@@ -43,14 +41,15 @@ export function ProjectDetailsPage(props: Props) {
         const modal = document.getElementById(id) as HTMLDialogElement | null;
         if (modal) modal.close();
     };
-
+    const routeParams = Router.useParams<{ id: string }>();
+    console.log("ProjectDetailsPage routeParams:", routeParams.id);
     const { id } = useParams();
     const [projectState, setProjectState] = React.useState(id ? props.projectsManager.getProject(id) : undefined);
     // Only update projectState when the project ID changes
     React.useEffect(() => {
       setProjectState(id ? props.projectsManager.getProject(id) : undefined);
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id, props.projectsManager]);
+    }, [id]);
     if (!projectState) {
       return <div>Project not found.</div>;
     }
@@ -89,57 +88,18 @@ export function ProjectDetailsPage(props: Props) {
     const [editAssignedTo, setEditAssignedTo] = React.useState('');
     const [editCreatedBy, setEditCreatedBy] = React.useState('');
 
-    // --- ToDo modal state ---
-    const [isNewToDoOpen, setIsNewToDoOpen] = React.useState(false);
-    const [isEditToDoOpen, setIsEditToDoOpen] = React.useState(false);
-    const [selectedToDo, setSelectedToDo] = React.useState<ItoDo | null>(null);
-
-    // --- ToDo logic ---
-    const [toDos, setToDos] = React.useState<any[]>([]);
-    React.useEffect(() => {
-        if (projectState && projectState.id && props.projectsManager) {
-            setToDos(projectState.toDos || []);
-        }
-    }, [projectState?.id]);
-
-    // --- ToDoForm handlers ---
-    const handleCreateToDo = (todoData: Omit<ItoDo, 'id' | 'created_at' | 'updated_at'>) => {
-        if (!projectState) return;
-        const newToDo: ItoDo = {
-            ...todoData,
-            id: Date.now().toString(),
-            project_id: projectState.id,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            completion_date: "",
-        };
-        projectState.addToDo(newToDo);
-        setToDos([...projectState.toDos]);
-        setIsNewToDoOpen(false);
-    };
-
-    const handleEditToDo = (todoData: Omit<ItoDo, 'id' | 'created_at' | 'updated_at'>) => {
-        if (!selectedToDo || !projectState) return;
-        const updatedToDo: ItoDo = {
-            ...selectedToDo,
-            ...todoData,
-            updated_at: new Date().toISOString(),
-        };
-        projectState.updateToDo(updatedToDo);
-        setToDos([...projectState.toDos]);
-        setIsEditToDoOpen(false);
-        setSelectedToDo(null);
-    };
-
-    const handleDeleteToDo = () => {
-        if (!selectedToDo || !projectState) return;
-        projectState.toDos = projectState.toDos.filter(td => td.id !== selectedToDo.id);
-        setToDos([...projectState.toDos]);
-        setIsEditToDoOpen(false);
-        setSelectedToDo(null);
-    };
-
     // Add state for to-dos
+    const [toDos, setToDos] = React.useState<any[]>([]);
+
+    // Load to-dos for the current project ONLY when project ID changes
+React.useEffect(() => {
+  if (projectState && projectState.id && props.projectsManager) {
+    setToDos(projectState.toDos || []);
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectState?.id]);
+
+    // State for new to-do form fields
     const [newToDo, setNewToDo] = React.useState({
       title: '',
       description: '',
@@ -602,7 +562,10 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <SearchBox onValueChange={setToDoSearchQuery} style={{ minWidth: 180 }} placeholder={t("search_tasks") || "Search for tasks"} />
                     </div>
-                    <button id="newToDoBtn" className="buttonTertiary" style={{ marginLeft: 8 }} onClick={() => setIsNewToDoOpen(true)}>
+                    <button id="newToDoBtn" className="buttonTertiary" style={{ marginLeft: 8 }} onClick={() => {
+  const modal = document.getElementById('newToDoModal') as HTMLDialogElement | null;
+  if (modal) modal.showModal();
+}}>
                       <span className="material-icons-round">add</span>
                     </button>
                   </div>
@@ -641,7 +604,7 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
                         key={todo.id || idx}
                         className={`todoItem ${statusClass}`}
                         style={{ marginBottom: 0 }}
-                        onClick={() => { setSelectedToDo(todo); setIsEditToDoOpen(true); }}
+                        onClick={() => openEditToDoModal(todo)}
                       >
                         <span className="todo-task-icon">
                           <span className="material-icons-round">check_circle</span>
@@ -715,7 +678,252 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
             </form>
         </dialog>
         
-        <InfoProjectForm
+        <dialog id="newToDoModal">
+    <form className="userForm form-wide" id="newToDoForm" onSubmit={handleNewToDoSubmit}>
+      <h2>{t("projects_add_task") || "Add Task"}</h2>
+      <div className="userCard">
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">apartment</span>{t("projects_title") || "Title"}</label>
+          <input name="title" type="text" id="toDoTitle" value={newToDo.title} onChange={handleNewToDoChange} />
+          <label className="label-tip">{t("projects_tip_short_title") || "TIP give it a short title"}</label>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">subject</span>{t("projects_description") || "Description"}</label>
+          <textarea name="description" cols={30} rows={5} placeholder={t("projects_description_placeholder") || "Description"} id="toDoDescription" value={newToDo.description} onChange={handleNewToDoChange} />
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_status") || "Status"}</label>
+          <select name="status" id="toDoStatus" value={newToDo.status} onChange={handleNewToDoChange}>
+            <option>Pending</option>
+            <option>In Progress</option>
+            <option>Completed</option>
+            <option>On Hold</option>
+          </select>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_priority") || "Priority"}</label>
+          <select name="priority" id="toDoPriority" value={newToDo.priority} onChange={handleNewToDoChange}>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+            <option>Critical</option>
+          </select>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">paid</span>{t("projects_estimated_hours") || "Estimated hours"}</label>
+          <input name="estimated_hours" type="number" placeholder={t("projects_estimated_hours_placeholder") || "Estimated hours for the task"} id="toDoEstimatedHours" value={newToDo.estimated_hours} onChange={handleNewToDoChange} />
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_estimated_hours_tip") || "Estimated hours for the task"}</label>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">paid</span>{t("projects_actual_hours") || "Actual hours"}</label>
+          <input name="actual_hours" type="number" placeholder={t("projects_actual_hours_placeholder") || "Hours used so far"} id="toDoActualHours" value={newToDo.actual_hours} onChange={handleNewToDoChange} />
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_actual_hours_tip") || "Hours used so far"}</label>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_responsible_person") || "Responsible Person"}</label>
+          <select name="assigned_to" id="toDoAssignedTo" value={newToDo.assigned_to} onChange={handleNewToDoChange}>
+            <option value="">{t("projects_select_responsible") || "Select responsible person"}</option>
+            {assignedUsers.map(user => (
+              <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+            ))}
+          </select>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_created_by") || "Created By"}</label>
+          <select name="created_by" id="toDoCreatedBy" value={newToDo.created_by} onChange={handleNewToDoChange}>
+            <option value="">{t("projects_select_creator") || "Select creator"}</option>
+            {assignedUsers.map(user => (
+              <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+            ))}
+          </select>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">calendar_today</span>{t("projects_start_date") || "Start Date"}</label>
+          <input name="start_date" type="date" id="toDoStartDate" value={newToDo.start_date} onChange={handleNewToDoChange} />
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">calendar_month</span>{t("projects_due_date") || "Due Date"}</label>
+          <input name="due_date" type="date" id="toDoDueDate" value={newToDo.due_date} onChange={handleNewToDoChange} />
+        </div>
+        {/* --- Dependencies as checkbox list in new to-do modal --- */}
+        <div className="formFieldContainer">
+          <label>Dependencies</label>
+          <div style={{ maxHeight: 120, overflowY: 'auto', border: '1px solid #ccc', borderRadius: 4, padding: 8 }}>
+            {getOtherTasks(projectState, null).map((td: any) => (
+              <label key={td.id} style={{ display: 'block', marginBottom: 4 }}>
+                <input
+                  type="checkbox"
+                  value={td.id}
+                  checked={Array.isArray(newToDo.dependencies) ? newToDo.dependencies.includes(td.id) : false}
+                  onChange={e => {
+                    const checked = e.target.checked;
+                    setNewToDo(prev => {
+                      let deps = Array.isArray(prev.dependencies) ? [...prev.dependencies] : [];
+                      if (checked) {
+                        if (!deps.includes(td.id)) deps.push(td.id);
+                      } else {
+                        deps = deps.filter(id => id !== td.id);
+                      }
+                      return { ...prev, dependencies: deps };
+                    });
+                  }}
+                />
+                {td.title}
+              </label>
+            ))}
+          </div>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">subject</span>{t("projects_comments") || "Comments"}</label>
+          <textarea name="comments" cols={30} rows={5} placeholder={t("projects_comments_placeholder") || "Add any clarification comment"} id="toDoComments" value={newToDo.comments || ''} onChange={e => setNewToDo({ ...newToDo, comments: e.target.value })} />
+        </div>
+      </div>
+      <div className="cancelAccept">
+        <button type="button" className="cancelButton" onClick={() => closeModal('newToDoModal')}>{t("projects_cancel") || "Cancel"}</button>
+        <button type="submit" className="acceptButton" id="submitToDoButton">{t("projects_accept") || "Accept"}</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="editToDoModal">
+    <form className="userForm form-wide" id="editToDoForm" onSubmit={handleEditToDoSubmit}>
+      <input type="hidden" id="editToDoId" name="id" value={editToDoFields.id} />
+      <h2>{t("projects_edit_task") || "Edit Task"}</h2>
+      <div className="userCard">
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">apartment</span>{t("projects_title") || "Title"}</label>
+          <input name="title" type="text" id="editToDoTitle" value={editToDoFields.title} onChange={handleEditToDoChange} />
+          <label className="label-tip">{t("projects_tip_short_title") || "TIP give it a short title"}</label>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">subject</span>{t("projects_description") || "Description"}</label>
+          <textarea name="description" cols={30} rows={5} placeholder={t("projects_description_placeholder") || "Description"}
+            id="editToDoDescription"
+            value={editToDoFields.description}
+            onChange={handleEditToDoChange}
+          />
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_status") || "Status"}</label>
+          <select name="status" id="editToDoStatus" value={editToDoFields.status} onChange={handleEditToDoChange}>
+            <option>Pending</option>
+            <option>In Progress</option>
+            <option>Completed</option>
+            <option>On Hold</option>
+          </select>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_priority") || "Priority"}</label>
+          <select name="priority" id="editToDoPriority" value={editToDoFields.priority} onChange={handleEditToDoChange}>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+            <option>Critical</option>
+          </select>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">paid</span>{t("projects_estimated_hours") || "Estimated hours"}</label>
+          <input name="estimated_hours" type="number" placeholder={t("projects_estimated_hours_placeholder") || "Estimated hours for the task"} id="editToDoEstimatedHours" value={editToDoFields.estimated_hours} onChange={handleEditToDoChange} />
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_estimated_hours_tip") || "Estimated hours for the task"}</label>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">paid</span>{t("projects_actual_hours") || "Actual hours"}</label>
+          <input name="actual_hours" type="number" placeholder={t("projects_actual_hours_placeholder") || "Hours used so far"} id="editToDoActualHours" value={editToDoFields.actual_hours} onChange={handleEditToDoChange} />
+          <label className="label-tip" style={{ fontSize: 12, fontStyle: "italic", paddingTop: 5 }}>{t("projects_actual_hours_tip") || "Hours used so far"}</label>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_responsible_person") || "Responsible Person"}</label>
+          <select name="assigned_to" id="editToDoAssignedTo" value={editToDoFields.assigned_to} onChange={handleEditToDoChange}>
+            <option value="">{t("projects_select_responsible") || "Select responsible person"}</option>
+            {projectState && projectState.assignedUsers && projectState.assignedUsers
+              .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+              .filter((user): user is User => Boolean(user))
+              .map(user => (
+                <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+              ))}
+          </select>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">not_listed_location</span>{t("projects_created_by") || "Created By"}</label>
+          <select name="created_by" id="editToDoCreatedBy" value={editToDoFields.created_by} onChange={handleEditToDoChange}>
+            <option value="">{t("projects_select_creator") || "Select creator"}</option>
+            {projectState && projectState.assignedUsers && projectState.assignedUsers
+              .map(au => usersManagerInstance.getUsers().find(u => u.id === au.userId))
+              .filter((user): user is User => Boolean(user))
+              .map(user => (
+                <option key={user.id} value={user.id}>{user.name} {user.surname}</option>
+              ))}
+          </select>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">calendar_today</span>{t("projects_start_date") || "Start Date"}</label>
+          <input name="start_date" type="date" id="editToDoStartDate" value={editToDoFields.start_date} onChange={handleEditToDoChange} />
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">calendar_month</span>{t("projects_due_date") || "Due Date"}</label>
+          <input name="due_date" type="date" id="editToDoDueDate" value={editToDoFields.due_date} onChange={handleEditToDoChange} />
+        </div>
+        {/* --- Dependencies as checkbox list in edit to-do modal --- */}
+        <div className="formFieldContainer">
+          <label>Dependencies</label>
+          <div style={{ maxHeight: 120, overflowY: 'auto', border: '1px solid #ccc', borderRadius: 4, padding: 8 }}>
+            {getOtherTasks(projectState, editToDoFields.id || null).map((td: any) => (
+              <label key={td.id} style={{ display: 'block', marginBottom: 4 }}>
+                <input
+                  type="checkbox"
+                  value={td.id}
+                  checked={Array.isArray(editToDoFields.dependencies) ? editToDoFields.dependencies.includes(td.id) : false}
+                  onChange={e => {
+                    const checked = e.target.checked;
+                    setEditToDoFields(prev => {
+                      let deps = Array.isArray(prev.dependencies) ? [...prev.dependencies] : [];
+                      if (checked) {
+                        if (!deps.includes(td.id)) deps.push(td.id);
+                      } else {
+                        deps = deps.filter(id => id !== td.id);
+                      }
+                      return { ...prev, dependencies: deps };
+                    });
+                  }}
+                />
+                {td.title}
+              </label>
+            ))}
+          </div>
+        </div>
+        <div className="formFieldContainer">
+          <label><span className="material-icons-round">subject</span>{t("projects_comments") || "Comments"}</label>
+          <textarea name="comments" cols={30} rows={5} placeholder={t("projects_comments_placeholder") || "Add any clarification comment"} id="editToDoComments" value={editToDoFields.comments} onChange={handleEditToDoChange} />
+        </div>
+      </div>
+      <div className="cancelAccept">
+        <button type="button" className="deleteButton" onClick={() => {
+          const id = (document.getElementById('editToDoId') as HTMLInputElement)?.value;
+          const td = toDos.find(td => td.id === id);
+          setToDoToDelete(td);
+          const modal = document.getElementById('DeleteTaskModal') as HTMLDialogElement | null;
+          if (modal) modal.showModal();
+        }}>{t("projects_delete") || "Delete"}</button>
+        <button type="button" className="cancelButton" onClick={() => closeModal('editToDoModal')}>{t("projects_cancel") || "Cancel"}</button>
+        <button type="submit" className="acceptButton" id="submitEditToDoButton">{t("projects_accept") || "Accept"}</button>
+      </div>
+    </form>
+  </dialog>
+  {/* Delete User Modal */}
+      <dialog id="DeleteUserModal">
+        <form className="app-modal-form" id="DeleteUserForm">
+          <h2>{t("projects_confirm_delete_user") || "Are you sure you want to delete the user"} {userToDelete?.name ? `"${userToDelete.name}"?` : "?"}</h2>
+          <div className="cancelAccept">
+            <button
+              type="button"
+              className="cancelButton"
+              onClick={() => { setUserToDelete(null); closeModal('DeleteUserModal'); }}>
+              {t("projects_cancel") || "Cancel"}
+            </button>
+            <button type="button" className="acceptButton" id="ConfirmDeleteUserButton" onClick={handleConfirmDeleteUser}>{t("projects_delete") || "Delete"}</button>
+          </div>
+        </form>
+      </dialog>
+      <InfoProjectForm
   isOpen={isInfoModalOpen}
   onClose={() => setIsInfoModalOpen(false)}
   onEdit={openEditModal}
@@ -733,36 +941,6 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
   companies={companiesManagerInstance.getCompanies()}
   users={usersManagerInstance.getUsers()}
 />
-
-            {/* New ToDo */}
-            <ToDoForm
-                open={isNewToDoOpen}
-                onClose={() => setIsNewToDoOpen(false)}
-                onSubmit={handleCreateToDo}
-                projects={[projectState]}
-                selectedProjectId={projectState.id}
-                submitLabel={t("projects_accept") || "Accept"}
-                availableTasks={toDos}
-                showTitle={false}
-            />
-
-            {/* Edit ToDo */}
-            <ToDoForm
-                open={isEditToDoOpen}
-                onClose={() => {
-                    setIsEditToDoOpen(false);
-                    setSelectedToDo(null);
-                }}
-                onSubmit={handleEditToDo}
-                onDelete={handleDeleteToDo}
-                initialData={selectedToDo || undefined}
-                projects={[projectState]}
-                selectedProjectId={projectState.id}
-                submitLabel={t("projects_accept") || "Accept"}
-                availableTasks={toDos}
-                showTitle={false}
-            />
-
     </div>
   );
 };

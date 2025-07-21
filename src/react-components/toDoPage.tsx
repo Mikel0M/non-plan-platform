@@ -4,7 +4,7 @@ import { ProjectsManager } from '../classes/ProjectsManager';
 import { useTranslation } from "./LanguageContext";
 import { Calendar } from './Calendar';
 import { Modal, ConfirmModal } from './Modal';
-import { TodoForm } from './TodoForm';
+import { ToDoForm } from './ToDoForm';
 import { useTodos, useModal } from '../hooks/useTodos';
 import { ItoDo } from '../classes/toDo';
 
@@ -36,9 +36,9 @@ export function ToDoPage(props: Props) {
   const newTodoModal = useModal();
   const editTodoModal = useModal();
   const deleteTodoModal = useModal();
+  const [selectedTodo, setSelectedTodo] = React.useState<ItoDo | null>(null);
 
   // Form state
-  const [selectedTodo, setSelectedTodo] = React.useState<ItoDo | null>(null);
   const [todoToDelete, setTodoToDelete] = React.useState<ItoDo | null>(null);
 
   // Project selection for new todos (when not in specific project page)
@@ -376,54 +376,37 @@ export function ToDoPage(props: Props) {
         </div>
 
       {/* New Todo Modal */}
-      <Modal 
-        isOpen={newTodoModal.isOpen} 
+      <ToDoForm
+        open={newTodoModal.isOpen}
         onClose={newTodoModal.closeModal}
-        title="Create New Task"
-        size="large"
-      >
-        <TodoForm
-          onSubmit={handleCreateTodo}
-          onCancel={newTodoModal.closeModal}
-          projects={props.projectsManager.list}
-          selectedProjectId={selectedProjectForNewTodo || currentProject?.id}
-          submitLabel="Create Task"
-          availableTasks={todos}
-          showTitle={false}
-        />
-      </Modal>
+        onSubmit={handleCreateTodo}
+        projects={props.projectsManager.list}
+        selectedProjectId={selectedProjectForNewTodo || currentProject?.id}
+        submitLabel="Create Task"
+        availableTasks={todos}
+        showTitle={false}
+      />
 
       {/* Edit Todo Modal */}
-      <Modal 
-        isOpen={editTodoModal.isOpen} 
+      <ToDoForm
+        open={editTodoModal.isOpen}
         onClose={() => {
           editTodoModal.closeModal();
           setSelectedTodo(null);
         }}
-        title="Edit Task"
-        size="large"
-      >
-        {selectedTodo && (
-          <TodoForm
-            onSubmit={handleEditTodo}
-            onCancel={() => {
-              editTodoModal.closeModal();
-              setSelectedTodo(null);
-            }}
-            onDelete={() => {
-              editTodoModal.closeModal();
-              setSelectedTodo(null);
-              openDeleteModal(selectedTodo);
-            }}
-            initialData={selectedTodo}
-            projects={props.projectsManager.list}
-            selectedProjectId={selectedTodo.project_id}
-            submitLabel="Update Task"
-            availableTasks={todos}
-            showTitle={false}
-          />
-        )}
-      </Modal>
+        onSubmit={handleEditTodo}
+        onDelete={() => {
+          editTodoModal.closeModal();
+          setSelectedTodo(null);
+          openDeleteModal(selectedTodo);
+        }}
+        initialData={selectedTodo || undefined}
+        projects={props.projectsManager.list}
+        selectedProjectId={selectedTodo?.project_id}
+        submitLabel="Update Task"
+        availableTasks={todos}
+        showTitle={false}
+      />
 
       {/* Delete Confirmation Modal */}
       <ConfirmModal
