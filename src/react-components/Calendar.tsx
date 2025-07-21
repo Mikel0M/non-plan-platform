@@ -12,7 +12,7 @@ interface ToDO {
     assignedTo?: string;
     projectName?: string;
     rawToDo?: any;
-    isProjectDuration?: boolean; // <-- Add this line
+    isProjectDuration?: boolean;
 }
 
 interface CalendarProps {
@@ -22,7 +22,7 @@ interface CalendarProps {
     onEditTask?: (task: ToDO) => void;
     hideTaskNames?: boolean;
     projectColor?: string;
-    projectName?: string; // <-- Add this
+    projectName?: string;
 }
 
 function getDaysArray(start: Date, end: Date) {

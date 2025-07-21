@@ -4,7 +4,7 @@ import * as Firestore from "firebase/firestore"
 import { IProject, userRole, status, phase, Project } from '../classes/Project';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { ProjectCard } from './ProjectCard';
-import { ProjectForm } from './ProjectForm';
+import { NewProjectForm } from './NewProjectForm';
 import { useTranslation } from "./LanguageContext";
 import { SearchBox } from './SearchBox';
 import { getCollection } from '../firebase';
@@ -178,7 +178,7 @@ export function ProjectsPage({ projectManager, customStyle }: Props) {
                     </p>
                 )}
             </div>
-            <ProjectForm
+            <NewProjectForm
                 isVisible={isModalOpen}
                 onSubmit={handleNewProject}
                 onCancel={() => setIsModalOpen(false)}

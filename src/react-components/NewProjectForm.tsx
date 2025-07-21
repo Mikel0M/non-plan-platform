@@ -6,7 +6,6 @@ import { useTranslation } from './LanguageContext';
 import { OpenStreetMapComponent } from './OpenStreetMapComponent';
 import { AddressAutocompleteInput } from './AddressAutocompleteInput';
 import { Calendar } from './Calendar';
-import { ChromePicker } from 'react-color';
 import { HexColorPicker } from "react-colorful";
 
 interface ProjectFormProps {
@@ -19,7 +18,7 @@ interface ProjectFormProps {
     users?: IUser[];
 }
 
-export const ProjectForm: React.FC<ProjectFormProps> = ({ 
+export const NewProjectForm: React.FC<ProjectFormProps> = ({ 
     isVisible, 
     onSubmit, 
     onCancel, 
@@ -31,7 +30,11 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     const { t } = useTranslation();
     const [errorMessage, setErrorMessage] = useState('');
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
-    const [selectedUsers, setSelectedUsers] = useState<string[]>(initialData?.assignedUsers?.map(au => au.userId) || []);
+
+    // --- CHANGED: selectedUsers now stores { userId, role }
+    const [selectedUsers, setSelectedUsers] = useState<Array<{ userId: string, role: string }>>(
+        initialData?.assignedUsers || []
+    );
     const [isUserSelectionModalOpen, setIsUserSelectionModalOpen] = useState(false);
     const [projectAddress, setProjectAddress] = useState<string>(initialData?.location || "");
     const [projectCoordinates, setProjectCoordinates] = useState<{ lat: number; lng: number } | null>(
@@ -54,11 +57,8 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const formData = new FormData(e.target as HTMLFormElement);
-        // Use selected users from state instead of form element
-        const assignedUsers = selectedUsers.map(userId => ({
-            userId: userId,
-            role: "Developer" // Default role, could be made configurable later
-        }));
+        const assignedUsers = selectedUsers; // Already in { userId, role } format
+
         // Generate icon from project name if not provided
         const projectName = formData.get("name") as string;
         const generateIcon = (name: string): string => {
@@ -123,11 +123,24 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         }
     };
 
+    // --- CHANGED: Toggle user selection and default role
     const handleUserToggle = (userId: string) => {
-        setSelectedUsers(prev => 
-            prev.includes(userId) 
-                ? prev.filter(id => id !== userId)
-                : [...prev, userId]
+        setSelectedUsers(prev => {
+            const exists = prev.find(u => u.userId === userId);
+            if (exists) {
+                return prev.filter(u => u.userId !== userId);
+            } else {
+                return [...prev, { userId, role: "Developer" }];
+            }
+        });
+    };
+
+    // --- CHANGED: Update role for a selected user
+    const handleRoleChange = (userId: string, newRole: string) => {
+        setSelectedUsers(prev =>
+            prev.map(u =>
+                u.userId === userId ? { ...u, role: newRole } : u
+            )
         );
     };
 
@@ -173,7 +186,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     const getSelectedUsersDisplay = () => {
         if (selectedUsers.length === 0) return t("projects_no_users_selected") || "No users selected";
         if (selectedUsers.length === 1) {
-            const user = users.find(u => u.id === selectedUsers[0]);
+            const user = users.find(u => u.id === selectedUsers[0].userId);
             return user ? `${user.name} ${user.surname}` : "1 user selected";
         }
         return `${selectedUsers.length} users selected`;
@@ -183,8 +196,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
 
     return (
         <>
-            
-            <dialog id="newProjectModal" open>
+            <dialog id="newProjectModal" className="projectModal" open>
                 <form className="userForm form-wide" id="newProjectForm"  onSubmit={handleFormSubmit}>
                     {/* Project Name at the very top, replacing the modal title */}
                     <h2 style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -499,54 +511,115 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             )}
 
             {isUserSelectionModalOpen && (
-                <dialog id="userSelectionModal" open>
-                    <form className="userForm" onSubmit={(e) => e.preventDefault()}>
-                        <h2 style={{ margin: 0, padding: "16px 0" }}>
-                            <span className="material-icons-round" style={{ verticalAlign: "middle", marginRight: 8 }}>
-                                people
-                            </span>
-                            {t("projects_select_users") || "Select Users"}
-                        </h2>
-                        <div className="userSelectionGrid">
-                            {users.map(user => (
-                                <div 
-                                    key={user.id}
-                                    className={`userSelectionCard ${selectedUsers.includes(user.id!) ? 'selected' : ''}`}
-                                    onClick={() => handleUserToggle(user.id!)}
-                                >
-                                    <div 
-                                        className="userIcon" 
-                                        style={{ backgroundColor: user.color }}
-                                    >
-                                        {user.icon}
-                                    </div>
-                                    <div className="userInfo">
-                                        <div className="userName">{user.name} {user.surname}</div>
-                                    </div>
-                                    <div className="checkMark">
-                                        <span className="material-icons-round">check</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "flex-end", gap: 16, marginTop: 16 }}>
+              <dialog id="userSelectionModal" className="projectModal" open>
+                <form className="userForm" onSubmit={e => e.preventDefault()}>
+                  <h2 style={{ margin: 0, padding: "16px 0" }}>
+                    <span className="material-icons-round" style={{ verticalAlign: "middle", marginRight: 8 }}>
+                      people
+                    </span>
+                    {t("projects_select_users") || "Select Users"}
+                  </h2>
+                  <div className="userSelectionGrid">
+                    {users.map(user => {
+                      const selected = selectedUsers.find(u => u.userId === user.id);
+                      const role = selected ? selected.role : "Developer";
+                      return (
+                        <div
+                          key={user.id}
+                          className={`userSelectionCard${selected ? ' selected' : ''}`}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: 8,
+                            minHeight: 48
+                          }}
+                        >
+                          <div className="userIcon" style={{ backgroundColor: user.color }}>
+                            {user.icon}
+                          </div>
+                          <div className="userInfo" style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center" }}>
+                            <div className="userName">{user.name} {user.surname}</div>
+                          </div>
+                          <select
+                            value={role}
+                            onChange={e => {
+                              if (selected) {
+                                handleRoleChange(user.id!, e.target.value);
+                              }
+                            }}
+                            disabled={!selected}
+                            style={{
+                              marginLeft: 8,
+                              minWidth: 100,
+                              height: 32,
+                              display: "flex",
+                              alignItems: "center"
+                            }}
+                          >
+                            <option value="Developer">Developer</option>
+                            <option value="Engineer">Engineer</option>
+                            <option value="Architect">Architect</option>
+                            <option value="Manager">Manager</option>
+                            <option value="">Other...</option>
+                          </select>
+                          {selected ? (
                             <button
-                                type="button"
-                                className="cancelButton"
-                                onClick={() => setIsUserSelectionModalOpen(false)}
+                              type="button"
+                              className="cancelButton"
+                              onClick={() => handleUserToggle(user.id!)}
+                              title={t("projects_remove_user") || "Remove"}
+                              style={{
+                                marginLeft: 8,
+                                minWidth: 40,
+                                height: 32,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              }}
                             >
-                                {t("projects_cancel") || "Cancel"}
+                              <span className="material-icons-round" style={{ fontSize: 20, verticalAlign: "middle" }}>close</span>
                             </button>
+                          ) : (
                             <button
-                                type="button"
-                                className="acceptButton"
-                                onClick={handleUserSelectionConfirm}
+                              type="button"
+                              className="acceptButton"
+                              onClick={() => handleUserToggle(user.id!)}
+                              title={t("projects_add_user") || "Add"}
+                              style={{
+                                marginLeft: 8,
+                                minWidth: 40,
+                                height: 32,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              }}
                             >
-                                {t("projects_confirm") || "Confirm"} ({selectedUsers.length})
+                              <span className="material-icons-round" style={{ fontSize: 20, verticalAlign: "middle" }}>check</span>
                             </button>
+                          )}
                         </div>
-                    </form>
-                </dialog>
+                      );
+                    })}
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 16, marginTop: 16 }}>
+                    <button
+                      type="button"
+                      className="cancelButton"
+                      onClick={() => setIsUserSelectionModalOpen(false)}
+                    >
+                      {t("projects_cancel") || "Cancel"}
+                    </button>
+                    <button
+                      type="button"
+                      className="acceptButton"
+                      onClick={handleUserSelectionConfirm}
+                    >
+                      {t("projects_confirm") || "Confirm"} ({selectedUsers.length})
+                    </button>
+                  </div>
+                </form>
+              </dialog>
             )}
         </>
     );

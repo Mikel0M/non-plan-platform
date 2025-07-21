@@ -8,6 +8,7 @@ import { useTranslation } from "./LanguageContext";
 import UserCard from "./UserCard";
 import { SearchBox } from './SearchBox';
 import { ThreeViewer } from './ThreeViewer';
+import { EditProjectForm } from "./EditProjectForm";
 
 
 interface Props {
@@ -17,6 +18,8 @@ interface Props {
 export function ProjectDetailsPage(props: Props) {
     const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = React.useState("");
+    const [isEditModalOpen, setIsEditModalOpen] = React.useState(false); // <-- Add this line
+
     // Helper to translate status and role
     const translateStatus = (status: string) => t(`projects_status_${status?.toLowerCase()}`) || status;
     const translateRole = (role: string) => {
@@ -38,7 +41,6 @@ export function ProjectDetailsPage(props: Props) {
     const routeParams = Router.useParams<{ id: string }>();
     console.log("ProjectDetailsPage routeParams:", routeParams.id);
     const { id } = useParams();
-    // Ensure id is a string before using it
     const [projectState, setProjectState] = React.useState(id ? props.projectsManager.getProject(id) : undefined);
     // Only update projectState when the project ID changes
     React.useEffect(() => {
@@ -48,6 +50,18 @@ export function ProjectDetailsPage(props: Props) {
     if (!projectState) {
       return <div>Project not found.</div>;
     }
+
+    // Handler for opening the edit modal
+    const openEditModal = () => setIsEditModalOpen(true);
+
+    // Handler for submitting the edit form
+    const handleEditProject = async (updates: any) => {
+      if (projectState) {
+        await props.projectsManager.updateProject(projectState.id, updates);
+        setProjectState(props.projectsManager.getProject(projectState.id));
+      }
+      setIsEditModalOpen(false);
+    };
 
     // Edit modal state for controlled fields
     const [editName, setEditName] = React.useState("");
@@ -64,22 +78,6 @@ export function ProjectDetailsPage(props: Props) {
     // Add state for edit modal fields
     const [editAssignedTo, setEditAssignedTo] = React.useState('');
     const [editCreatedBy, setEditCreatedBy] = React.useState('');
-
-    // When opening the modal, set edit states
-    const openEditModal = () => {
-      setEditName(projectState.name ?? "");
-      setEditDescription(projectState.description ?? "");
-      setEditLocation(projectState.location ?? "");
-      setEditProgress((projectState.progress ?? "").toString());
-      setEditCost((projectState.cost ?? "").toString());
-      setEditUserRole(projectState.userRole ?? "");
-      setEditStatus(projectState.status ?? "");
-      setEditPhase(projectState.phase ?? "");
-      setEditStartDate(projectState.startDate ?? "");
-      setEditFinishDate(projectState.finishDate ?? "");
-      const modal = document.getElementById('editProjectModal') as HTMLDialogElement | null;
-      if (modal) modal.showModal();
-    };
 
     // Add state for to-dos
     const [toDos, setToDos] = React.useState<any[]>([]);
@@ -670,148 +668,7 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
                 </div>
             </form>
         </dialog>
-        <dialog id="editProjectModal">
-            <form className="userForm form-wide" id="editProjectForm" onSubmit={async e => {
-                e.preventDefault();
-                if (projectState) {
-                  try {
-                    // Update project using Firebase sync method
-                    const updates = {
-                      name: editName,
-                      description: editDescription,
-                      location: editLocation,
-                      progress: parseFloat(editProgress) || 0,
-                      cost: parseFloat(editCost) || 0,
-                      userRole: editUserRole as any,
-                      status: editStatus as any,
-                      phase: editPhase as any,
-                      startDate: editStartDate,
-                      finishDate: editFinishDate
-                    };
-                    
-                    await props.projectsManager.updateProject(projectState.id || '', updates);
-                    
-                    // Update local state to reflect changes
-                    const updatedProject = Object.assign(Object.create(Object.getPrototypeOf(projectState)), {
-                      ...projectState,
-                      ...updates
-                    });
-                    setProjectState(updatedProject);
-                    
-                    console.log("Project updated successfully in Firebase");
-                  } catch (error) {
-                    console.error("Failed to update project:", error);
-                    // Error handling is done in ProjectsManager
-                  }
-                }
-                closeModal('editProjectModal');
-            }}>
-                <h2>{t("projects_edit_project") || "Edit Project"}</h2>
-                <div className="userCard">
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">apartment</span>{t("projects_name") || "Name"}</label>
-                    <input name="name" type="text" id="projectNameInput" value={editName} onChange={e => setEditName(e.target.value)} />
-                    <label className="label-tip">{t("projects_name_tip") || "TIP give it a short name"}</label>
-                </div>
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">subject</span>{t("projects_description") || "Description"}</label>
-                    <textarea
-                        name="description"
-                        cols={30}
-                        rows={5}
-                        placeholder={t("projects_description_placeholder") || "Give your project a nice description!"}
-                        id="projectDescriptionInput"
-                        value={editDescription}
-                        onChange={e => setEditDescription(e.target.value)}
-                    />
-                </div>
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">pin_drop</span>{t("projects_location") || "Location"}</label>
-                    <input
-                        name="location"
-                        type="text"
-                        placeholder={t("projects_location_placeholder") || "Where is your project located?"}
-                        id="projectLocationInput"
-                        value={editLocation}
-                        onChange={e => setEditLocation(e.target.value)}
-                    />
-                </div>
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">percent</span>{t("projects_progress") || "Estimated Progress"}</label>
-                    <input
-                        name="progress"
-                        type="number"
-                        placeholder={t("projects_progress_placeholder") || "What's the estimated completion progress of the project?"}
-                        id="projectProgressInput"
-                        value={editProgress}
-                        onChange={e => setEditProgress(e.target.value)}
-                    />
-                    <label className="label-tip">{t("projects_progress_tip") || "Estimated progress percentage of the project"}</label>
-                </div>
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">paid</span>{t("projects_cost") || "Estimated cost"}</label>
-                    <input
-                        name="cost"
-                        type="number"
-                        placeholder={t("projects_cost_placeholder") || "What's the estimated cost of the project?"}
-                        id="projectCostInput"
-                        value={editCost}
-                        onChange={e => setEditCost(e.target.value)}
-                    />
-                    <label className="label-tip">{t("projects_cost_tip") || "Estimated cost of the project"}</label>
-                </div>
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">account_circle</span>{t("projects_role") || "Role"}</label>
-                    <select name="userRole" id="projectRoleInput" value={editUserRole} onChange={e => setEditUserRole(e.target.value)}>
-                        <option>{t("projects_role_not_defined") || "not defined"}</option>
-                        <option>{t("projects_role_architect") || "Architect"}</option>
-                        <option>{t("projects_role_engineer") || "Engineer"}</option>
-                        <option>{t("projects_role_developer") || "Developer"}</option>
-                    </select>
-                </div>
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">not_listed_location</span>{t("projects_status") || "Status"}</label>
-                    <select name="status" id="projectStatusInput" value={editStatus} onChange={e => setEditStatus(e.target.value)}>
-                        <option>{t("projects_status_pending") || "Pending"}</option>
-                        <option>{t("projects_status_active") || "Active"}</option>
-                        <option>{t("projects_status_finished") || "Finished"}</option>
-                    </select>
-                </div>
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">calendar_view_week</span>{t("projects_phase") || "Design Phase"}</label>
-                    <select name="phase" id="projectPhaseInput" value={editPhase} onChange={e => setEditPhase(e.target.value)}>
-                        <option>{t("projects_phase_design") || "Design"}</option>
-                        <option>{t("projects_phase_construction_project") || "Construction project"}</option>
-                        <option>{t("projects_phase_execution") || "Execution"}</option>
-                        <option>{t("projects_phase_construction") || "Construction"}</option>
-                    </select>
-                </div>
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">calendar_today</span>{t("projects_start_date") || "Start Date"}</label>
-                    <input name="startDate" type="date" id="projectStartPDInput" value={editStartDate} onChange={e => setEditStartDate(e.target.value)} />
-                </div>
-                <div className="formFieldContainer">
-                    <label><span className="material-icons-round">calendar_month</span>{t("projects_finish_date") || "Finish Date"}</label>
-                    <input name="finishDate" type="date" id="projectFinishPDInput" value={editFinishDate} onChange={e => setEditFinishDate(e.target.value)} />
-                </div>
-                </div>
-                <div className="cancelAccept">
-                    <button
-                        type="button"
-                        className="cancelButton"
-                        onClick={() => closeModal('editProjectModal')}
-                    >
-                        {t("projects_cancel") || "Cancel"}
-                    </button>
-                    <button
-                        type="submit"
-                        className="acceptButton"
-                    >
-                        {t("projects_accept") || "Accept"}
-                    </button>
-                </div>
-            </form>
-        </dialog>
+        
         <dialog id="newToDoModal">
     <form className="userForm form-wide" id="newToDoForm" onSubmit={handleNewToDoSubmit}>
       <h2>{t("projects_add_task") || "Add Task"}</h2>
@@ -930,7 +787,11 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
         </div>
         <div className="formFieldContainer">
           <label><span className="material-icons-round">subject</span>{t("projects_description") || "Description"}</label>
-          <textarea name="description" cols={30} rows={5} placeholder={t("projects_description_placeholder") || "Description"} id="editToDoDescription" value={editToDoFields.description} onChange={handleEditToDoChange} />
+          <textarea name="description" cols={30} rows={5} placeholder={t("projects_description_placeholder") || "Description"}
+            id="editToDoDescription"
+            value={editToDoFields.description}
+            onChange={handleEditToDoChange}
+          />
         </div>
         <div className="formFieldContainer">
           <label><span className="material-icons-round">not_listed_location</span>{t("projects_status") || "Status"}</label>
@@ -1053,6 +914,13 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
           </div>
         </form>
       </dialog>
+      <EditProjectForm
+  isOpen={isEditModalOpen}
+  onClose={() => setIsEditModalOpen(false)}
+  project={projectState}
+  onSubmit={handleEditProject}
+  t={t}
+/>
     </div>
   );
 };
