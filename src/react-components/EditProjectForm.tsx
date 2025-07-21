@@ -212,12 +212,14 @@ export const EditProjectForm: React.FC<EditProjectFormProps> = ({
   // Combine project duration bar and todos for the calendar
   const projectTasks = (project.toDos || []).map(todo => ({
     ...todo,
-    id: todo.id || `${todo.title}-${todo.start_date || ""}-${todo.due_date || ""}`, // Fallback if id is missing
+    id: todo.id || `${todo.title}-${todo.start_date || ""}-${todo.due_date || ""}`,
     startDate: todo.start_date,
     dueDate: todo.due_date,
     completed: todo.isComplete ?? false,
     color: getToDoColor(todo),
     title: todo.title,
+    dependencies: Array.isArray(todo.dependencies) ? todo.dependencies : [],
+    rawToDo: todo, // <-- THIS IS THE KEY FOR ARROWS!
   }));
 
   return (

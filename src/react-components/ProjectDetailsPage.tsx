@@ -8,7 +8,9 @@ import { useTranslation } from "./LanguageContext";
 import UserCard from "./UserCard";
 import { SearchBox } from './SearchBox';
 import { ThreeViewer } from './ThreeViewer';
+import { InfoProjectForm } from "./InfoProjectForm";
 import { EditProjectForm } from "./EditProjectForm";
+import { companiesManagerInstance } from '../classes/CompaniesManager';
 
 
 interface Props {
@@ -18,7 +20,8 @@ interface Props {
 export function ProjectDetailsPage(props: Props) {
     const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = React.useState("");
-    const [isEditModalOpen, setIsEditModalOpen] = React.useState(false); // <-- Add this line
+    const [isInfoModalOpen, setIsInfoModalOpen] = React.useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
 
     // Helper to translate status and role
     const translateStatus = (status: string) => t(`projects_status_${status?.toLowerCase()}`) || status;
@@ -51,8 +54,14 @@ export function ProjectDetailsPage(props: Props) {
       return <div>Project not found.</div>;
     }
 
-    // Handler for opening the edit modal
-    const openEditModal = () => setIsEditModalOpen(true);
+    // Handler for opening the info modal
+    const openInfoModal = () => setIsInfoModalOpen(true);
+
+    // Handler for opening the edit modal from info modal
+    const openEditModal = () => {
+      setIsInfoModalOpen(false);
+      setTimeout(() => setIsEditModalOpen(true), 100); // slight delay for smooth UX
+    };
 
     // Handler for submitting the edit form
     const handleEditProject = async (updates: any) => {
@@ -416,13 +425,13 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
                 </p>
                 <div className="flex-row-gap-10">
                   <button
-                    id="editProject"
+                    id="infoProject"
                     className="buttonTertiary"
-                    onClick={openEditModal}
+                    onClick={openInfoModal}
                     style={{ width: 40, height: 40, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, padding: 0, minWidth: 0, border: "none", background: "var(--primary)", color: "white" }}
-                    title={t("projects_edit") || "Edit"}
+                    title={t("projects_info") || "Info"}
                   >
-                    <span className="material-icons-round">add</span>
+                    <span className="material-icons-round">info</span>
                   </button>
                   <button
                     id="deleteProjectBtn"
@@ -914,12 +923,23 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
           </div>
         </form>
       </dialog>
+      <InfoProjectForm
+  isOpen={isInfoModalOpen}
+  onClose={() => setIsInfoModalOpen(false)}
+  onEdit={openEditModal}
+  project={projectState}
+  t={t}
+  companies={companiesManagerInstance.getCompanies()}
+  users={usersManagerInstance.getUsers()}
+/>
       <EditProjectForm
   isOpen={isEditModalOpen}
   onClose={() => setIsEditModalOpen(false)}
   project={projectState}
   onSubmit={handleEditProject}
   t={t}
+  companies={companiesManagerInstance.getCompanies()}
+  users={usersManagerInstance.getUsers()}
 />
     </div>
   );
