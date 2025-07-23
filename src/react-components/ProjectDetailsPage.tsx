@@ -14,6 +14,7 @@ import { companiesManagerInstance } from '../classes/CompaniesManager';
 import { ToDoForm } from './ToDoForm';
 import { ItoDo } from '../classes/toDo';
 import { toDoManagerInstance } from '../classes/toDoManager';
+import { ProjectTasksList } from "./ProjectTaskList";
 
 
 interface Props {
@@ -307,14 +308,14 @@ const [editToDoFields, setEditToDoFields] = React.useState({
 
     // Handler for delete confirmation
     const handleConfirmDeleteToDo = () => {
-      if (toDoToDelete && projectState) {
-        projectState.toDos = projectState.toDos.filter(td => td.id !== toDoToDelete.id);
-        setToDos([...projectState.toDos]);
-        setToDoToDelete(null);
-        closeModal('DeleteTaskModal');
-        closeModal('editToDoModal');
-      }
-    };
+        if (toDoToDelete && projectState) {
+          projectState.toDos = projectState.toDos.filter(td => td.id !== toDoToDelete.id);
+          setToDos([...projectState.toDos]);
+          setToDoToDelete(null);
+          closeModal('DeleteTaskModal');
+          closeModal('editToDoModal');
+        }
+      };
 
     // State for assigning users
     const [assignUserModalOpen, setAssignUserModalOpen] = React.useState(false);
@@ -598,63 +599,31 @@ function getOtherTasks(project: any, excludeId: string | null = null) {
                       <span className="material-icons-round">group</span>
                     </button>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <SearchBox onValueChange={setToDoSearchQuery} style={{ minWidth: 180 }} placeholder={t("search_tasks") || "Search for tasks"} />
-                    </div>
-                    <button id="newToDoBtn" className="buttonTertiary" style={{ marginLeft: 8 }} onClick={() => setIsNewToDoOpen(true)}>
-                      <span className="material-icons-round">add</span>
-                    </button>
-                  </div>
+                  <button id="newToDoBtn" className="buttonTertiary" style={{ marginLeft: 8 }} onClick={() => setIsNewToDoOpen(true)}>
+                    <span className="material-icons-round">add</span>
+                  </button>
                 </div>
-                {/* To-Do List Container */}
-                <div
-                  id="toDoListContainer"
-                  ref={toDoListContainerRef}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    rowGap: 10,
-                    marginTop: 20
-                  }}
-                >
-                  {/* Render filtered To-Do list items reactively */}
-                  {filteredToDos.length === 0 && (
-                    <div style={{color: '#aaa'}}>
-                      {t("projects_no_todos")}
-                    </div>
-                  )}
-                  {filteredToDos.map((todo, idx) => {
-                    let statusClass = 'status-pending';
-                    switch (todo.status) {
-                      case 'Pending': statusClass = 'status-pending'; break;
-                      case 'In Progress': statusClass = 'status-inprogress'; break;
-                      case 'Completed': statusClass = 'status-completed'; break;
-                      case 'On Hold': statusClass = 'status-onhold'; break;
-                      default: statusClass = 'status-pending';
-                    }
-                    const responsibleUser = projectState && projectState.assignedUsers
-                      ? usersManagerInstance.getUsers().find(u => u.id === todo.assigned_to)
-                      : null;
-                    return (
-                      <div
-                        key={todo.id || idx}
-                        className={`todoItem ${statusClass}`}
-                        style={{ marginBottom: 0 }}
-                        onClick={() => { setSelectedToDo(todo); setIsEditToDoOpen(true); }}
-                      >
-                        <span className="todo-task-icon">
-                          <span className="material-icons-round">check_circle</span>
-                        </span>
-                        <span className="todo-task-value" style={{ fontWeight: 600 }}>{todo.title}</span>
-                        <span className="todo-task-value">{todo.priority}</span>
-                        <span className="todo-task-value">{responsibleUser ? `${responsibleUser.name} ${responsibleUser.surname}` : ''}</span>
-                        <span className="todo-task-value">{todo.due_date}</span>
-                        <span className="todo-task-delete" />
-                      </div>
-                    );
-                  })}
-                </div>
+                {/* --- Use ProjectTasksList here --- */}
+                <div className="todo-cards-list">
+    <ProjectTasksList
+      todos={toDos}
+      onEdit={todo => {
+        setSelectedToDo(todo);
+        setIsEditToDoOpen(true);
+      }}
+      updateTodo={async (id, updates) => {
+        // Find the todo and update it in projectState
+        const todo = projectState.toDos.find(td => td.id === id);
+        if (todo) {
+          const updated = { ...todo, ...updates, updated_at: new Date().toISOString() };
+          projectState.updateToDo(updated);
+          setToDos([...projectState.toDos]);
+          return updated; // <-- Return the updated todo to match Promise<ItoDo>
+        }
+        return Promise.reject(new Error("Todo not found"));
+      }}
+    />
+  </div>
               </div>
             )}
           </div>

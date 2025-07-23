@@ -2058,18 +2058,108 @@ input:focus, textarea:focus, select:focus {
   padding: 0;
 }
 
-.toDoForm {
-  padding: 24px;
-  background: transparent;
-  border: none;
-  box-shadow: none;
+/* Horizontal ToDoCard layout */
+.todo-card-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: var(--background-100);
+  margin-bottom: 8px;
+  min-height: 48px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: box-shadow 0.2s;
+  cursor: pointer;
   width: 100%;
   max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
 }
 
-.cancelAccept {
+.todo-card-row .todo-title {
+  font-weight: 600;
+  flex: 2 1 0;
+  min-width: 120px;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-card-row .todo-user {
+  flex: 1 1 0;
+  min-width: 100px;
+  color: #ccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-card-row .todo-date {
+  flex: 1 1 0;
+  min-width: 90px;
+  color: #bbb;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-card-row .todo-priority {
+  flex: 0 0 80px;
+  text-align: right;
+  color: var(--primary);
+  margin-left: auto;
+  margin-right: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-card-row .todo-status {
+  flex: 0 0 90px;
+  text-align: right;
+  color: var(--green);
+  margin-left: 10px;
+  margin-right: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-card-row .todo-checkbox-container {
+  flex: 0 0 auto;
+  margin-left: 20px;
+  margin-right: 20px;
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
+  align-items: center;
+}
+
+.todo-checkbox {
+  accent-color: var(--primary);
+  margin-left: 0;
+}
+
+/* Make the todo card list scrollable */
+.project-todo-card {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.todo-cards-list {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 400px; /* Or whatever fits your layout */
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.todo-card-row,
+.todoItem {
+  overflow: visible !important;
+  max-height: none !important;
 }

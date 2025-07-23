@@ -7,6 +7,7 @@ import { Modal, ConfirmModal } from './Modal';
 import { ToDoForm } from './ToDoForm';
 import { useTodos, useModal } from '../hooks/useTodos';
 import { ItoDo } from '../classes/toDo';
+import { ProjectTasksList } from "./ProjectTaskList";
 
 interface Props {
   projectsManager: ProjectsManager;
@@ -54,7 +55,6 @@ export function ToDoPage(props: Props) {
     try {
       await addTodo(todoData, selectedProjectForNewTodo || currentProject?.id);
       newTodoModal.closeModal();
-      setSelectedProjectForNewTodo(currentProject?.id || '');
     } catch (err) {
       console.error('Failed to create todo:', err);
     }
@@ -213,13 +213,14 @@ export function ToDoPage(props: Props) {
             <div className="dashboardCard calendar-fixed-size">
               <div className="cardHeader">
                 <h3>Gantt Calendar</h3>
+                {/* Project selector for filtering and creating tasks */}
                 {!currentProject && (
-                  <div className="calendar-project-selector">
+                  <div className="project-selector" style={{ marginBottom: 16 }}>
                     <label htmlFor="project-select">Project:</label>
-                    <select 
+                    <select
                       id="project-select"
                       value={selectedProjectForNewTodo}
-                      onChange={(e) => setSelectedProjectForNewTodo(e.target.value)}
+                      onChange={e => setSelectedProjectForNewTodo(e.target.value)}
                     >
                       <option value="">All Projects</option>
                       {props.projectsManager.list.map(project => (
@@ -269,109 +270,30 @@ export function ToDoPage(props: Props) {
 
           {/* Tasks List */}
           {viewMode === 'list' && (
-            <div className="todo-cards-list">
-              {!currentProject && (
-                <div className="dashboardCard">
-                  <div className="calendar-project-selector">
-                    <label htmlFor="project-select-list">Project:</label>
-                    <select 
-                      id="project-select-list"
-                      value={selectedProjectForNewTodo}
-                      onChange={(e) => setSelectedProjectForNewTodo(e.target.value)}
-                    >
-                      <option value="">All Projects</option>
-                      {props.projectsManager.list.map(project => (
-                        <option key={project.id} value={project.id}>
-                          {project.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-              <div className="dashboardCard todo-card">
-                <div className="todo-card-header">
-                  <h3 className="todo-card-title">Tasks</h3>
-                  <span className="user-count-row">
-                    <span className="material-icons-round">task</span>
-                    {todos.filter(todo => !selectedProjectForNewTodo || todo.project_id === selectedProjectForNewTodo).length} tasks
-                  </span>
-                </div>
-
-                {todos.filter(todo => !selectedProjectForNewTodo || todo.project_id === selectedProjectForNewTodo).length === 0 ? (
-                  <div className="todo-empty">
-                    No tasks found. Create your first task to get started.
-                  </div>
-                ) : (
-                  <>
-                    {/* Tasks Header */}
-                    <div className="todo-items-header">
-                      <div className="todo-task-icon"></div>
-                      <div className="todo-header-label">Title</div>
-                      <div className="todo-header-label">Status</div>
-                      <div className="todo-header-label">Priority</div>
-                      <div className="todo-header-label">Due Date</div>
-                      <div className="todo-header-label">Complete</div>
-                      <div className="todo-task-delete"></div>
-                    </div>
-
-                    {/* Tasks List */}
-                    {todos
-                      .filter(todo => !selectedProjectForNewTodo || todo.project_id === selectedProjectForNewTodo)
-                      .map((todo) => (
-                      <div 
-                        key={todo.id}
-                        className={`todoItem user-card-hover ${getStatusClass(todo.status)} ${todo.isComplete ? 'completed' : ''}`}
-                        onClick={() => openEditModal(todo)}
-                      >
-                        <div className="todo-task-icon">
-                          <span className="material-icons-round">task</span>
-                        </div>
-                        <div className="todo-task-value">
-                          <div className="todo-item-title-row">
-                            <h5 className={`todo-item-title ${todo.isComplete ? 'completed-text' : ''}`}>
-                              {todo.title}
-                            </h5>
-                          </div>
-                          {todo.description && (
-                            <div className="todo-item-desc">{todo.description}</div>
-                          )}
-                        </div>
-                        <div className="todo-task-value">{todo.status}</div>
-                        <div className="todo-task-value">{todo.priority}</div>
-                        <div className="todo-task-value">{formatDate(todo.due_date)}</div>
-                        <div className="todo-task-value">
-                          <label className="checkbox-container">
-                            <input
-                              type="checkbox"
-                              checked={todo.isComplete || false}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                handleToggleComplete(todo);
-                              }}
-                            />
-                            <span className="checkmark"></span>
-                          </label>
-                        </div>
-                        <div className="todo-task-delete">
-                          <button
-                            type="button"
-                            className="buttonTertiary"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openDeleteModal(todo);
-                            }}
-                            title="Delete task"
-                          >
-                            <span className="material-icons-round">delete</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </>
-                )}
+            <>
+              <div className="project-selector" style={{ marginBottom: 16 }}>
+                <label htmlFor="project-select">Project:</label>
+                <select
+                  id="project-select"
+                  value={selectedProjectForNewTodo}
+                  onChange={e => setSelectedProjectForNewTodo(e.target.value)}
+                >
+                  <option value="">All Projects</option>
+                  {props.projectsManager.list.map(project => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
+              <div className="todo-cards-list">
+                <ProjectTasksList
+                  todos={todos.filter(todo => !selectedProjectForNewTodo || todo.project_id === selectedProjectForNewTodo)}
+                  onEdit={openEditModal}
+                  updateTodo={updateTodo}
+                />
+              </div>
+            </>
           )}
         </div>
 

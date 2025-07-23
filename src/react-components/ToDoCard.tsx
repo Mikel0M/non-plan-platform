@@ -1,30 +1,38 @@
 import React from "react";
+import { ItoDo } from "../classes/toDo";
+import { usersManagerInstance } from "../classes/UsersManager";
 
 export interface ToDoCardProps {
-  toDo: {
-    id: string;
-    title: string;
-    description?: string;
-    dueDate?: string;
-    completed: boolean;
-    // Add other fields as needed
-  };
-  onToggleComplete?: (id: string) => void;
+  toDo: ItoDo;
+  onToggleComplete?: () => void;
+  onClick?: () => void;
 }
 
-const ToDoCard: React.FC<ToDoCardProps> = ({ toDo, onToggleComplete }) => {
+const ToDoCard: React.FC<ToDoCardProps> = ({ toDo, onToggleComplete, onClick }) => {
+  const responsibleUser = usersManagerInstance.getUsers().find(u => u.id === toDo.assigned_to);
+
   return (
-    <div className={`todo-card${toDo.completed ? " completed" : ""}`}> 
-      <div className="todo-card-header">
+    <div
+      className={`todoItem todo-card-row status-${toDo.status.replace(/\s+/g, '').toLowerCase()} priority-${toDo.priority.toLowerCase()}`}
+      onClick={onClick}
+    >
+      <span className="todo-title">{toDo.title}</span>
+      <span className="todo-user">{responsibleUser ? `${responsibleUser.name} ${responsibleUser.surname}` : ''}</span>
+      <span className="todo-date">{toDo.due_date}</span>
+      <span className="todo-priority">{toDo.priority}</span>
+      <span className="todo-status">{toDo.status}</span>
+      <span className="todo-checkbox-container">
         <input
           type="checkbox"
-          checked={toDo.completed}
-          onChange={() => onToggleComplete && onToggleComplete(toDo.id)}
+          checked={!!toDo.isComplete}
+          onClick={e => e.stopPropagation()} // Prevent card click/edit
+          onChange={() => {
+            onToggleComplete && onToggleComplete();
+          }}
+          className="todo-checkbox"
         />
-        <span className="todo-title">{toDo.title}</span>
-      </div>
-      {toDo.description && <div className="todo-desc">{toDo.description}</div>}
-      {toDo.dueDate && <div className="todo-due">Due: {toDo.dueDate}</div>}
+      </span>
+      <span className="todo-task-delete" />
     </div>
   );
 };
