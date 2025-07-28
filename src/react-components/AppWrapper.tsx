@@ -1,4 +1,7 @@
 import * as React from 'react';
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { app } from "../firebase";
+import LoginModal from "./LoginModal";
 import { usersManagerInstance } from '../classes/UsersManager';
 import { companiesManagerInstance } from '../classes/CompaniesManager';
 import { projectsManagerInstance } from '../classes/ProjectsManager';
@@ -12,19 +15,29 @@ export const AppWrapper: React.FC<AppWrapperProps> = ({ children }) => {
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
 
+    // --- Add auth state ---
+    const [user, setUser] = React.useState<User | null>(null);
+    const [checkingAuth, setCheckingAuth] = React.useState(true);
+
     React.useEffect(() => {
+        const auth = getAuth(app);
+        const unsubscribe = onAuthStateChanged(auth, (u) => {
+            setUser(u);
+            setCheckingAuth(false);
+        });
+        return unsubscribe;
+    }, []);
+
+    React.useEffect(() => {
+        if (!user) return;
         const initializeApp = async () => {
             try {
                 console.log('[AppWrapper] Initializing app data...');
-                
-                // Load users, companies, and projects at app startup
                 await usersManagerInstance.ensureUsersLoaded();
                 await companiesManagerInstance.ensureCompaniesLoaded();
                 await projectsManagerInstance.ensureProjectsLoaded();
-                
                 setIsInitialized(true);
                 console.log('[AppWrapper] App initialization complete');
-                
             } catch (error) {
                 console.error('[AppWrapper] Failed to initialize app:', error);
                 setError('Failed to load app data. Please refresh the page.');
@@ -32,9 +45,8 @@ export const AppWrapper: React.FC<AppWrapperProps> = ({ children }) => {
                 setIsLoading(false);
             }
         };
-
         initializeApp();
-    }, []);
+    }, [user]);
 
     // Auto-refresh users and companies when window regains focus (user switches back to tab)
     React.useEffect(() => {
@@ -57,6 +69,15 @@ export const AppWrapper: React.FC<AppWrapperProps> = ({ children }) => {
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, [isInitialized]);
+
+    if (checkingAuth) {
+        return null; // or a spinner
+    }
+
+    // Show login modal if not authenticated
+    if (!user) {
+        return <LoginModal open={true} onClose={() => {}} />;
+    }
 
     if (isLoading) {
         return (

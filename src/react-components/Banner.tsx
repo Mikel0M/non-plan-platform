@@ -1,26 +1,17 @@
 import * as React from "react";
 import { translations } from "../text/Language"// Assuming translations are imported
 import { useLanguage, useTranslation } from "./LanguageContext";
+import LoginModal from "./LoginModal";
+import { getAuth, signOut } from "firebase/auth";
+import { app } from "../firebase";
 
 export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
     const { language, setLanguage } = useLanguage();
     const { t } = useTranslation();
+    const [loginModalOpen, setLoginModalOpen] = React.useState(false);
 
-    const onLoginClick = () => {
-        const modal = document.getElementById("loginModal");
-        if (!(modal && modal instanceof HTMLDialogElement)) {
-            return;
-        }
-        modal.showModal(); // Show the modal dialog
-    };
-
-    const onLoginCloseClick = () => {
-        const modal = document.getElementById("loginModal");
-        if (!(modal && modal instanceof HTMLDialogElement)) {
-            return;
-        }
-        modal.close(); // Hides the modal dialog
-    };
+    const onLoginClick = () => setLoginModalOpen(true);
+    const onLoginCloseClick = () => setLoginModalOpen(false);
 
     const toggleLanguageMenu = () => {
         const menu = document.getElementById("languageMenu");
@@ -37,6 +28,9 @@ export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
             menu.classList.add("hidden"); // Hide the menu
         }
     };
+
+    const auth = getAuth(app);
+    const user = auth.currentUser;
 
     return (
         <div id="banner" style={{ display: "flex", flexDirection: "column" }}>
@@ -138,125 +132,7 @@ export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
                             </div>
                         </form>
                     </dialog>
-                    <dialog
-                        id="loginModal"
-                        style={{ textAlign: "center", alignItems: "center" }}
-                    >
-                        <form className="loginForm" id="loginForm">
-                            <div
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <h2 style={{ paddingLeft: 30 }} />
-                                <div className="cancelAccept">
-                                    <button
-                                        type="button"
-                                        onClick={onLoginCloseClick}
-                                        className="buttonSecondary"
-                                        style={{
-                                            width: 40,
-                                            height: 40,
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <span className="material-icons-round" style={{ fontSize: 24 }}>
-                                            close
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                            <img
-                                id="non-plan-logo"
-                                src="./assets/non-plan-logo.svg"
-                                alt="non-plan"
-                                style={{ paddingTop: 20, transform: "scale(0.8)" }}
-                            />
-                            <h1 style={{ padding: 20 }}>{t("start_loginWelcome1")}</h1>
-                            <h4>{t("start_loginWelcome2")}</h4>
-                            <div className="loginCard">
-                                <div className="formFieldContainer">
-                                    <input
-                                        name="UserName"
-                                        type="string"
-                                        placeholder={t("start_UsernameEmail") + "*"}
-                                    />
-                                </div>
-                                <div className="formFieldContainer">
-                                    <input
-                                        name="UserPassword"
-                                        type="string"
-                                        placeholder={t("start_Password") + "*"}
-                                    />
-                                </div>
-                                <button
-                                    id="forgotPassword"
-                                    className="buttonTextBlue"
-                                    onClick={onLoginCloseClick}
-                                    style={{
-                                        fontSize: "var(--fontSizeSmall)",
-                                        padding: 0,
-                                        display: "flex",
-                                        alignItems: "start",
-                                        borderRadius: 45,
-                                        width: 400,
-                                        height: 45,
-                                        justifyContent: "left",
-                                    }}
-                                >
-                                    {t("start_forgotPassword")}
-                                </button>
-                                <button
-                                    type="button"
-                                    id="logINBtn"
-                                    className="loginButton"
-                                    onClick={onLoginCloseClick}
-                                    style={{
-                                        width: 400,
-                                        padding: 0,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        textAlign: "center",
-                                        borderRadius: 45,
-                                        height: 45,
-                                        justifyContent: "center",
-                                    }}
-                                >
-                                    {t("start_continue")}
-                                </button>
-                            </div>
-                            <div style={{ display: "flex", flexDirection: "row", paddingLeft: 20 }}>
-                                <h5
-                                    style={{ display: "flex", width: 300 }}
-                                >
-                                    {t("start_newAccount")}
-                                </h5>
-                                <button
-                                    id="newAccountBtn"
-                                    className="buttonTextBlue"
-                                    type="button"
-                                    onClick={onLoginCloseClick}
-                                    style={{
-                                        fontSize: "var(--fontSizeMedium)",
-                                        padding: 0,
-                                        display: "flex",
-                                        alignItems: "start",
-                                        borderRadius: 45,
-                                        width: 400,
-                                        height: 45,
-                                        justifyContent: "left",
-                                    }}
-                                >
-                                    Sign in
-                                </button>
-                            </div>
-                        </form>
-                    </dialog>
+                    <LoginModal open={loginModalOpen} onClose={onLoginCloseClick} />
                     <button
                         id="infoLogINBtn"
                         onClick={onLoginClick}
@@ -275,6 +151,26 @@ export function Banner({ customStyle }: { customStyle?: React.CSSProperties }) {
                     >
                         LOG IN
                     </button>
+                    {user && (
+                        <button
+                            onClick={() => signOut(auth)}
+                            className="buttonTertiary"
+                            style={{
+                                fontSize: "var(--fontSizeMedium)",
+                                display: "flex",
+                                alignItems: "center",
+                                borderRadius: 45,
+                                width: 100,
+                                height: 45,
+                                justifyContent: "center",
+                                position: "relative",
+                                left: "-50px",
+                                marginLeft: 8,
+                            }}
+                        >
+                            LOG OUT
+                        </button>
+                    )}
                 </div>
             </header>
         </div>
